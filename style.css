@@ -1,0 +1,710 @@
+/* Classic 2017 Theme */
+* {
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+body {
+    background-color: #f2f4f5;
+    margin: 0;
+    padding: 0;
+    color: #393b3d;
+}
+
+.navbar {
+    background-color: #0074BD;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    height: 40px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo-container {
+    padding: 10px 15px;
+    margin-left: -15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.navbar img.logo {
+    height: 20px;
+    filter: invert(1);
+    mix-blend-mode: screen;
+}
+
+/* Search Bar */
+.search-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 0 20px;
+}
+
+.search-bar {
+    width: 100%;
+    max-width: 600px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    font-size: 14px;
+    outline: none;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    position: relative;
+    gap: 15px;
+}
+
+.container {
+    max-width: 95%;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.box {
+    background-color: white;
+    border: 1px solid #c3c3c3;
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.greeting-title {
+    font-size: 36px;
+    font-weight: bold;
+    margin: 10px 0 30px 0;
+}
+
+h2.section-title {
+    font-size: 24px;
+    font-weight: normal;
+    border-bottom: 1px solid #c3c3c3;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.games-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.game-card {
+    background: white;
+    border: 1px solid #c3c3c3;
+    border-radius: 4px;
+    width: 300px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.game-card:hover {
+    border-color: #00a2ff;
+    transform: scale(1.03);
+}
+
+.quick-play-btn-square {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background-color: #02b757;
+    color: white;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    opacity: 0;
+    transition: 0.2s;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.game-card:hover .quick-play-btn-square {
+    opacity: 1;
+}
+
+.quick-play-btn-square:hover {
+    background-color: #019c4a;
+    transform: scale(1.05);
+}
+
+.game-thumbnail {
+    width: 100%;
+    height: 168px;
+    object-fit: cover;
+    border-bottom: 1px solid #e3e3e3;
+}
+
+.account-item {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 15px !important;
+    border-bottom: 1px solid #eee;
+}
+
+.account-item img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.account-item .remove-acc-btn {
+    opacity: 0;
+    color: #ff5a5a;
+    transition: 0.2s;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.account-item:hover .remove-acc-btn {
+    opacity: 1;
+}
+
+.account-item .remove-acc-btn:hover {
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+.account-item.active {
+    background-color: #e6f3ff;
+    border-left: 3px solid #00a2ff;
+}
+
+.nav-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.game-info {
+    padding: 12px;
+}
+
+/* Genre Filter Pills */
+.genre-filters {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 0 20px 0;
+    margin-bottom: 20px;
+    scrollbar-width: none;
+    /* Hide scrollbar Firefox */
+}
+
+.genre-filters::-webkit-scrollbar {
+    display: none;
+    /* Hide scrollbar Chrome/Safari */
+}
+
+.genre-pill,
+.market-filter-pill {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 8px 16px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid #dcdcdc;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+
+.genre-pill:hover,
+.market-filter-pill:hover {
+    background-color: #e0e0e0;
+}
+
+.genre-pill.active,
+.market-filter-pill.active {
+    background-color: #0074BD;
+    color: white;
+    border-color: #0074BD;
+}
+
+.dark-mode .genre-pill,
+.dark-mode .market-filter-pill {
+    background-color: #1b1c1e;
+    color: #ccc;
+    border-color: #333;
+}
+
+.dark-mode .genre-pill:hover,
+.dark-mode .market-filter-pill:hover {
+    background-color: #2b2b2b;
+    color: #fff;
+}
+
+.dark-mode .genre-pill.active,
+.dark-mode .market-filter-pill.active {
+    background-color: #0074BD;
+    color: white;
+    border-color: #0074BD;
+}
+
+.nav-tabs {
+    display: flex;
+    gap: 20px;
+    margin-left: 20px;
+}
+
+.nav-tab {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 5px;
+    border-bottom: 3px solid transparent;
+    transition: 0.2s;
+}
+
+.nav-tab:hover {
+    color: white;
+}
+
+.nav-tab.active {
+    color: white;
+    border-bottom-color: white;
+}
+
+.marketplace-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.item-card {
+    background: white;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #e3e3e3;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.item-card:hover {
+    border-color: #00a2ff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.item-thumbnail {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    background: #f2f4f5;
+}
+
+.item-info {
+    padding: 10px;
+}
+
+.item-title {
+    font-size: 14px;
+    font-weight: normal;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-price {
+    color: #02b757;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.genre-pill.active {
+    background-color: #0074BD;
+    color: white;
+    border-color: #005a91;
+}
+
+.game-title {
+    font-size: 20px;
+    font-weight: normal;
+    margin: 0 0 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.game-layout {
+    display: flex;
+    gap: 20px;
+}
+
+.main-column {
+    flex: 2;
+}
+
+.side-column {
+    flex: 1;
+    padding: 20px;
+    background-color: #fdfdfd;
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+}
+
+.big-thumbnail {
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid #c3c3c3;
+}
+
+.description-box {
+    margin-top: 20px;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.game-header-side h2 {
+    margin: 0 0 5px 0;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.game-header-side p {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    color: #757575;
+}
+
+.creator-link {
+    color: #00a2ff;
+    text-decoration: none;
+    font-weight: normal;
+}
+
+.creator-link:hover {
+    text-decoration: underline;
+}
+
+/* Action Buttons Row */
+.action-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    height: 45px;
+}
+
+.play-btn {
+    flex: 1;
+    background-color: #02b757;
+    color: white;
+    border-radius: 4px;
+    border: 1px solid #019c4a;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.play-btn:hover {
+    background-color: #019c4a;
+}
+
+.play-btn .material-icons {
+    font-size: 36px;
+}
+
+.fav-btn {
+    width: 45px;
+    background-color: #f1c40f;
+    color: white;
+    border-radius: 4px;
+    border: 1px solid #d4ac0d;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.2s;
+}
+
+.fav-btn:hover {
+    background-color: #d4ac0d;
+}
+
+.fav-btn .material-icons {
+    font-size: 28px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    color: #757575;
+}
+
+.stat-row span:last-child {
+    color: #393b3d;
+    font-weight: normal;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* SETTINGS & NOTIFICATIONS */
+.dropdown-container {
+    position: relative;
+    display: inline-block;
+    display: flex;
+    align-items: center;
+}
+
+.nav-icon {
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+    user-select: none;
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 35px;
+    background: white;
+    border: 1px solid #c3c3c3;
+    border-radius: 4px;
+    padding: 5px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    min-width: 200px;
+    z-index: 100;
+    color: #393b3d;
+}
+
+.dropdown-menu button {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 12px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    color: inherit;
+}
+
+.dropdown-menu button:hover {
+    background-color: #f2f4f5;
+}
+
+.notification-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-title {
+    font-weight: normal;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.notification-desc {
+    font-size: 14px;
+    color: #757575;
+}
+
+/* DARK MODE STYLES */
+body.dark-mode {
+    background-color: #111214;
+    color: #e1e1e1;
+}
+
+.dark-mode .box {
+    background-color: #232527;
+    border-color: #111;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .game-card {
+    background-color: #232527;
+    border-color: #111;
+}
+
+.dark-mode .game-thumbnail {
+    border-bottom-color: #111;
+}
+
+.dark-mode .game-title {
+    color: #fff;
+}
+
+.dark-mode h2.section-title {
+    border-bottom-color: #333;
+    color: #fff;
+}
+
+.dark-mode .side-column {
+    background-color: #1b1c1e;
+    border-color: #111;
+}
+
+.dark-mode .stat-row {
+    border-bottom-color: #333;
+}
+
+.dark-mode .stat-row span:last-child {
+    color: #fff;
+}
+
+.dark-mode .big-thumbnail {
+    border-color: #111;
+}
+
+.dark-mode .dropdown-menu {
+    background-color: #232527;
+    border-color: #111;
+    color: #e1e1e1;
+}
+
+.dark-mode .dropdown-menu button:hover {
+    background-color: #111214;
+}
+
+.dark-mode .notification-item {
+    border-bottom-color: #333;
+}
+
+.dark-mode .notification-desc {
+    color: #aaa;
+}
+
+.dark-mode .search-bar {
+    background-color: #1b1c1e;
+    color: white;
+    border: 1px solid #333;
+}
+
+.dark-mode .account-item {
+    border-bottom-color: #333;
+}
+
+.dark-mode .account-item.active {
+    background-color: #2b3a4a;
+}
+
+.dark-mode .login-input {
+    background-color: #1b1c1e;
+    color: white;
+    border-color: #444;
+}
+
+/* Dark Mode Marketplace */
+.dark-mode .item-card {
+    background-color: #232527;
+    border-color: #111;
+}
+
+.dark-mode .item-thumbnail {
+    background-color: #1b1c1e;
+}
+
+.dark-mode .item-title {
+    color: #fff;
+}
+
+.dark-mode .marketplace-type {
+    color: #e1e1e1 !important;
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .modal-content {
+    background-color: #232527;
+    color: white;
+}
+
+.roblox-modal-logo {
+    height: 50px;
+    margin-bottom: 15px;
+}
+
+.close-modal {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #757575;
+}
+
+.close-modal:hover {
+    color: #393b3d;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.download-btn {
+    display: inline-block;
+    background-color: #02b757;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    border: 1px solid #019c4a;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.download-btn:hover {
+    background-color: #019c4a;
+}

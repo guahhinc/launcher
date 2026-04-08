@@ -24,718 +24,7 @@
     <link rel="icon" type="image/png" sizes="512x512"
         href="https://raw.githubusercontent.com/guahhinc/launcher/main/betterblox.png">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/guahhinc/launcher/main/betterblox.png">
-    <style>
-        /* Classic 2017 Theme */
-        * {
-            font-family: 'Source Sans Pro', sans-serif;
-        }
-
-        body {
-            background-color: #f2f4f5;
-            margin: 0;
-            padding: 0;
-            color: #393b3d;
-        }
-
-        .navbar {
-            background-color: #0074BD;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            height: 40px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .logo-container {
-            padding: 10px 15px;
-            margin-left: -15px;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .navbar img.logo {
-            height: 20px;
-            filter: invert(1);
-            mix-blend-mode: screen;
-        }
-
-        /* Search Bar */
-        .search-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            padding: 0 20px;
-        }
-
-        .search-bar {
-            width: 100%;
-            max-width: 600px;
-            padding: 6px 12px;
-            border-radius: 4px;
-            border: none;
-            font-size: 14px;
-            outline: none;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            position: relative;
-            gap: 15px;
-        }
-
-        .container {
-            max-width: 95%;
-            margin: 20px auto;
-            padding: 20px;
-        }
-
-        .box {
-            background-color: white;
-            border: 1px solid #c3c3c3;
-            border-radius: 4px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        .greeting-title {
-            font-size: 36px;
-            font-weight: bold;
-            margin: 10px 0 30px 0;
-        }
-
-        h2.section-title {
-            font-size: 24px;
-            font-weight: normal;
-            border-bottom: 1px solid #c3c3c3;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .games-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .game-card {
-            background: white;
-            border: 1px solid #c3c3c3;
-            border-radius: 4px;
-            width: 300px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            position: relative;
-            transition: transform 0.2s, border-color 0.2s;
-        }
-
-        .game-card:hover {
-            border-color: #00a2ff;
-            transform: scale(1.03);
-        }
-
-        .quick-play-btn-square {
-            position: absolute;
-            bottom: 12px;
-            right: 12px;
-            background-color: #02b757;
-            color: white;
-            width: 38px;
-            height: 38px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 4px;
-            opacity: 0;
-            transition: 0.2s;
-            z-index: 10;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .game-card:hover .quick-play-btn-square {
-            opacity: 1;
-        }
-
-        .quick-play-btn-square:hover {
-            background-color: #019c4a;
-            transform: scale(1.05);
-        }
-
-        .game-thumbnail {
-            width: 100%;
-            height: 168px;
-            object-fit: cover;
-            border-bottom: 1px solid #e3e3e3;
-        }
-
-        .account-item {
-            display: flex !important;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 15px !important;
-            border-bottom: 1px solid #eee;
-        }
-
-        .account-item img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .account-item .remove-acc-btn {
-            opacity: 0;
-            color: #ff5a5a;
-            transition: 0.2s;
-            padding: 5px;
-            border-radius: 4px;
-        }
-
-        .account-item:hover .remove-acc-btn {
-            opacity: 1;
-        }
-
-        .account-item .remove-acc-btn:hover {
-            background-color: rgba(255, 0, 0, 0.1);
-        }
-
-        .account-item.active {
-            background-color: #e6f3ff;
-            border-left: 3px solid #00a2ff;
-        }
-
-        .nav-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.8);
-        }
-
-        .game-info {
-            padding: 12px;
-        }
-
-        /* Genre Filter Pills */
-        .genre-filters {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 10px 0 20px 0;
-            margin-bottom: 20px;
-            scrollbar-width: none;
-            /* Hide scrollbar Firefox */
-        }
-
-        .genre-filters::-webkit-scrollbar {
-            display: none;
-            /* Hide scrollbar Chrome/Safari */
-        }
-
-        .genre-pill,
-        .market-filter-pill {
-            background-color: #f0f0f0;
-            color: #333;
-            padding: 8px 16px;
-            border-radius: 3px;
-            font-size: 14px;
-            font-weight: 600;
-            border: 1px solid #dcdcdc;
-            cursor: pointer;
-            transition: 0.2s;
-            white-space: nowrap;
-        }
-
-        .genre-pill:hover,
-        .market-filter-pill:hover {
-            background-color: #e0e0e0;
-        }
-
-        .genre-pill.active,
-        .market-filter-pill.active {
-            background-color: #0074BD;
-            color: white;
-            border-color: #0074BD;
-        }
-
-        .dark-mode .genre-pill,
-        .dark-mode .market-filter-pill {
-            background-color: #1b1c1e;
-            color: #ccc;
-            border-color: #333;
-        }
-
-        .dark-mode .genre-pill:hover,
-        .dark-mode .market-filter-pill:hover {
-            background-color: #2b2b2b;
-            color: #fff;
-        }
-
-        .dark-mode .genre-pill.active,
-        .dark-mode .market-filter-pill.active {
-            background-color: #0074BD;
-            color: white;
-            border-color: #0074BD;
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 20px;
-            margin-left: 20px;
-        }
-
-        .nav-tab {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            padding: 10px 5px;
-            border-bottom: 3px solid transparent;
-            transition: 0.2s;
-        }
-
-        .nav-tab:hover {
-            color: white;
-        }
-
-        .nav-tab.active {
-            color: white;
-            border-bottom-color: white;
-        }
-
-        .marketplace-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .item-card {
-            background: white;
-            border-radius: 4px;
-            overflow: hidden;
-            border: 1px solid #e3e3e3;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .item-card:hover {
-            border-color: #00a2ff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .item-thumbnail {
-            width: 100%;
-            aspect-ratio: 1/1;
-            object-fit: cover;
-            background: #f2f4f5;
-        }
-
-        .item-info {
-            padding: 10px;
-        }
-
-        .item-title {
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .item-price {
-            color: #02b757;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .genre-pill.active {
-            background-color: #0074BD;
-            color: white;
-            border-color: #005a91;
-        }
-
-        .game-title {
-            font-size: 20px;
-            font-weight: normal;
-            margin: 0 0 5px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .game-layout {
-            display: flex;
-            gap: 20px;
-        }
-
-        .main-column {
-            flex: 2;
-        }
-
-        .side-column {
-            flex: 1;
-            padding: 20px;
-            background-color: #fdfdfd;
-            border: 1px solid #e3e3e3;
-            border-radius: 4px;
-        }
-
-        .big-thumbnail {
-            width: 100%;
-            border-radius: 4px;
-            border: 1px solid #c3c3c3;
-        }
-
-        .description-box {
-            margin-top: 20px;
-            font-size: 14px;
-            line-height: 1.5;
-            white-space: pre-wrap;
-        }
-
-        .game-header-side h2 {
-            margin: 0 0 5px 0;
-            font-size: 32px;
-            font-weight: bold;
-        }
-
-        .game-header-side p {
-            margin: 0 0 15px 0;
-            font-size: 14px;
-            color: #757575;
-        }
-
-        .creator-link {
-            color: #00a2ff;
-            text-decoration: none;
-            font-weight: normal;
-        }
-
-        .creator-link:hover {
-            text-decoration: underline;
-        }
-
-        /* Action Buttons Row */
-        .action-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            height: 45px;
-        }
-
-        .play-btn {
-            flex: 1;
-            background-color: #02b757;
-            color: white;
-            border-radius: 4px;
-            border: 1px solid #019c4a;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            transition: 0.2s;
-        }
-
-        .play-btn:hover {
-            background-color: #019c4a;
-        }
-
-        .play-btn .material-icons {
-            font-size: 36px;
-        }
-
-        .fav-btn {
-            width: 45px;
-            background-color: #f1c40f;
-            color: white;
-            border-radius: 4px;
-            border: 1px solid #d4ac0d;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: 0.2s;
-        }
-
-        .fav-btn:hover {
-            background-color: #d4ac0d;
-        }
-
-        .fav-btn .material-icons {
-            font-size: 28px;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-            color: #757575;
-        }
-
-        .stat-row span:last-child {
-            color: #393b3d;
-            font-weight: normal;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* SETTINGS & NOTIFICATIONS */
-        .dropdown-container {
-            position: relative;
-            display: inline-block;
-            display: flex;
-            align-items: center;
-        }
-
-        .nav-icon {
-            font-size: 24px;
-            cursor: pointer;
-            color: white;
-            user-select: none;
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            right: 0;
-            top: 35px;
-            background: white;
-            border: 1px solid #c3c3c3;
-            border-radius: 4px;
-            padding: 5px 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            min-width: 200px;
-            z-index: 100;
-            color: #393b3d;
-        }
-
-        .dropdown-menu button {
-            width: 100%;
-            text-align: left;
-            background: none;
-            border: none;
-            padding: 12px 15px;
-            cursor: pointer;
-            font-size: 16px;
-            color: inherit;
-        }
-
-        .dropdown-menu button:hover {
-            background-color: #f2f4f5;
-        }
-
-        .notification-item {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .notification-item:last-child {
-            border-bottom: none;
-        }
-
-        .notification-title {
-            font-weight: normal;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        .notification-desc {
-            font-size: 14px;
-            color: #757575;
-        }
-
-        /* DARK MODE STYLES */
-        body.dark-mode {
-            background-color: #111214;
-            color: #e1e1e1;
-        }
-
-        .dark-mode .box {
-            background-color: #232527;
-            border-color: #111;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .dark-mode .game-card {
-            background-color: #232527;
-            border-color: #111;
-        }
-
-        .dark-mode .game-thumbnail {
-            border-bottom-color: #111;
-        }
-
-        .dark-mode .game-title {
-            color: #fff;
-        }
-
-        .dark-mode h2.section-title {
-            border-bottom-color: #333;
-            color: #fff;
-        }
-
-        .dark-mode .side-column {
-            background-color: #1b1c1e;
-            border-color: #111;
-        }
-
-        .dark-mode .stat-row {
-            border-bottom-color: #333;
-        }
-
-        .dark-mode .stat-row span:last-child {
-            color: #fff;
-        }
-
-        .dark-mode .big-thumbnail {
-            border-color: #111;
-        }
-
-        .dark-mode .dropdown-menu {
-            background-color: #232527;
-            border-color: #111;
-            color: #e1e1e1;
-        }
-
-        .dark-mode .dropdown-menu button:hover {
-            background-color: #111214;
-        }
-
-        .dark-mode .notification-item {
-            border-bottom-color: #333;
-        }
-
-        .dark-mode .notification-desc {
-            color: #aaa;
-        }
-
-        .dark-mode .search-bar {
-            background-color: #1b1c1e;
-            color: white;
-            border: 1px solid #333;
-        }
-
-        .dark-mode .account-item {
-            border-bottom-color: #333;
-        }
-
-        .dark-mode .account-item.active {
-            background-color: #2b3a4a;
-        }
-
-        .dark-mode .login-input {
-            background-color: #1b1c1e;
-            color: white;
-            border-color: #444;
-        }
-
-        /* Dark Mode Marketplace */
-        .dark-mode .item-card {
-            background-color: #232527;
-            border-color: #111;
-        }
-
-        .dark-mode .item-thumbnail {
-            background-color: #1b1c1e;
-        }
-
-        .dark-mode .item-title {
-            color: #fff;
-        }
-
-        .dark-mode .marketplace-type {
-            color: #e1e1e1 !important;
-        }
-
-        /* Modal Styles */
-        .modal {
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            width: 400px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .dark-mode .modal-content {
-            background-color: #232527;
-            color: white;
-        }
-
-        .roblox-modal-logo {
-            height: 50px;
-            margin-bottom: 15px;
-        }
-
-        .close-modal {
-            position: absolute;
-            right: 15px;
-            top: 10px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #757575;
-        }
-
-        .close-modal:hover {
-            color: #393b3d;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-
-        .download-btn {
-            display: inline-block;
-            background-color: #02b757;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: bold;
-            border: 1px solid #019c4a;
-            font-size: 14px;
-            transition: 0.2s;
-        }
-
-        .download-btn:hover {
-            background-color: #019c4a;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -748,8 +37,8 @@
         </div>
 
         <div class="nav-tabs">
-            <button class="nav-tab active" id="tab-home" onclick="showPage('home')">Home</button>
-            <button class="nav-tab" id="tab-marketplace" onclick="showPage('marketplace')">Marketplace</button>
+            <button class="nav-tab active" id="tab-home" onclick="showPage('home')">Home & Games</button>
+            <button class="nav-tab" id="tab-marketplace" onclick="showPage('marketplace')">Catalog</button>
         </div>
 
         <div class="search-container">
@@ -781,6 +70,7 @@
                     <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
                     <button onclick="changeName()">Change Name</button>
                     <button onclick="clearRecent()">Clear Recently Played</button>
+                    <button onclick="clearTasteProfile()">Clear Recommendation Knowledge</button>
                     <button
                         onclick="window.open('https://www.roblox.com/users/inventory#!/accessories', '_blank')">Inventory</button>
                     <button onclick="window.open('https://en.help.roblox.com/hc/en-us', '_blank')">Help &
@@ -802,7 +92,7 @@
         </div>
 
         <div id="recommendations-section" class="hidden">
-            <h2 class="section-title">Recommended for You</h2>
+            <h2 class="section-title">Recommended For You</h2>
             <div class="games-grid" id="recommendations-container" style="margin-bottom: 40px;">
             </div>
         </div>
@@ -1278,11 +568,22 @@
                 </div>
             </div>
 
+            <div class="game-card" onclick="showPage('game-detail-sbb')">
+                <img class="game-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-ec5fc17541e2ab2233bbfe151926261c/768/432/Image/Webp/noFilter"
+                    alt="SBB Marathon">
+                <div class="game-info">
+                    <h3 class="game-title">SBB Marathon</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Maelstronomer</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <div id="marketplace" class="container page-view hidden">
-        <h2 class="section-title">Marketplace</h2>
+        <h2 class="section-title">Catalog</h2>
 
         <div class="genre-filters">
             <button class="market-filter-pill active" onclick="filterMarketplace('All')">All</button>
@@ -1290,6 +591,8 @@
             <button class="market-filter-pill" onclick="filterMarketplace('Characters')">Characters</button>
             <button class="market-filter-pill" onclick="filterMarketplace('Classic Shirts')">Classic Shirts</button>
             <button class="market-filter-pill" onclick="filterMarketplace('Hair')">Hair</button>
+            <button class="market-filter-pill" onclick="filterMarketplace('Head Accessories')">Head Accessories</button>
+            <button class="market-filter-pill" onclick="filterMarketplace('Face Accessories')">Face Accessories</button>
         </div>
 
         <div class="marketplace-grid">
@@ -1417,6 +720,88 @@
                     <div class="item-price">Free</div>
                 </div>
             </div>
+            <div class="item-card" data-type="Heads"
+                onclick="window.open('https://www.roblox.com/bundles/265345/Shiny-Teeth', '_blank')">
+                <img class="item-thumbnail"
+                    src="https://tr.rbxcdn.com/30DAY-DynamicHeadCostume-5F46B2B5246923F6F798E61FCD7C52D7-Png/420/420/DynamicHeadCostume/Webp/noFilter"
+                    alt="Shiny Teeth">
+                <div class="item-info">
+                    <div class="item-title">Shiny Teeth</div>
+                    <div style="font-size: 11px; color: #757575; margin-bottom: 5px;">Created By <span
+                            style="color: #00a2ff;">Roblox</span></div>
+                    <div class="marketplace-type" style="font-size: 12px; color: #333; margin-bottom: 10px;">Heads</div>
+                    <div class="item-price">Free</div>
+                </div>
+            </div>
+            <div class="item-card" data-type="Characters"
+                onclick="window.open('https://www.roblox.com/bundles/291/Zombie', '_blank')">
+                <img class="item-thumbnail"
+                    src="https://tr.rbxcdn.com/30DAY-Avatar-40BACF4CADF3D14B50AEA27A3E9C0BD2-Png/420/420/Avatar/Webp/noFilter"
+                    alt="Zombie">
+                <div class="item-info">
+                    <div class="item-title">Zombie</div>
+                    <div style="font-size: 11px; color: #757575; margin-bottom: 5px;">Created By <span
+                            style="color: #00a2ff;">Roblox</span></div>
+                    <div class="marketplace-type" style="font-size: 12px; color: #333; margin-bottom: 10px;">Characters
+                    </div>
+                    <div class="item-price">R$540</div>
+                </div>
+            </div>
+            <div class="item-card" data-type="Head Accessories"
+                onclick="window.open('https://www.roblox.com/catalog/89615321/Hungry-Dino', '_blank')">
+                <img class="item-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-eb524b5c18681fcb6bd9eea0ed73b93a/420/420/Hat/Webp/noFilter"
+                    alt="Hungry Dino">
+                <div class="item-info">
+                    <div class="item-title">Hungry Dino</div>
+                    <div style="font-size: 11px; color: #757575; margin-bottom: 5px;">Created By <span
+                            style="color: #00a2ff;">Roblox</span></div>
+                    <div class="marketplace-type" style="font-size: 12px; color: #333; margin-bottom: 10px;">Head
+                        Accessories</div>
+                    <div class="item-price">R$90</div>
+                </div>
+            </div>
+            <div class="item-card" data-type="Face Accessories"
+                onclick="window.open('https://www.roblox.com/catalog/1192464705/Bear-Face-Mask', '_blank')">
+                <img class="item-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-917523b22d0f8dcbb78e0cef6d36f164/420/420/FaceAccessory/Webp/noFilter"
+                    alt="Bear Face Mask">
+                <div class="item-info">
+                    <div class="item-title">Bear Face Mask</div>
+                    <div style="font-size: 11px; color: #757575; margin-bottom: 5px;">Created By <span
+                            style="color: #00a2ff;">Roblox</span></div>
+                    <div class="marketplace-type" style="font-size: 12px; color: #333; margin-bottom: 10px;">Face
+                        Accessories</div>
+                    <div class="item-price">R$95</div>
+                </div>
+            </div>
+            <div class="item-card" data-type="Head Accessories"
+                onclick="window.open('https://www.roblox.com/catalog/139152472/Holiday-Crown', '_blank')">
+                <img class="item-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-5e83c4d89d3c839b8917b45e9d8163a9/420/420/Hat/Webp/noFilter"
+                    alt="Holiday Crown">
+                <div class="item-info">
+                    <div class="item-title">Holiday Crown</div>
+                    <div style="font-size: 11px; color: #757575; margin-bottom: 5px;">Created By <span
+                            style="color: #00a2ff;">Roblox</span></div>
+                    <div class="marketplace-type" style="font-size: 12px; color: #333; margin-bottom: 10px;">Head
+                        Accessories</div>
+                    <div class="item-price">R$90</div>
+                </div>
+            </div>
+            <div class="item-card" data-type="Hair"
+                onclick="window.open('https://www.roblox.com/catalog/456225312/Midnight-Motor-Magnifique', '_blank')">
+                <img class="item-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-1b40608dab7d6fe6cfdd8017e23d19ad/420/420/HairAccessory/Webp/noFilter"
+                    alt="Midnight Motor Magnifique">
+                <div class="item-info">
+                    <div class="item-title">Midnight Motor Magnifique</div>
+                    <div style="font-size: 11px; color: #757575; margin-bottom: 5px;">Created By <span
+                            style="color: #00a2ff;">Roblox</span></div>
+                    <div class="marketplace-type" style="font-size: 12px; color: #333; margin-bottom: 10px;">Hair</div>
+                    <div class="item-price">R$495</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1448,7 +833,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>23 Jan 2020</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Horror</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Horror</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-piggy">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('piggy', 'roblox://placeId=4623386862')" class="play-btn"><span
@@ -1481,8 +868,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>21 Jan 2019</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Horror / Survival</span>
-                    </div>
+                    <div class="stat-row"><span>Genre</span><span>Horror / Survival</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-3008">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('3008', 'roblox://placeId=2768379856')" class="play-btn"><span
@@ -1523,8 +911,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>22 Nov 2020</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival /
-                            Infection</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival / Infection</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-smile">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('smile', 'roblox://placeId=5985232436')" class="play-btn"><span
@@ -1562,7 +951,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>29 July 2015</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-epic">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('epic', 'roblox://placeId=277751860')" class="play-btn"><span
@@ -1595,7 +986,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>11 Apr 2017</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-shark">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('shark', 'roblox://placeId=734159876')" class="play-btn"><span
@@ -1634,7 +1027,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>31 Aug 2015</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>FPS</span></div>
+                    <div class="stat-row"><span>Genre</span><span>FPS</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-phantom">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('phantom', 'roblox://placeId=292439477')" class="play-btn"><span
@@ -1674,7 +1069,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>11 Jan 2026</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-murdurr">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('murdurr', 'roblox://placeId=79735281630764')"
@@ -1723,7 +1120,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>13 July 2023</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Action</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Action</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-untitled">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('untitled', 'roblox://placeId=14044547200')"
@@ -1757,7 +1156,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>19 Oct 2020</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Simulation</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Simulation</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-retro">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('retro', 'roblox://placeId=5846386835')" class="play-btn"><span
@@ -1796,7 +1197,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>27 May 2023</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Action</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Action</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-combat">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('combat', 'roblox://placeId=13559635034')"
@@ -1835,7 +1238,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>20 Dec 2025</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Casual</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Casual</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-knockout">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('knockout', 'roblox://placeId=136764190843219')"
@@ -1880,7 +1285,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>15 July 2017</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Roleplay</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Roleplay</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-adopt">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('adopt', 'roblox://placeId=920587237')" class="play-btn"><span
@@ -1922,7 +1329,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>26 Mar 2025</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Simulation</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Simulation</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-garden">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('garden', 'roblox://placeId=126884695634066')"
@@ -1952,7 +1361,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>29 Mar 2008</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-disaster">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('disaster', 'roblox://placeId=189707')" class="play-btn"><span
@@ -2000,7 +1411,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>29 Nov 2019</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Sports</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Sports</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-golf">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('golf', 'roblox://placeId=4468711919')" class="play-btn"><span
@@ -2040,7 +1453,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>18 jan 2014</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-mm2">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('mm2', 'roblox://placeId=142823291')" class="play-btn"><span
@@ -2074,7 +1489,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>4 Feb 2022</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Simulation</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Simulation</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-pet99">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('pet99', 'roblox://placeId=8737899170')" class="play-btn"><span
@@ -2116,8 +1533,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>17 Apr 2022</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Action / Fighting</span>
-                    </div>
+                    <div class="stat-row"><span>Genre</span><span>Action / Fighting</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-jujutsu">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('jujutsu', 'roblox://placeId=9391468976')"
@@ -2164,7 +1582,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>1 Mar 2026</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Puzzle</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Puzzle</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-overtone">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('overtone', 'roblox://placeId=102779234672656')"
@@ -2207,8 +1627,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>18 Oct 2008</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Obby / Platformer</span>
-                    </div>
+                    <div class="stat-row"><span>Genre</span><span>Obby / Platformer</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-coolobby">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('coolobby', 'roblox://placeId=4927387')" class="play-btn"><span
@@ -2241,8 +1662,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>2 Jan 2012</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Simulation /
-                            Tycoon</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Simulation / Tycoon</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-theme-park">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('theme-park', 'roblox://placeId=69184822')"
@@ -2277,7 +1699,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>21 Mar 2018</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Simulation</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Simulation</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-bee-swarm">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('bee-swarm', 'roblox://placeId=1537690962')"
@@ -2321,7 +1745,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>21 Mar 2026</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-homer">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('homer', 'roblox://placeId=108124933582607')"
@@ -2366,7 +1792,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>30 May 2025</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Social</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Social</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-podcasts">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('podcasts', 'roblox://placeId=110584310129887')"
@@ -2396,8 +1824,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>14 Dec 2017</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Obby / Platformer</span>
-                    </div>
+                    <div class="stat-row"><span>Genre</span><span>Obby / Platformer</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-ballaxe">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('ballaxe', 'roblox://placeId=1242235469')"
@@ -2447,7 +1876,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>9 Jan 2025</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-robots2">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('robots2', 'roblox://placeId=103980862080286')"
@@ -2481,8 +1912,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>18 Jun 2018</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Obby / Platformer</span>
-                    </div>
+                    <div class="stat-row"><span>Genre</span><span>Obby / Platformer</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-tower">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('tower', 'roblox://placeId=1962086868')" class="play-btn"><span
@@ -2513,8 +1945,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>1 May 2014</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Action / Open
-                            World</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Action / Open World</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-prison">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('prison', 'roblox://placeId=155615604')" class="play-btn"><span
@@ -2555,7 +1988,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>1 May 2025</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Simulation</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Simulation</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-prospecting">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('prospecting', 'roblox://placeId=129827112113663')"
@@ -2593,8 +2028,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>18 Jan 2015</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Party / Casual</span>
-                    </div>
+                    <div class="stat-row"><span>Genre</span><span>Party / Casual</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-hide-seek">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('hide-seek', 'roblox://placeId=205224386')"
@@ -2629,7 +2065,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>2 May 2015</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-horrific-housing">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('horrific-housing', 'roblox://placeId=263761432')"
@@ -2682,7 +2120,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>20 Apr 2020</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Roleplay</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Roleplay</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-brookhaven">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('brookhaven', 'roblox://placeId=4924922222')"
@@ -2728,7 +2168,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>26 May 2024</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Shooter</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Shooter</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-rivals">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('rivals', 'roblox://placeId=17625359962')"
@@ -2766,8 +2208,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>30 Jun 2017</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival / Action</span>
-                    </div>
+                    <div class="stat-row"><span>Genre</span><span>Survival / Action</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-flee-facility">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('flee-facility', 'roblox://placeId=893973440')"
@@ -2810,7 +2253,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>15 Aug 2010</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-flood-escape">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('flood-escape', 'roblox://placeId=32990482')"
@@ -2841,8 +2286,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>6 Mar 2016</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Adventure / Puzzle</span>
-                    </div>
+                    <div class="stat-row"><span>Genre</span><span>Adventure / Puzzle</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-cone">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('cone', 'roblox://placeId=378223328')" class="play-btn"><span
@@ -2873,7 +2319,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>16 Jun 2021</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Physics Sim</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Physics Sim</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-fling">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('fling', 'roblox://placeId=6961824067')" class="play-btn"><span
@@ -2906,8 +2354,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>13 Jan 2019</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Exploration /
-                            Comedy</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Exploration / Comedy</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-eg">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('eg', 'roblox://placeId=2747834912')" class="play-btn"><span
@@ -2939,8 +2388,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>16 Oct 2017</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Obby / Platformer</span>
-                    </div>
+                    <div class="stat-row"><span>Genre</span><span>Obby / Platformer</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-robot64">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('robot64', 'roblox://placeId=1111083356')"
@@ -2972,8 +2422,9 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>3 Nov 2021</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Adventure / Scavenger
-                            Hunt</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Adventure / Scavenger Hunt</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-markers">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('markers', 'roblox://placeId=7896264844')"
@@ -3005,13 +2456,57 @@
                     </div>
 
                     <div class="stat-row"><span>Created</span><span>26 June 2024</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Simulation</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Simulation</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-deforestation">0</span></div>
 
                     <div class="action-row">
                         <a href="#" onclick="launchGame('deforestation', 'roblox://placeId=18216750738')"
                             class="play-btn"><span class="material-icons">play_arrow</span></a>
                         <button class="fav-btn" data-game="deforestation"
                             onclick="toggleFavorite('deforestation', this)"><span
+                                class="material-icons">star_border</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-sbb" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail"
+                        src="https://tr.rbxcdn.com/180DAY-ec5fc17541e2ab2233bbfe151926261c/768/432/Image/Webp/noFilter"
+                        alt="SBB Marathon">
+                    <div class="description-box">From the creator of Super Blocky Ball,
+
+                        All 15 maps put together!
+
+                        Now with backwards racing!!
+
+                        April 9 2021 update:
+                        - faster controls
+                        - centered shift lock camera
+                        - shorter jump delay
+                        - added dev times</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>SBB Marathon</h2>
+                        <p>By <a href="https://www.roblox.com/users/487805/profile/" target="_blank"
+                                class="creator-link">Maelstronomer</a></p>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>8 May 2020</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Sports / Racing</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
+                            id="times-played-sbb">0</span></div>
+
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('sbb', 'roblox://placeId=4999134338')" class="play-btn"><span
+                                class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="sbb" onclick="toggleFavorite('sbb', this)"><span
                                 class="material-icons">star_border</span></button>
                     </div>
                 </div>
@@ -3053,629 +2548,7 @@
         </div>
     </div>
 
-    <script>
-        const gamesData = {
-            'piggy': { title: 'Piggy', developer: 'MiniToon', genre: 'Horror', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-9a6167eabc17cccd69511f6213e94b03/768/432/Image/Webp/noFilter', page: 'game-detail-piggy', launchUrl: 'roblox://placeId=4623386862', description: 'Do you have what it takes to escape Piggy and uncover the mysteries surrounding the beast?' },
-            '3008': { title: '3008', developer: 'uglyburger0', genre: 'Horror', year: 2019, img: 'https://tr.rbxcdn.com/180DAY-1393cf4ea0d2cb4e97bc0a05938822e6/768/432/Image/Webp/noFilter', page: 'game-detail-3008', launchUrl: 'roblox://placeId=2768379856', description: 'Wander through the vast horror land of home hardware located within 3008-1. Build a base, survive from employees.' },
-            'smile': { title: 'Infectious Smile', developer: 'Laughable_Sponge', genre: 'Survival', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-792578a0730d4dcf6dbac9fd15de33e0/768/432/Image/Webp/noFilter', page: 'game-detail-smile', launchUrl: 'roblox://placeId=5985232436', description: 'As ordinary people we all strive to find true happiness in life. But no... not like this.... something is REALLY off about this...' },
-            'epic': { title: 'Epic Minigames ✨', developer: 'TypicalType', genre: 'Party', year: 2015, img: 'https://tr.rbxcdn.com/180DAY-7ee35d19e13cefd730129cf99268792c/768/432/Image/Webp/noFilter', page: 'game-detail-epic', launchUrl: 'roblox://placeId=277751860', description: 'Enjoy a collection of 140 unique and exciting minigames! Level up and earn coins by winning rounds.' },
-            'shark': { title: 'SharkBite Classic 🦈', developer: 'Abracadabra', genre: 'Survival', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-8af54bd04cab100361501d9c38211f4e/768/432/Image/Webp/noFilter', page: 'game-detail-shark', launchUrl: 'roblox://placeId=734159876', description: 'Join your friends in a battle of survival against the boat eating shark. Use your weapon to fight off the shark.' },
-            'phantom': { title: 'Phantom Forces', developer: 'Stylis Studios', genre: 'Shooter', year: 2015, img: 'https://tr.rbxcdn.com/180DAY-bf6f7058336de36c002dc58d33e9c101/768/432/Image/Webp/noFilter', page: 'game-detail-phantom', launchUrl: 'roblox://placeId=292439477', description: 'Intense tactical first person shooter. Thank you for continuing support for PF for over 10 years!' },
-            'murdurr': { title: 'MurDurr', developer: 'braxworks', genre: 'Horror', year: 2025, img: 'https://tr.rbxcdn.com/180DAY-bfdb4c4f5bad565d32ce203e375dc288/768/432/Image/Webp/noFilter', page: 'game-detail-murdurr', launchUrl: 'roblox://placeId=79735281630764', description: 'Durr has turned evil… and he is hungry. Inspired by orange the killer and you vs homer.' },
-            'untitled': { title: 'untitled tag game', developer: 'typical_type', genre: 'Party', year: 2023, img: 'https://tr.rbxcdn.com/180DAY-cd834c110aa147df9bc89a79fece32ea/768/432/Image/Webp/noFilter', page: 'game-detail-untitled', launchUrl: 'roblox://placeId=14044547200', description: 'Play variations of tag with advanced movement, such as climbing, sliding, rolling, and vaulting!' },
-            'retro': { title: 'RetroStudio', developer: 'Retro Dev', genre: 'Social', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-9e4fae118735bc44c824d52e7c7799f0/768/432/Image/Webp/noFilter', page: 'game-detail-retro', launchUrl: 'roblox://placeId=5846386835', description: 'Create and play your own classic Roblox games. Simulation of any time period between 2009 and 2015.' },
-            'combat': { title: 'Combat Initiation', developer: 'Combat Devs', genre: 'Action', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-6c257588551cecd73f962d8165e6b9f1/768/432/Image/Webp/noFilter', page: 'game-detail-combat', launchUrl: 'roblox://placeId=13559635034', description: 'Fast-paced arena brickbattle game. Choose your weapons and tools to ascend the spire of death.' },
-            'knockout': { title: 'Knockout! 🐧', developer: 'braxworks', genre: 'Party', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-f75a05b251c9fdb0c762a3bd997a2901/768/432/Image/Webp/noFilter', page: 'game-detail-knockout', launchUrl: 'roblox://placeId=136764190843219', description: 'Out-maneuver to be the last penguin standing! Predicted movement and ice survival.' },
-            'adopt': { title: 'Adopt Me!', developer: 'Uplift Games', genre: 'RPG', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-dc544ac25d03f485d6a58f79efc51ed2/768/432/Image/Webp/noFilter', page: 'game-detail-adopt', launchUrl: 'roblox://placeId=920587237', description: 'Adopt and raise pets, trade and collect legendary pets, build your dream home, and roleplay with friends!' },
-            'garden': { title: 'Grow a Garden 🌶️', developer: 'The Garden Game', genre: 'Simulation', year: 2025, img: 'https://tr.rbxcdn.com/180DAY-edd534a57d371273de1f5d94c2b30583/768/432/Image/Webp/noFilter', page: 'game-detail-garden', launchUrl: 'roblox://placeId=126884695634066', description: 'Plant seeds, collect profits, and flex your fruits. Your garden grows even while you are offline.' },
-            'disaster': { title: 'Natural Disaster Survival', developer: 'Stickmasterluke', genre: 'Survival', year: 2008, img: 'https://tr.rbxcdn.com/180DAY-7ea7065a02f8cff80f8b0270a9ad2d3b/768/432/Image/Webp/noFilter', page: 'game-detail-disaster', launchUrl: 'roblox://placeId=189707', description: 'Quickly, run around in circles! Your life depends on it in this disaster survival classic.' },
-            'golf': { title: 'Super Golf!', developer: 'Nosniy Games', genre: 'Sports', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-28f42fb6bbd4bc16216d6d95b0c9a468/768/432/Image/Webp/noFilter', page: 'game-detail-golf', launchUrl: 'roblox://placeId=4468711919', description: 'Play against others on a variety of exciting courses, unlock cool rewards, and customize your ball.' },
-            'mm2': { title: 'Murder Mystery 2', developer: 'Nikilis', genre: 'Horror', year: 2014, img: 'https://tr.rbxcdn.com/180DAY-0a5d0d27fd60272237a869af29cbccb1/768/432/Image/Webp/noFilter', page: 'game-detail-mm2', launchUrl: 'roblox://placeId=142823291', description: 'Can you solve the mystery and survive each round? Run and hide from the murderer.' },
-            'pet99': { title: 'Pet Simulator 99', developer: 'BIG Games Pets', genre: 'Simulation', year: 2022, img: 'https://tr.rbxcdn.com/180DAY-59a871f1639e5a55e3c49273a0b34d6a/768/432/Image/Webp/noFilter', page: 'game-detail-pet99', launchUrl: 'roblox://placeId=8737899170', description: 'Create an army of the coolest pets! They will help you get rich. 2,000+ pets to collect!' },
-            'jujutsu': { title: 'Jujutsu Shenanigans', developer: 'Tze', genre: 'Action', year: 2022, img: 'https://tr.rbxcdn.com/180DAY-decec85a41b80e4ac0beca8bc2952a7f/768/432/Image/Webp/noFilter', page: 'game-detail-jujutsu', launchUrl: 'roblox://placeId=9391468976', description: 'Combat craziness based on many battleground games. Destruction and jujutsu shenanigans.' },
-            'overtone': { title: 'Overtone', developer: 'Overtone Projects', genre: 'Puzzle', year: 2026, img: 'https://tr.rbxcdn.com/180DAY-3523135b8468cb8c6663e021da5f78b5/768/432/Image/Webp/noFilter', page: 'game-detail-overtone', launchUrl: 'roblox://placeId=102779234672656', description: 'Multiplayer color card game where you mix translucent color cards to match a target.' },
-            'coolobby': { title: '[250] Cool Obby 2', developer: 'deadalready', genre: 'Obby', year: 2008, img: 'https://tr.rbxcdn.com/180DAY-44d4a95190453bbd14a4db3f84410433/768/432/Image/Webp/noFilter', page: 'game-detail-coolobby', launchUrl: 'roblox://placeId=4927387', description: 'Simplistic obby game with 5 themes to discover and explore over 250 stages.' },
-            'theme-park': { title: 'Theme Park Tycoon 2', developer: 'Den_S', genre: 'Simulation', year: 2012, img: 'https://tr.rbxcdn.com/180DAY-19d37e8208a9d390075158433face2cd/768/432/Image/Webp/noFilter', page: 'game-detail-theme-park', launchUrl: 'roblox://placeId=69184822', description: 'Build your own theme park together with your friends! Construct rides and roller coasters.' },
-            'bee-swarm': { title: 'Bee Swarm Simulator', developer: 'Onett', genre: 'Simulation', year: 2018, img: 'https://tr.rbxcdn.com/180DAY-0458177ee998eb2ffd882ad46207e4c5/768/432/Image/Webp/noFilter', page: 'game-detail-bee-swarm', launchUrl: 'roblox://placeId=1537690962', description: 'Grow your own swarm of bees, collect pollen, and make honey! Meet friendly bears and complete quests.' },
-            'homer': { title: 'You VS Homer', developer: 'dgk enterprises', genre: 'Horror', year: 2026, img: 'https://tr.rbxcdn.com/180DAY-6f65dd5173f9f11b026acbb7aef20740/768/432/Image/Webp/noFilter', page: 'game-detail-homer', launchUrl: 'roblox://placeId=108124933582607', description: 'Survive and hide as a Bart or become a Homer and seek. Adapted from classic Retro Studio tests.' },
-            'podcasts': { title: '[VC] Podcasts 🔊', developer: 'NDO Studios', genre: 'Social', year: 2026, img: 'https://tr.rbxcdn.com/180DAY-dd6388f386387a2d1d6f942eca4856fb/768/432/Image/Webp/noFilter', page: 'game-detail-podcasts', launchUrl: 'roblox://placeId=110584310129887', description: 'Grab a mic, create stages, and record hilarious debates in your own virtual podcast studio.' },
-            'ballaxe': { title: 'ball and axe', developer: 'DoctorPurpl', genre: 'Obby', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-a9d6d065668af8b6e08e7813168f18fa/768/432/Image/Webp/noFilter', page: 'game-detail-ballaxe', launchUrl: 'roblox://placeId=1242235469', description: 'Videogame. Advanced obby mechanics with ball and axe.' },
-            'robots2': { title: 'Build to Survive the Robots 2', developer: 'SheriffTaco', genre: 'Survival', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-8d80a4c1885d64b1d8903f6dfb6c485f/768/432/Image/Webp/noFilter', page: 'game-detail-robots2', launchUrl: 'roblox://placeId=103980862080286', description: 'Build a base before nightfall and survive the robots until morning. If you die, you become a robot!' },
-            'tower': { title: 'Tower of Hell', developer: 'YXceptional Studios', genre: 'Obby', year: 2018, img: 'https://tr.rbxcdn.com/180DAY-20a372111085c33de1e64004e4dca1d8/768/432/Image/Webp/noFilter', page: 'game-detail-tower', launchUrl: 'roblox://placeId=1962086868', description: 'Randomly generated obby with absolutely no checkpoints. Can you be the first to reach the top?' },
-            'prison': { title: 'Prison Life', developer: 'Aesthetical', genre: 'Action', year: 2014, img: 'https://tr.rbxcdn.com/180DAY-7e4ac70bc3496ea7e4d039f3cd60b6a4/768/432/Image/Webp/noFilter', page: 'game-detail-prison', launchUrl: 'roblox://placeId=155615604', description: 'Live life as a prisoner and escape, or become a guard and defend the prison!' },
-            'prospecting': { title: 'Prospecting! 💎', developer: 'Prospecting!', genre: 'Simulation', year: 2025, img: 'https://tr.rbxcdn.com/180DAY-e18515933a4c6208e2176d2f0351f12c/768/432/Image/Webp/noFilter', page: 'game-detail-prospecting', launchUrl: 'roblox://placeId=129827112113663', description: 'Grab your pan and head to the river in a relaxing gold-panning adventure! Discover rare gems.' },
-            'hide-seek': { title: 'Hide and Seek Extreme', developer: 'Tim7775', genre: 'Party', year: 2015, img: 'https://tr.rbxcdn.com/180DAY-c17b13acb45f07ec1517623969b81ec0/768/432/Image/Webp/noFilter', page: 'game-detail-hide-seek', launchUrl: 'roblox://placeId=205224386', description: 'Classic hide and seek with special abilities. At the start of the game, one player is chosen as It.' },
-            'horrific-housing': { title: 'Horrific Housing', developer: 'CookieScript', genre: 'Party', year: 2015, img: 'https://tr.rbxcdn.com/180DAY-a361113feebd101cd29510bfe3f610dd/768/432/Image/Webp/noFilter', page: 'game-detail-horrific-housing', launchUrl: 'roblox://placeId=263761432', description: 'Survive a laundry list of exciting disasters on a floating plot of land. Out-live your opponents!' },
-            'brookhaven': { title: 'Brookhaven 🏡RP', developer: 'Wolfpaq', genre: 'RPG', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-a4fb7b266105fa038d92bf425d58ee53/768/432/Image/Webp/noFilter', page: 'game-detail-brookhaven', launchUrl: 'roblox://placeId=4924922222', description: 'Roleplay with like minded people. Own amazing houses, drive cool vehicles, and explore the city.' },
-            'rivals': { title: 'RIVALS', developer: 'Nosniy Games', genre: 'Shooter', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-eb783deba3b661ff753ab9be4089188d/768/432/Image/Webp/noFilter', page: 'game-detail-rivals', launchUrl: 'roblox://placeId=17625359962', description: 'Intense first person shooter duels. First to 5 wins. available on desktop and consoles.' },
-            'flee-facility': { title: 'Flee the Facility', developer: 'MrWindy', genre: 'Horror', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-f3e6bca490d2d655cde4894e502e5989/768/432/Image/Webp/noFilter', page: 'game-detail-flee-facility', launchUrl: 'roblox://placeId=893973440', description: 'Run, hide, escape the murderer. Team up with fellow survivors to hack computers and escape!' },
-            'flood-escape': { title: 'Flood Escape: Classic', developer: 'Crazyblox', genre: 'Survival', year: 2010, img: 'https://tr.rbxcdn.com/180DAY-0317908608680ca27ade363ac0feb6c0/768/432/Image/Webp/noFilter', page: 'game-detail-flood-escape', launchUrl: 'roblox://placeId=32990482', description: 'Locked in a flooding facility, push buttons and find the way out before the flood takes you!' },
-            'cone': { title: 'CONE', developer: 'Defaultio', genre: 'Adventure / Puzzle', year: 2016, img: 'https://tr.rbxcdn.com/180DAY-3286dd029217592b49d830707e0bfcfa/768/432/Image/Webp/noFilter', page: 'game-detail-cone', launchUrl: 'roblox://placeId=378223328', description: 'CONE' },
-            'fling': { title: 'Fling Things and People', developer: 'Horomori', genre: 'Physics Sim', year: 2021, img: 'https://tr.rbxcdn.com/180DAY-20254f91c5043de87f6cc8adb218c624/768/432/Image/Webp/noFilter', page: 'game-detail-fling', launchUrl: 'roblox://placeId=6961824067', description: 'A place where you can play with or fling various objects and players.' },
-            'eg': { title: '🥚 Eg!', developer: 'Nimblz', genre: 'Exploration / Comedy', year: 2019, img: 'https://tr.rbxcdn.com/180DAY-96097b5752ff62cf014a214f427ba0c1/768/432/Image/Webp/noFilter', page: 'game-detail-eg', launchUrl: 'roblox://placeId=2747834912', description: '🥚 eg! is a silly social game about being an egg with legs! Explore a vast world with your friends!' },
-            'robot64': { title: 'Robot 64', developer: 'zKevin', genre: 'Obby / Platformer', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-f1e38127294c9673738306a5d002b372/768/432/Image/Webp/noFilter', page: 'game-detail-robot64', launchUrl: 'roblox://placeId=1111083356', description: 'Robot 64 is a modern 3D Platformer with a large array of movements. Explore wacky worlds and collect ice cream!' },
-            'markers': { title: 'Find the Markers', developer: 'markers epic memers', genre: 'Adventure / Scavenger Hunt', year: 2021, img: 'https://tr.rbxcdn.com/180DAY-666aa1bde55fa5557827dc36e10c6c8d/768/432/Image/Webp/noFilter', page: 'game-detail-markers', launchUrl: 'roblox://placeId=7896264844', description: 'this game was highly inspired by a lot of "find the" games, specifically "find the domos". Marker originated from the web series known as \'battle for dream island\'.' },
-            'deforestation': { title: 'deforestation therapy || alpha', developer: 'The Fartering Few', genre: 'Simulation', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-fedb2d4f532dbb6ccc21a9050a9dc750/768/432/Image/Webp/noFilter', page: 'game-detail-deforestation', launchUrl: 'roblox://placeId=18216750738', description: 'a calm game where you (and your friends) deforest a forest full of trees! The game doesn\'t try to stress or rush you, just keep you in peace of mind. Uses classic roblox and 90s asthetics.' }
-        };
-
-
-
-        function searchGames() {
-            const input = document.getElementById('search-bar').value.toLowerCase();
-            const cards = document.querySelectorAll('#all-games-container .game-card');
-
-            // Reset filters when searching
-            document.querySelectorAll('.genre-pill').forEach(p => p.classList.remove('active'));
-            document.querySelector('.genre-pill[onclick*="All"]').classList.add('active');
-
-            cards.forEach(card => {
-                const titleElement = card.querySelector('.game-title');
-                if (!titleElement) return;
-                const title = titleElement.textContent.toLowerCase();
-                const devContainer = card.querySelector('.game-info span');
-                const developer = devContainer ? devContainer.textContent.toLowerCase() : '';
-
-                if (title.includes(input) || developer.includes(input)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-            showPage('home');
-        }
-
-        function filterByGenre(genre) {
-            const cards = document.querySelectorAll('#all-games-container .game-card');
-            const pills = document.querySelectorAll('.genre-pill');
-
-            pills.forEach(pill => {
-                pill.classList.remove('active');
-                if (pill.textContent.includes(genre)) pill.classList.add('active');
-            });
-
-            cards.forEach(card => {
-                const title = card.querySelector('.game-title').textContent;
-                // Find game key by title
-                const gameKey = Object.keys(gamesData).find(key => gamesData[key].title === title);
-                const game = gamesData[gameKey];
-
-                if (genre === 'All' || (game && (game.genre.includes(genre)))) {
-                    card.style.display = 'block';
-                } else if (genre === 'Action' && game && (game.genre === 'Fighting' || game.genre === 'Action')) {
-                    card.style.display = 'block';
-                } else if (genre === 'Party' && game && (game.genre === 'Social' || game.genre === 'Party')) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        function updateTasteProfile(gameKey) {
-            const game = gamesData[gameKey];
-            if (!game) return;
-
-            let taste = JSON.parse(localStorage.getItem('betterblox_taste') || '{"genres":{}, "years":{}, "devs":{}}');
-
-            taste.genres[game.genre] = (taste.genres[game.genre] || 0) + 1;
-            taste.years[game.year] = (taste.years[game.year] || 0) + 1;
-            taste.devs[game.developer] = (taste.devs[game.developer] || 0) + 1;
-
-            localStorage.setItem('betterblox_taste', JSON.stringify(taste));
-            loadRecommendations();
-        }
-
-        function loadRecommendations() {
-            const taste = JSON.parse(localStorage.getItem('betterblox_taste') || 'null');
-            const history = JSON.parse(localStorage.getItem('betterblox_recent_history') || '[]');
-            const container = document.getElementById('recommendations-container');
-            const section = document.getElementById('recommendations-section');
-
-            if (!taste) {
-                section.classList.add('hidden');
-                return;
-            }
-
-            container.innerHTML = '';
-
-            // Related Genres Map (Synergy clusters)
-            const genreWeights = {
-                'Horror': ['Survival', 'Action', 'Psychological'],
-                'Survival': ['Horror', 'Action', 'Simulation'],
-                'Party': ['Social', 'Casual', 'Classic'],
-                'Social': ['Party', 'RPG', 'Roleplay'],
-                'Simulation': ['Tycoon', 'Casual', 'Bee Swarm', 'Pet Simulator'],
-                'Action': ['Fighting', 'Shooter', 'Survival', 'Combat'],
-                'Fighting': ['Action', 'Competitive'],
-                'Shooter': ['Action', 'Tactical', 'FPS'],
-                'Obby': ['Casual', 'Platformer', 'Physics'],
-                'RPG': ['Social', 'Adventure'],
-                'Tycoon': ['Simulation', 'Economy']
-            };
-
-            // Common Title Keywords to track preference
-            const titleKeywords = ['Simulator', 'Classic', 'Tycoon', 'Obby', 'Horror', 'Survival', 'RP', 'Roleplay', 'Story', 'Minigames', 'Fighting', 'Action', 'Mystery', 'Physics', 'Platformer', 'Exploration', 'Puzzle'];
-
-            // Score all games
-            let scores = [];
-            Object.keys(gamesData).forEach(key => {
-                const game = gamesData[key];
-
-                // Do not recommend if currently in Recently Played
-                if (history.includes(key)) return;
-
-                let score = 0;
-
-                // 1. Direct Keyword Matches (Highest weights)
-                if (taste.genres[game.genre]) score += taste.genres[game.genre] * 18;
-                if (taste.devs[game.developer]) score += taste.devs[game.developer] * 12;
-
-                // 2. Title Keyword Matching (New!)
-                const recentTitles = history.slice(0, 3).map(k => gamesData[k].title.toLowerCase());
-                const targetTitle = game.title.toLowerCase();
-
-                titleKeywords.forEach(word => {
-                    const lowWord = word.toLowerCase();
-                    // If you played games with this word in the title recently
-                    if (recentTitles.some(t => t.includes(lowWord)) && targetTitle.includes(lowWord)) {
-                        score += 25; // Significant boost for name matching (e.g. Simulator -> Simulator)
-                    }
-                });
-
-                // 3. Genre Synergy Cluster
-                Object.keys(taste.genres).forEach(favGenre => {
-                    const related = genreWeights[favGenre] || [];
-                    if (related.includes(game.genre)) {
-                        score += taste.genres[favGenre] * 6;
-                    }
-                });
-
-                // 4. Era Span Analysis (±3 year window)
-                Object.keys(taste.years).forEach(favYear => {
-                    const diff = Math.abs(parseInt(favYear) - game.year);
-                    if (diff === 0) score += taste.years[favYear] * 10; // Exact Year
-                    else if (diff <= 2) score += taste.years[favYear] * 5; // Close Era
-                    else if (diff <= 4) score += taste.years[favYear] * 2; // Broad Era
-                });
-
-                // 5. Developer Consistency
-                const recentDevs = history.slice(0, 3).map(k => gamesData[k].developer);
-                if (recentDevs.includes(game.developer)) score += 15;
-
-                // 6. Random discovery jitter
-                score += Math.random() * 8;
-
-                scores.push({ key, score });
-            });
-
-            // Sort by score
-            scores.sort((a, b) => b.score - a.score);
-
-            const topGames = scores.filter(s => s.score > 10).slice(0, 6);
-
-            if (topGames.length === 0) {
-                section.classList.add('hidden');
-                return;
-            }
-
-            section.classList.remove('hidden');
-            topGames.forEach(item => {
-                const game = gamesData[item.key];
-                const card = document.createElement('div');
-                card.className = 'game-card';
-                card.onclick = () => showPage(game.page);
-                card.innerHTML = `
-                    <div style="position: relative;">
-                        <img class="game-thumbnail" src="${game.img}" alt="${game.title}">
-                    </div>
-                    <div class="game-info">
-                        <h3 class="game-title">${game.title}</h3>
-                        <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">${game.developer}</span></div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function loadGreetingTime() {
-            const hour = new Date().getHours();
-            let greeting = "Good Evening";
-            if (hour < 12) greeting = "Good Morning";
-            else if (hour < 18) greeting = "Good Afternoon";
-            document.getElementById('greeting-time').textContent = greeting;
-        }
-
-        function loadName() {
-            const savedName = localStorage.getItem('betterbloxName') || 'Robloxian';
-            document.getElementById('greeting-name').textContent = savedName;
-        }
-
-        function changeName() {
-            const newName = prompt("Enter your new name:");
-            if (newName && newName.trim() !== "") {
-                localStorage.setItem('betterbloxName', newName.trim());
-                loadName();
-            }
-            document.getElementById('settings-menu').classList.add('hidden');
-        }
-
-        function loadTheme() {
-            const isDark = localStorage.getItem('betterbloxDarkMode') === 'true';
-            if (isDark) document.body.classList.add('dark-mode');
-        }
-
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('betterbloxDarkMode', isDark);
-            document.getElementById('settings-menu').classList.add('hidden');
-        }
-
-        function renderFavorites() {
-            const favs = JSON.parse(localStorage.getItem('betterbloxFavs') || '[]');
-            const container = document.getElementById('favorites-container');
-            const section = document.getElementById('favorites-section');
-
-            if (favs.length > 0) {
-                container.innerHTML = '';
-                favs.forEach(id => {
-                    if (gamesData[id]) {
-                        const game = gamesData[id];
-                        container.innerHTML += `
-                            <div class="game-card" onclick="showPage('${game.page}')">
-                                <div class="quick-play-btn-square" onclick="event.stopPropagation(); launchGame('${id}', '${game.launchUrl}')">
-                                    <span class="material-icons">play_arrow</span>
-                                </div>
-                                <img class="game-thumbnail" src="${game.img}" alt="${game.title}">
-                                <div class="game-info">
-                                    <h3 class="game-title">${game.title}</h3>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-                section.classList.remove('hidden');
-            } else {
-                section.classList.add('hidden');
-            }
-        }
-
-        function toggleFavorite(gameId, btnElement) {
-            let favs = JSON.parse(localStorage.getItem('betterbloxFavs') || '[]');
-            const icon = btnElement.querySelector('.material-icons');
-
-            if (favs.includes(gameId)) {
-                favs = favs.filter(id => id !== gameId);
-                icon.textContent = 'star_border';
-            } else {
-                favs.push(gameId);
-                icon.textContent = 'star';
-            }
-
-            localStorage.setItem('betterbloxFavs', JSON.stringify(favs));
-            renderFavorites();
-        }
-
-        function loadFavorites() {
-            let favs = JSON.parse(localStorage.getItem('betterbloxFavs') || '[]');
-            document.querySelectorAll('.fav-btn').forEach(btn => {
-                const gameId = btn.getAttribute('data-game');
-                const icon = btn.querySelector('.material-icons');
-                if (favs.includes(gameId)) {
-                    icon.textContent = 'star';
-                } else {
-                    icon.textContent = 'star_border';
-                }
-            });
-            renderFavorites();
-        }
-
-        function loadRecentGame() {
-            const history = JSON.parse(localStorage.getItem('betterblox_recent_history') || '[]');
-            const container = document.getElementById('recent-game-container');
-            const section = document.getElementById('continue-playing-section');
-
-            if (history.length > 0) {
-                container.innerHTML = '';
-                history.forEach(gameKey => {
-                    if (gamesData[gameKey]) {
-                        const game = gamesData[gameKey];
-                        const card = document.createElement('div');
-                        card.className = 'game-card';
-                        card.onclick = () => showPage(game.page);
-                        card.innerHTML = `
-                            <div class="quick-play-btn-square" onclick="event.stopPropagation(); launchGame('${gameKey}', '${game.launchUrl}')">
-                                <span class="material-icons">play_arrow</span>
-                            </div>
-                            <img class="game-thumbnail" src="${game.img}" alt="${game.title}">
-                            <div class="game-info">
-                                <h3 class="game-title">${game.title}</h3>
-                            </div>
-                        `;
-                        container.appendChild(card);
-                    }
-                });
-                section.classList.remove('hidden');
-            } else {
-                section.classList.add('hidden');
-            }
-        }
-
-        function launchGame(gameKey, url) {
-            updateTasteProfile(gameKey);
-
-            // Update History (Last 6 unique)
-            let history = JSON.parse(localStorage.getItem('betterblox_recent_history') || '[]');
-            history = history.filter(item => item !== gameKey); // Remove if exists
-            history.unshift(gameKey); // Add to front
-            history = history.slice(0, 6); // Keep last 6
-            localStorage.setItem('betterblox_recent_history', JSON.stringify(history));
-
-            loadRecentGame();
-
-            const activeAcc = localStorage.getItem('betterbloxActiveAccount');
-            let finalUrl = url;
-            if (activeAcc) {
-                // Assuming url already has placeId, we append username
-                finalUrl += `&username=${encodeURIComponent(activeAcc)}`;
-            }
-
-            window.location.href = finalUrl;
-            document.getElementById('launch-modal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('launch-modal').classList.add('hidden');
-        }
-
-        function clearRecent() {
-            localStorage.removeItem('betterblox_recent_history');
-            loadRecentGame();
-            document.getElementById('settings-menu').classList.add('hidden');
-        }
-
-        function showPage(pageId) {
-            const pages = document.querySelectorAll('.page-view');
-            pages.forEach(page => page.classList.add('hidden'));
-
-            const targetPage = document.getElementById(pageId);
-            if (targetPage) targetPage.classList.remove('hidden');
-
-            // Handle Nav Tab Active States
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            if (pageId === 'home') document.getElementById('tab-home').classList.add('active');
-            if (pageId === 'marketplace') document.getElementById('tab-marketplace').classList.add('active');
-        }
-
-        function toggleMenu(menuId) {
-            const menus = document.querySelectorAll('.dropdown-menu');
-            menus.forEach(menu => {
-                if (menu.id !== menuId) menu.classList.add('hidden');
-            });
-            document.getElementById(menuId).classList.toggle('hidden');
-        }
-
-        window.onclick = function (event) {
-            if (!event.target.matches('.nav-icon') && !event.target.matches('.nav-avatar')) {
-                const dropdowns = document.getElementsByClassName("dropdown-menu");
-                for (let i = 0; i < dropdowns.length; i++) {
-                    let openDropdown = dropdowns[i];
-                    if (!openDropdown.classList.contains('hidden')) {
-                        openDropdown.classList.add('hidden');
-                    }
-                }
-            }
-        }
-
-        function openLoginModal() {
-            document.getElementById('account-menu').classList.add('hidden');
-            document.getElementById('login-modal').classList.remove('hidden');
-        }
-
-        function closeLoginModal() {
-            document.getElementById('login-modal').classList.add('hidden');
-        }
-
-        // ====== ROBLOX OAUTH2 PKCE IMPLEMENTATION ======
-        // Set this to your actual Client ID from the Roblox Developer Portal!
-        const OAUTH_CLIENT_ID = "9102062315667697258";
-        const OAUTH_REDIRECT_URI = window.location.href.split('?')[0];
-
-        function generateRandomString(length) {
-            const array = new Uint32Array(length / 2);
-            window.crypto.getRandomValues(array);
-            return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
-        }
-
-        async function generateCodeChallenge(verifier) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(verifier);
-            const digest = await window.crypto.subtle.digest('SHA-256', data);
-            return btoa(String.fromCharCode(...new Uint8Array(digest)))
-                .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-        }
-
-        async function startRobloxOAuth() {
-            if (OAUTH_CLIENT_ID === "YOUR_CLIENT_ID_HERE") {
-                alert("Developer Note: You need to register an app on Roblox Open Cloud and set the OAUTH_CLIENT_ID near the bottom of this file before this button will function.");
-                return;
-            }
-
-            const verifier = generateRandomString(64);
-            const state = generateRandomString(32);
-            localStorage.setItem('roblox_oauth_verifier', verifier);
-            localStorage.setItem('roblox_oauth_state', state);
-
-            const challenge = await generateCodeChallenge(verifier);
-
-            const authUrl = new URL("https://apis.roblox.com/oauth/v1/authorize");
-            authUrl.searchParams.append("client_id", OAUTH_CLIENT_ID);
-            authUrl.searchParams.append("redirect_uri", OAUTH_REDIRECT_URI);
-            authUrl.searchParams.append("scope", "openid profile");
-            authUrl.searchParams.append("response_type", "code");
-            authUrl.searchParams.append("state", state);
-            authUrl.searchParams.append("code_challenge", challenge);
-            authUrl.searchParams.append("code_challenge_method", "S256");
-
-            window.location.href = authUrl.toString();
-        }
-
-        async function checkOAuthCallback() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            const state = urlParams.get('state');
-
-            if (code && state) {
-                const savedState = localStorage.getItem('roblox_oauth_state');
-                const verifier = localStorage.getItem('roblox_oauth_verifier');
-
-                if (state !== savedState) {
-                    console.error("OAuth State Mismatch");
-                    return;
-                }
-
-                try {
-                    const response = await fetch("https://apis.roblox.com/oauth/v1/token", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                        body: new URLSearchParams({
-                            client_id: OAUTH_CLIENT_ID,
-                            grant_type: "authorization_code",
-                            code: code,
-                            redirect_uri: OAUTH_REDIRECT_URI,
-                            code_verifier: verifier
-                        })
-                    });
-
-                    const data = await response.json();
-                    if (data.access_token) {
-                        const userRes = await fetch("https://apis.roblox.com/oauth/v1/userinfo", {
-                            headers: { "Authorization": `Bearer ${data.access_token}` }
-                        });
-                        const userData = await userRes.json();
-
-                        let accounts = JSON.parse(localStorage.getItem('betterbloxAccounts') || '[]');
-                        const newAcc = {
-                            username: userData.preferred_username || userData.nickname || "User",
-                            avatar: userData.picture || "https://tr.rbxcdn.com/38c6edcb50633730e9159382f54506eb/150/150/AvatarHeadshot/Webp"
-                        };
-
-                        if (!accounts.some(acc => acc.username === newAcc.username)) {
-                            accounts.push(newAcc);
-                            localStorage.setItem('betterbloxAccounts', JSON.stringify(accounts));
-                        }
-
-                        localStorage.setItem('betterbloxActiveAccount', newAcc.username);
-                        window.history.replaceState({}, document.title, window.location.pathname);
-                        loadAccounts();
-                    }
-                } catch (e) {
-                    console.error("OAuth Validation Error:", e);
-                }
-            }
-        }
-        // ===============================================
-
-        function loadAccounts() {
-            let accounts = JSON.parse(localStorage.getItem('betterbloxAccounts') || '[]');
-            const activeAcc = localStorage.getItem('betterbloxActiveAccount');
-            const list = document.getElementById('accounts-list');
-            list.innerHTML = '';
-
-            const iconContainer = document.getElementById('current-account-icon-container');
-
-            if (activeAcc && accounts.some(acc => acc.username === activeAcc)) {
-                const activeData = accounts.find(acc => acc.username === activeAcc);
-                iconContainer.innerHTML = `<img src="${activeData.avatar}" class="nav-avatar" onclick="toggleMenu('account-menu')">`;
-            } else {
-                iconContainer.innerHTML = `<span class="material-icons nav-icon" onclick="toggleMenu('account-menu')">account_circle</span>`;
-            }
-
-            accounts.forEach(acc => {
-                const isActive = acc.username === activeAcc;
-                const container = document.createElement('div');
-                container.style.display = 'flex';
-                container.style.alignItems = 'center';
-                container.className = `account-item ${isActive ? 'active' : ''}`;
-
-                container.innerHTML = `
-                    <div style="flex:1; display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="switchAccount('${acc.username}')">
-                        <img src="${acc.avatar}" alt="Avatar">
-                        <span style="font-size: 16px;">${acc.username}</span>
-                        ${isActive ? '<span class="material-icons" style="font-size: 18px; color: #02b757; margin-left:5px;">check_circle</span>' : ''}
-                    </div>
-                    <span class="material-icons remove-acc-btn" title="Remove Account" onclick="event.stopPropagation(); removeAccount('${acc.username}')">logout</span>
-                `;
-                list.appendChild(container);
-            });
-
-            if (accounts.length === 0) {
-                list.innerHTML = '<div style="padding: 10px 15px; color: #757575; font-size: 14px;">No accounts added.</div>';
-            }
-        }
-
-        function switchAccount(username) {
-            localStorage.setItem('betterbloxActiveAccount', username);
-            loadAccounts();
-            document.getElementById('account-menu').classList.add('hidden');
-        }
-
-        function removeAccount(username) {
-            let accounts = JSON.parse(localStorage.getItem('betterbloxAccounts') || '[]');
-            accounts = accounts.filter(acc => acc.username !== username);
-            localStorage.setItem('betterbloxAccounts', JSON.stringify(accounts));
-
-            const activeAcc = localStorage.getItem('betterbloxActiveAccount');
-            if (activeAcc === username) {
-                if (accounts.length > 0) {
-                    localStorage.setItem('betterbloxActiveAccount', accounts[0].username);
-                } else {
-                    localStorage.removeItem('betterbloxActiveAccount');
-                }
-            }
-
-            loadAccounts();
-        }
-
-        function filterMarketplace(type) {
-            const cards = document.querySelectorAll('#marketplace .item-card');
-            const pills = document.querySelectorAll('.market-filter-pill');
-
-            pills.forEach(pill => {
-                pill.classList.remove('active');
-                if (pill.textContent.trim() === type) pill.classList.add('active');
-            });
-
-            cards.forEach(card => {
-                const itemType = card.getAttribute('data-type');
-                if (type === 'All' || itemType === type) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        // Register Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker registered!'))
-                    .catch(err => console.log('Service Worker registration failed:', err));
-            });
-        }
-
-        // Initialize on load
-        loadGreetingTime();
-        loadName();
-        loadTheme();
-        checkOAuthCallback().then(() => {
-            loadAccounts();
-        });
-        loadRecentGame();
-        loadFavorites();
-        loadRecommendations();
-    </script>
+    <script src="script.js"></script>
 
 </body>
 
