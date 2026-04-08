@@ -1,0 +1,25 @@
+{
+  "name": "Betterblox Launcher",
+  "short_name": "Betterblox",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f2f4f5",
+  "theme_color": "#0074BD",
+  "icons": [
+    {
+      "src": "https://see.fontimg.com/api/rf5/v6dO/ZjY2YTVmYmNjNTEwNDg2N2I1MzM2YjU4OThmYjQ1OTQudHRm/Yg/roblox-2017.png?r=fs&h=128&w=128&fg=000000&bg=FFFFFF&tb=1&s=128",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "https://see.fontimg.com/api/rf5/v6dO/ZjY2YTVmYmNjNTEwNDg2N2I1MzM2YjU4OThmYjQ1OTQudHRm/Yg/roblox-2017.png?r=fs&h=192&w=192&fg=000000&bg=FFFFFF&tb=1&s=192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://see.fontimg.com/api/rf5/v6dO/ZjY2YTVmYmNjNTEwNDg2N2I1MzM2YjU4OThmYjQ1OTQudHRm/Yg/roblox-2017.png?r=fs&h=512&w=512&fg=000000&bg=FFFFFF&tb=1&s=512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
