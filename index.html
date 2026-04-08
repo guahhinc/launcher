@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Betterblox Launcher</title>
+    <title>Betterblox</title>
+    <link rel="icon" type="image/png" href="https://see.fontimg.com/api/rf5/v6dO/ZjY2YTVmYmNjNTEwNDg2N2I1MzM2YjU4OThmYjQ1OTQudHRm/Yg/roblox-2017.png?r=fs&h=104&w=1000&fg=000000&bg=FFFFFF&tb=1&s=104">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,7 +57,6 @@
         .game-card:hover { border-color: #00a2ff; }
         .game-thumbnail { width: 100%; height: 168px; object-fit: cover; border-bottom: 1px solid #e3e3e3; }
         .game-info { padding: 15px; }
-        /* Removed bolding from home screen titles */
         .game-title { font-size: 20px; font-weight: normal; margin: 0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .game-layout { display: flex; gap: 20px; }
@@ -67,7 +67,6 @@
         .description-box { margin-top: 20px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
         .game-header-side h2 { margin: 0 0 5px 0; font-size: 32px; font-weight: bold; } 
         .game-header-side p { margin: 0 0 15px 0; font-size: 14px; color: #757575; }
-        /* Removed bolding from developer links */
         .creator-link { color: #00a2ff; text-decoration: none; font-weight: normal; }
         .creator-link:hover { text-decoration: underline; }
         
@@ -91,7 +90,6 @@
         .fav-btn .material-icons { font-size: 28px; }
 
         .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; color: #757575; }
-        /* Removed bolding from stat row answers */
         .stat-row span:last-child { color: #393b3d; font-weight: normal; }
 
         .hidden { display: none !important; }
@@ -104,7 +102,6 @@
             border-radius: 4px; padding: 5px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); min-width: 200px; z-index: 100;
             color: #393b3d;
         }
-        /* Increased settings text size */
         .dropdown-menu button { 
             width: 100%; text-align: left; background: none; border: none; padding: 12px 15px; 
             cursor: pointer; font-size: 16px; color: inherit;
@@ -112,7 +109,6 @@
         .dropdown-menu button:hover { background-color: #f2f4f5; }
         .notification-item { padding: 12px 15px; border-bottom: 1px solid #eee; }
         .notification-item:last-child { border-bottom: none; }
-        /* Removed bolding and increased notification sizes */
         .notification-title { font-weight: normal; font-size: 16px; margin-bottom: 5px; }
         .notification-desc { font-size: 14px; color: #757575; }
 
@@ -159,6 +155,7 @@
                 <div id="settings-menu" class="dropdown-menu hidden">
                     <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
                     <button onclick="changeName()">Change Name</button>
+                    <button onclick="clearRecent()">Clear Recently Played</button>
                     <button onclick="window.open('https://www.roblox.com/users/inventory#!/accessories', '_blank')">Inventory</button>
                     <button onclick="window.open('https://en.help.roblox.com/hc/en-us', '_blank')">Help & Safety</button>
                 </div>
@@ -726,6 +723,12 @@ Inspired by many games, most notably a hit game named ULTRAKILL.</div>
             localStorage.setItem('recentBetterbloxGame', gameId);
             loadRecentGame(); 
             window.location.href = url; 
+        }
+
+        function clearRecent() {
+            localStorage.removeItem('recentBetterbloxGame');
+            loadRecentGame();
+            document.getElementById('settings-menu').classList.add('hidden'); 
         }
 
         function showPage(pageId) {
