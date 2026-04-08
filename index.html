@@ -131,10 +131,40 @@
             width: 300px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             cursor: pointer;
+            position: relative;
+            transition: transform 0.2s, border-color 0.2s;
         }
 
         .game-card:hover {
             border-color: #00a2ff;
+            transform: scale(1.03);
+        }
+
+        .quick-play-btn-square {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background-color: #02b757;
+            color: white;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+            opacity: 0;
+            transition: 0.2s;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-card:hover .quick-play-btn-square {
+            opacity: 1;
+        }
+
+        .quick-play-btn-square:hover {
+            background-color: #019c4a;
+            transform: scale(1.05);
         }
 
         .game-thumbnail {
@@ -440,6 +470,11 @@
         .dark-mode .modal-content {
             background-color: #232527;
             color: white;
+        }
+
+        .roblox-modal-logo {
+            height: 50px;
+            margin-bottom: 15px;
         }
 
         .close-modal {
@@ -2198,6 +2233,7 @@ https://devforum.roblox.com/t/flee-the-facility-credits/2026108</div>
 
     <div id="launch-modal" class="modal hidden" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Roblox_Corporation_2025_logo.svg/960px-Roblox_Corporation_2025_logo.svg.png" class="roblox-modal-logo" alt="Roblox">
             <span class="close-modal" onclick="closeModal()">&times;</span>
             <h2 style="margin-top: 0;">Launched in Roblox!</h2>
             <p>Your game is now launching in the Roblox client. If you don't have Roblox installed, you can download it below.</p>
@@ -2210,41 +2246,43 @@ https://devforum.roblox.com/t/flee-the-facility-credits/2026108</div>
 
     <script>
         const gamesData = {
-            'piggy': { title: 'Piggy', img: 'https://tr.rbxcdn.com/180DAY-9a6167eabc17cccd69511f6213e94b03/768/432/Image/Webp/noFilter', page: 'game-detail-piggy' },
-            '3008': { title: '3008', img: 'https://tr.rbxcdn.com/180DAY-1393cf4ea0d2cb4e97bc0a05938822e6/768/432/Image/Webp/noFilter', page: 'game-detail-3008' },
-            'smile': { title: 'Infectious Smile', img: 'https://tr.rbxcdn.com/180DAY-792578a0730d4dcf6dbac9fd15de33e0/768/432/Image/Webp/noFilter', page: 'game-detail-smile' },
-            'epic': { title: 'Epic Minigames ✨', img: 'https://tr.rbxcdn.com/180DAY-7ee35d19e13cefd730129cf99268792c/768/432/Image/Webp/noFilter', page: 'game-detail-epic' },
-            'shark': { title: 'SharkBite Classic 🦈', img: 'https://tr.rbxcdn.com/180DAY-8af54bd04cab100361501d9c38211f4e/768/432/Image/Webp/noFilter', page: 'game-detail-shark' },
-            'phantom': { title: 'Phantom Forces', img: 'https://tr.rbxcdn.com/180DAY-bf6f7058336de36c002dc58d33e9c101/768/432/Image/Webp/noFilter', page: 'game-detail-phantom' },
-            'murdurr': { title: 'MurDurr', img: 'https://tr.rbxcdn.com/180DAY-bfdb4c4f5bad565d32ce203e375dc288/768/432/Image/Webp/noFilter', page: 'game-detail-murdurr' },
-            'untitled': { title: 'untitled tag game', img: 'https://tr.rbxcdn.com/180DAY-cd834c110aa147df9bc89a79fece32ea/768/432/Image/Webp/noFilter', page: 'game-detail-untitled' },
-            'retro': { title: 'RetroStudio', img: 'https://tr.rbxcdn.com/180DAY-9e4fae118735bc44c824d52e7c7799f0/768/432/Image/Webp/noFilter', page: 'game-detail-retro' },
-            'combat': { title: 'Combat Initiation', img: 'https://tr.rbxcdn.com/180DAY-6c257588551cecd73f962d8165e6b9f1/768/432/Image/Webp/noFilter', page: 'game-detail-combat' },
-            'knockout': { title: 'Knockout! 🐧', img: 'https://tr.rbxcdn.com/180DAY-f75a05b251c9fdb0c762a3bd997a2901/768/432/Image/Webp/noFilter', page: 'game-detail-knockout' },
-            'adopt': { title: 'Adopt Me!', img: 'https://tr.rbxcdn.com/180DAY-dc544ac25d03f485d6a58f79efc51ed2/768/432/Image/Webp/noFilter', page: 'game-detail-adopt' },
-            'garden': { title: 'Grow a Garden 🌶️', img: 'https://tr.rbxcdn.com/180DAY-edd534a57d371273de1f5d94c2b30583/768/432/Image/Webp/noFilter', page: 'game-detail-garden' },
-            'disaster': { title: 'Natural Disaster Survival', img: 'https://tr.rbxcdn.com/180DAY-7ea7065a02f8cff80f8b0270a9ad2d3b/768/432/Image/Webp/noFilter', page: 'game-detail-disaster' },
-            'golf': { title: 'Super Golf!', img: 'https://tr.rbxcdn.com/180DAY-28f42fb6bbd4bc16216d6d95b0c9a468/768/432/Image/Webp/noFilter', page: 'game-detail-golf' },
-            'mm2': { title: 'Murder Mystery 2', img: 'https://tr.rbxcdn.com/180DAY-0a5d0d27fd60272237a869af29cbccb1/768/432/Image/Webp/noFilter', page: 'game-detail-mm2' },
-            'pet99': { title: 'Pet Simulator 99', img: 'https://tr.rbxcdn.com/180DAY-59a871f1639e5a55e3c49273a0b34d6a/768/432/Image/Webp/noFilter', page: 'game-detail-pet99' },
-            'jujutsu': { title: 'Jujutsu Shenanigans', img: 'https://tr.rbxcdn.com/180DAY-decec85a41b80e4ac0beca8bc2952a7f/768/432/Image/Webp/noFilter', page: 'game-detail-jujutsu' },
-            'overtone': { title: 'Overtone', img: 'https://tr.rbxcdn.com/180DAY-3523135b8468cb8c6663e021da5f78b5/768/432/Image/Webp/noFilter', page: 'game-detail-overtone' },
-            'coolobby': { title: '[250] Cool Obby 2', img: 'https://tr.rbxcdn.com/180DAY-44d4a95190453bbd14a4db3f84410433/768/432/Image/Webp/noFilter', page: 'game-detail-coolobby' },
-            'theme-park': { title: 'Theme Park Tycoon 2', img: 'https://tr.rbxcdn.com/180DAY-19d37e8208a9d390075158433face2cd/768/432/Image/Webp/noFilter', page: 'game-detail-theme-park' },
-            'bee-swarm': { title: 'Bee Swarm Simulator', img: 'https://tr.rbxcdn.com/180DAY-0458177ee998eb2ffd882ad46207e4c5/768/432/Image/Webp/noFilter', page: 'game-detail-bee-swarm' },
-            'homer': { title: 'You VS Homer', img: 'https://tr.rbxcdn.com/180DAY-6f65dd5173f9f11b026acbb7aef20740/768/432/Image/Webp/noFilter', page: 'game-detail-homer' },
-            'podcasts': { title: '[VC] Podcasts 🔊', img: 'https://tr.rbxcdn.com/180DAY-dd6388f386387a2d1d6f942eca4856fb/768/432/Image/Webp/noFilter', page: 'game-detail-podcasts' },
-            'ballaxe': { title: 'ball and axe', img: 'https://tr.rbxcdn.com/180DAY-a9d6d065668af8b6e08e7813168f18fa/768/432/Image/Webp/noFilter', page: 'game-detail-ballaxe' },
-            'robots2': { title: 'Build to Survive the Robots 2', img: 'https://tr.rbxcdn.com/180DAY-8d80a4c1885d64b1d8903f6dfb6c485f/768/432/Image/Webp/noFilter', page: 'game-detail-robots2' },
-            'tower': { title: 'Tower of Hell', img: 'https://tr.rbxcdn.com/180DAY-20a372111085c33de1e64004e4dca1d8/768/432/Image/Webp/noFilter', page: 'game-detail-tower' },
-            'prison': { title: 'Prison Life', img: 'https://tr.rbxcdn.com/180DAY-7e4ac70bc3496ea7e4d039f3cd60b6a4/768/432/Image/Webp/noFilter', page: 'game-detail-prison' },
-            'prospecting': { title: 'Prospecting! 💎', img: 'https://tr.rbxcdn.com/180DAY-e18515933a4c6208e2176d2f0351f12c/768/432/Image/Webp/noFilter', page: 'game-detail-prospecting' },
-            'hide-seek': { title: 'Hide and Seek Extreme', img: 'https://tr.rbxcdn.com/180DAY-c17b13acb45f07ec1517623969b81ec0/768/432/Image/Webp/noFilter', page: 'game-detail-hide-seek' },
-            'horrific-housing': { title: 'Horrific Housing', img: 'https://tr.rbxcdn.com/180DAY-a361113feebd101cd29510bfe3f610dd/768/432/Image/Webp/noFilter', page: 'game-detail-horrific-housing' },
-            'brookhaven': { title: 'Brookhaven 🏡RP', img: 'https://tr.rbxcdn.com/180DAY-a4fb7b266105fa038d92bf425d58ee53/768/432/Image/Webp/noFilter', page: 'game-detail-brookhaven' },
-            'rivals': { title: 'RIVALS', img: 'https://tr.rbxcdn.com/180DAY-eb783deba3b661ff753ab9be4089188d/768/432/Image/Webp/noFilter', page: 'game-detail-rivals' },
-            'flee-facility': { title: 'Flee the Facility', img: 'https://tr.rbxcdn.com/180DAY-f3e6bca490d2d655cde4894e502e5989/768/432/Image/Webp/noFilter', page: 'game-detail-flee-facility' }
+            'piggy': { title: 'Piggy', img: 'https://tr.rbxcdn.com/180DAY-9a6167eabc17cccd69511f6213e94b03/768/432/Image/Webp/noFilter', page: 'game-detail-piggy', launchUrl: 'roblox://placeId=4623386862' },
+            '3008': { title: '3008', img: 'https://tr.rbxcdn.com/180DAY-1393cf4ea0d2cb4e97bc0a05938822e6/768/432/Image/Webp/noFilter', page: 'game-detail-3008', launchUrl: 'roblox://placeId=2768379856' },
+            'smile': { title: 'Infectious Smile', img: 'https://tr.rbxcdn.com/180DAY-792578a0730d4dcf6dbac9fd15de33e0/768/432/Image/Webp/noFilter', page: 'game-detail-smile', launchUrl: 'roblox://placeId=5985232436' },
+            'epic': { title: 'Epic Minigames ✨', img: 'https://tr.rbxcdn.com/180DAY-7ee35d19e13cefd730129cf99268792c/768/432/Image/Webp/noFilter', page: 'game-detail-epic', launchUrl: 'roblox://placeId=277751860' },
+            'shark': { title: 'SharkBite Classic 🦈', img: 'https://tr.rbxcdn.com/180DAY-8af54bd04cab100361501d9c38211f4e/768/432/Image/Webp/noFilter', page: 'game-detail-shark', launchUrl: 'roblox://placeId=734159876' },
+            'phantom': { title: 'Phantom Forces', img: 'https://tr.rbxcdn.com/180DAY-bf6f7058336de36c002dc58d33e9c101/768/432/Image/Webp/noFilter', page: 'game-detail-phantom', launchUrl: 'roblox://placeId=292439477' },
+            'murdurr': { title: 'MurDurr', img: 'https://tr.rbxcdn.com/180DAY-bfdb4c4f5bad565d32ce203e375dc288/768/432/Image/Webp/noFilter', page: 'game-detail-murdurr', launchUrl: 'roblox://placeId=79735281630764' },
+            'untitled': { title: 'untitled tag game', img: 'https://tr.rbxcdn.com/180DAY-cd834c110aa147df9bc89a79fece32ea/768/432/Image/Webp/noFilter', page: 'game-detail-untitled', launchUrl: 'roblox://placeId=14044547200' },
+            'retro': { title: 'RetroStudio', img: 'https://tr.rbxcdn.com/180DAY-9e4fae118735bc44c824d52e7c7799f0/768/432/Image/Webp/noFilter', page: 'game-detail-retro', launchUrl: 'roblox://placeId=5846386835' },
+            'combat': { title: 'Combat Initiation', img: 'https://tr.rbxcdn.com/180DAY-6c257588551cecd73f962d8165e6b9f1/768/432/Image/Webp/noFilter', page: 'game-detail-combat', launchUrl: 'roblox://placeId=13559635034' },
+            'knockout': { title: 'Knockout! 🐧', img: 'https://tr.rbxcdn.com/180DAY-f75a05b251c9fdb0c762a3bd997a2901/768/432/Image/Webp/noFilter', page: 'game-detail-knockout', launchUrl: 'roblox://placeId=136764190843219' },
+            'adopt': { title: 'Adopt Me!', img: 'https://tr.rbxcdn.com/180DAY-dc544ac25d03f485d6a58f79efc51ed2/768/432/Image/Webp/noFilter', page: 'game-detail-adopt', launchUrl: 'roblox://placeId=920587237' },
+            'garden': { title: 'Grow a Garden 🌶️', img: 'https://tr.rbxcdn.com/180DAY-edd534a57d371273de1f5d94c2b30583/768/432/Image/Webp/noFilter', page: 'game-detail-garden', launchUrl: 'roblox://placeId=126884695634066' },
+            'disaster': { title: 'Natural Disaster Survival', img: 'https://tr.rbxcdn.com/180DAY-7ea7065a02f8cff80f8b0270a9ad2d3b/768/432/Image/Webp/noFilter', page: 'game-detail-disaster', launchUrl: 'roblox://placeId=189707' },
+            'golf': { title: 'Super Golf!', img: 'https://tr.rbxcdn.com/180DAY-28f42fb6bbd4bc16216d6d95b0c9a468/768/432/Image/Webp/noFilter', page: 'game-detail-golf', launchUrl: 'roblox://placeId=4468711919' },
+            'mm2': { title: 'Murder Mystery 2', img: 'https://tr.rbxcdn.com/180DAY-0a5d0d27fd60272237a869af29cbccb1/768/432/Image/Webp/noFilter', page: 'game-detail-mm2', launchUrl: 'roblox://placeId=142823291' },
+            'pet99': { title: 'Pet Simulator 99', img: 'https://tr.rbxcdn.com/180DAY-59a871f1639e5a55e3c49273a0b34d6a/768/432/Image/Webp/noFilter', page: 'game-detail-pet99', launchUrl: 'roblox://placeId=8737899170' },
+            'jujutsu': { title: 'Jujutsu Shenanigans', img: 'https://tr.rbxcdn.com/180DAY-decec85a41b80e4ac0beca8bc2952a7f/768/432/Image/Webp/noFilter', page: 'game-detail-jujutsu', launchUrl: 'roblox://placeId=9391468976' },
+            'overtone': { title: 'Overtone', img: 'https://tr.rbxcdn.com/180DAY-3523135b8468cb8c6663e021da5f78b5/768/432/Image/Webp/noFilter', page: 'game-detail-overtone', launchUrl: 'roblox://placeId=102779234672656' },
+            'coolobby': { title: '[250] Cool Obby 2', img: 'https://tr.rbxcdn.com/180DAY-44d4a95190453bbd14a4db3f84410433/768/432/Image/Webp/noFilter', page: 'game-detail-coolobby', launchUrl: 'roblox://placeId=4927387' },
+            'theme-park': { title: 'Theme Park Tycoon 2', img: 'https://tr.rbxcdn.com/180DAY-19d37e8208a9d390075158433face2cd/768/432/Image/Webp/noFilter', page: 'game-detail-theme-park', launchUrl: 'roblox://placeId=69184822' },
+            'bee-swarm': { title: 'Bee Swarm Simulator', img: 'https://tr.rbxcdn.com/180DAY-0458177ee998eb2ffd882ad46207e4c5/768/432/Image/Webp/noFilter', page: 'game-detail-bee-swarm', launchUrl: 'roblox://placeId=1537690962' },
+            'homer': { title: 'You VS Homer', img: 'https://tr.rbxcdn.com/180DAY-6f65dd5173f9f11b026acbb7aef20740/768/432/Image/Webp/noFilter', page: 'game-detail-homer', launchUrl: 'roblox://placeId=108124933582607' },
+            'podcasts': { title: '[VC] Podcasts 🔊', img: 'https://tr.rbxcdn.com/180DAY-dd6388f386387a2d1d6f942eca4856fb/768/432/Image/Webp/noFilter', page: 'game-detail-podcasts', launchUrl: 'roblox://placeId=110584310129887' },
+            'ballaxe': { title: 'ball and axe', img: 'https://tr.rbxcdn.com/180DAY-a9d6d065668af8b6e08e7813168f18fa/768/432/Image/Webp/noFilter', page: 'game-detail-ballaxe', launchUrl: 'roblox://placeId=1242235469' },
+            'robots2': { title: 'Build to Survive the Robots 2', img: 'https://tr.rbxcdn.com/180DAY-8d80a4c1885d64b1d8903f6dfb6c485f/768/432/Image/Webp/noFilter', page: 'game-detail-robots2', launchUrl: 'roblox://placeId=103980862080286' },
+            'tower': { title: 'Tower of Hell', img: 'https://tr.rbxcdn.com/180DAY-20a372111085c33de1e64004e4dca1d8/768/432/Image/Webp/noFilter', page: 'game-detail-tower', launchUrl: 'roblox://placeId=1962086868' },
+            'prison': { title: 'Prison Life', img: 'https://tr.rbxcdn.com/180DAY-7e4ac70bc3496ea7e4d039f3cd60b6a4/768/432/Image/Webp/noFilter', page: 'game-detail-prison', launchUrl: 'roblox://placeId=155615604' },
+            'prospecting': { title: 'Prospecting! 💎', img: 'https://tr.rbxcdn.com/180DAY-e18515933a4c6208e2176d2f0351f12c/768/432/Image/Webp/noFilter', page: 'game-detail-prospecting', launchUrl: 'roblox://placeId=129827112113663' },
+            'hide-seek': { title: 'Hide and Seek Extreme', img: 'https://tr.rbxcdn.com/180DAY-c17b13acb45f07ec1517623969b81ec0/768/432/Image/Webp/noFilter', page: 'game-detail-hide-seek', launchUrl: 'roblox://placeId=205224386' },
+            'horrific-housing': { title: 'Horrific Housing', img: 'https://tr.rbxcdn.com/180DAY-a361113feebd101cd29510bfe3f610dd/768/432/Image/Webp/noFilter', page: 'game-detail-horrific-housing', launchUrl: 'roblox://placeId=263761432' },
+            'brookhaven': { title: 'Brookhaven 🏡RP', img: 'https://tr.rbxcdn.com/180DAY-a4fb7b266105fa038d92bf425d58ee53/768/432/Image/Webp/noFilter', page: 'game-detail-brookhaven', launchUrl: 'roblox://placeId=4924922222' },
+            'rivals': { title: 'RIVALS', img: 'https://tr.rbxcdn.com/180DAY-eb783deba3b661ff753ab9be4089188d/768/432/Image/Webp/noFilter', page: 'game-detail-rivals', launchUrl: 'roblox://placeId=17625359962' },
+            'flee-facility': { title: 'Flee the Facility', img: 'https://tr.rbxcdn.com/180DAY-f3e6bca490d2d655cde4894e502e5989/768/432/Image/Webp/noFilter', page: 'game-detail-flee-facility', launchUrl: 'roblox://placeId=893973440' }
         };
+
+
 
         function searchGames() {
             const input = document.getElementById('search-bar').value.toLowerCase();
@@ -2308,6 +2346,9 @@ https://devforum.roblox.com/t/flee-the-facility-credits/2026108</div>
                         const game = gamesData[id];
                         container.innerHTML += `
                             <div class="game-card" onclick="showPage('${game.page}')">
+                                <div class="quick-play-btn-square" onclick="event.stopPropagation(); launchGame('${id}', '${game.launchUrl}')">
+                                    <span class="material-icons">play_arrow</span>
+                                </div>
                                 <img class="game-thumbnail" src="${game.img}" alt="${game.title}">
                                 <div class="game-info">
                                     <h3 class="game-title">${game.title}</h3>
@@ -2361,6 +2402,9 @@ https://devforum.roblox.com/t/flee-the-facility-credits/2026108</div>
                 const game = gamesData[recentId];
                 container.innerHTML = `
                     <div class="game-card" onclick="showPage('${game.page}')">
+                        <div class="quick-play-btn-square" onclick="event.stopPropagation(); launchGame('${recentId}', '${game.launchUrl}')">
+                            <span class="material-icons">play_arrow</span>
+                        </div>
                         <img class="game-thumbnail" src="${game.img}" alt="${game.title}">
                         <div class="game-info">
                             <h3 class="game-title">${game.title}</h3>
