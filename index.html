@@ -689,6 +689,26 @@
                 </div>
             </div>
 
+            <div class="game-card" onclick="showPage('game-detail-homer')">
+                <img class="game-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-6f65dd5173f9f11b026acbb7aef20740/768/432/Image/Webp/noFilter"
+                    alt="You VS Homer">
+                <div class="game-info">
+                    <h3 class="game-title">You VS Homer</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">dgk enterprises</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-podcasts')">
+                <img class="game-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-dd6388f386387a2d1d6f942eca4856fb/768/432/Image/Webp/noFilter"
+                    alt="[VC] Podcasts 🔊">
+                <div class="game-info">
+                    <h3 class="game-title">[VC] Podcasts 🔊</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">NDO Studios</span></div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -1541,6 +1561,85 @@ Music courtesy of APM Music and Monstercat</div>
         </div>
     </div>
 
+    <div id="game-detail-homer" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail"
+                        src="https://tr.rbxcdn.com/180DAY-6f65dd5173f9f11b026acbb7aef20740/768/432/Image/Webp/noFilter"
+                        alt="You VS Homer">
+                    <div class="description-box">(BETA)
+SHUTDOWN = YOU REJOIN
+
+Survive and hide as a Bart with your fellow players...
+Or become a Homer and seek out every Bart till none are left standing!
+Can you survive Homer and not be eaten?
+
+This game originated from michae84525 and baconsarthebest19's "Survive Homer scary test" on Retro Studio. It was then adapted through many other Homer games! (Most notable being Agust3K's YOU vs HOMER Remasterd'nt, also on Retro Studio) If you haven't played them, go check them out! This game wouldn't exist without them.
+
+Tags: Horror, Asym, Scary, Escape, Survival, Simpsons, Bart, Homer, Forsaken, Hide From Homer, You VS Homer, Lisa, Maggie, Marge, Retro, Retro Studio, Classic, 2016 , 2017, Roblox, Retro Roblox, Fortnite, Simpsons Fortnite,</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>You VS Homer</h2>
+                        <p>By <a href="https://www.roblox.com/communities/33760527/dgk-enterprises#!/about" target="_blank"
+                                class="creator-link">dgk enterprises</a></p>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>21 Mar 2026</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival</span></div>
+
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('homer', 'roblox://placeId=108124933582607')" class="play-btn"><span
+                                class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="homer" onclick="toggleFavorite('homer', this)"><span
+                                class="material-icons">star_border</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-podcasts" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail"
+                        src="https://tr.rbxcdn.com/180DAY-dd6388f386387a2d1d6f942eca4856fb/768/432/Image/Webp/noFilter"
+                        alt="[VC] Podcasts 🔊">
+                    <div class="description-box">🎙️ Podcasts
+Grab a mic, gather your crew, and create stages! Use your voice to record hilarious debates, deep convos, or chaos in your own virtual podcast studio. Talk it out, vibe with friends, and go viral (maybe).
+
+Supports:
+- PC
+- Mobile
+
+⚠️ DISCLAIMER ⚠️
+By creating servers within our game, you agree we reserve the right to close your server for violations against Roblox's TOS and take necessary actions to protect the platform and our community.
+Server boost or not you are not immune to moderation, no refund policy.
+Serious + repeat offenses will be dealt with unappealable permanent + strict temporary bans.</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>[VC] Podcasts 🔊</h2>
+                        <p>By <a href="https://www.roblox.com/communities/4699129/NDO-Studios#!/about" target="_blank"
+                                class="creator-link">NDO Studios</a></p>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>30 May 2025</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Social</span></div>
+
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('podcasts', 'roblox://placeId=110584310129887')" class="play-btn"><span
+                                class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="podcasts" onclick="toggleFavorite('podcasts', this)"><span
+                                class="material-icons">star_border</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const gamesData = {
             'piggy': { title: 'Piggy', img: 'https://tr.rbxcdn.com/180DAY-9a6167eabc17cccd69511f6213e94b03/768/432/Image/Webp/noFilter', page: 'game-detail-piggy' },
@@ -1564,7 +1663,9 @@ Music courtesy of APM Music and Monstercat</div>
             'overtone': { title: 'Overtone', img: 'https://tr.rbxcdn.com/180DAY-3523135b8468cb8c6663e021da5f78b5/768/432/Image/Webp/noFilter', page: 'game-detail-overtone' },
             'coolobby': { title: '[250] Cool Obby 2', img: 'https://tr.rbxcdn.com/180DAY-44d4a95190453bbd14a4db3f84410433/768/432/Image/Webp/noFilter', page: 'game-detail-coolobby' },
             'theme-park': { title: 'Theme Park Tycoon 2', img: 'https://tr.rbxcdn.com/180DAY-19d37e8208a9d390075158433face2cd/768/432/Image/Webp/noFilter', page: 'game-detail-theme-park' },
-            'bee-swarm': { title: 'Bee Swarm Simulator', img: 'https://tr.rbxcdn.com/180DAY-0458177ee998eb2ffd882ad46207e4c5/768/432/Image/Webp/noFilter', page: 'game-detail-bee-swarm' }
+            'bee-swarm': { title: 'Bee Swarm Simulator', img: 'https://tr.rbxcdn.com/180DAY-0458177ee998eb2ffd882ad46207e4c5/768/432/Image/Webp/noFilter', page: 'game-detail-bee-swarm' },
+            'homer': { title: 'You VS Homer', img: 'https://tr.rbxcdn.com/180DAY-6f65dd5173f9f11b026acbb7aef20740/768/432/Image/Webp/noFilter', page: 'game-detail-homer' },
+            'podcasts': { title: '[VC] Podcasts 🔊', img: 'https://tr.rbxcdn.com/180DAY-dd6388f386387a2d1d6f942eca4856fb/768/432/Image/Webp/noFilter', page: 'game-detail-podcasts' }
         };
 
         function searchGames() {
@@ -1730,6 +1831,15 @@ Music courtesy of APM Music and Monstercat</div>
                     }
                 }
             }
+        }
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered!'))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
         }
 
         // Initialize on load
