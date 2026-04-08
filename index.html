@@ -44,6 +44,9 @@
             align-items: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             height: 40px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .navbar img.logo {
@@ -756,6 +759,56 @@
                 <div class="game-info">
                     <h3 class="game-title">Prospecting! 💎</h3>
                     <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Prospecting!</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-hide-seek')">
+                <img class="game-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-c17b13acb45f07ec1517623969b81ec0/768/432/Image/Webp/noFilter"
+                    alt="Hide and Seek Extreme">
+                <div class="game-info">
+                    <h3 class="game-title">Hide and Seek Extreme</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Tim7775</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-horrific-housing')">
+                <img class="game-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-a361113feebd101cd29510bfe3f610dd/768/432/Image/Webp/noFilter"
+                    alt="Horrific Housing">
+                <div class="game-info">
+                    <h3 class="game-title">Horrific Housing</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">CookieScript's games</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-brookhaven')">
+                <img class="game-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-a4fb7b266105fa038d92bf425d58ee53/768/432/Image/Webp/noFilter"
+                    alt="Brookhaven 🏡RP">
+                <div class="game-info">
+                    <h3 class="game-title">Brookhaven 🏡RP</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Brookhaven by Voldex</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-rivals')">
+                <img class="game-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-eb783deba3b661ff753ab9be4089188d/768/432/Image/Webp/noFilter"
+                    alt="RIVALS">
+                <div class="game-info">
+                    <h3 class="game-title">RIVALS</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Nosniy Games</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-flee-facility')">
+                <img class="game-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-f3e6bca490d2d655cde4894e502e5989/768/432/Image/Webp/noFilter"
+                    alt="Flee the Facility">
+                <div class="game-info">
+                    <h3 class="game-title">Flee the Facility</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">A.W. Apps</span></div>
                 </div>
             </div>
 
@@ -1843,7 +1896,7 @@ Owners of VIP-Servers can use the settings menu to skip rounds, set the tower si
 ⛏️ Pan for gold
 💎 Discover rare gems
 🤑 Use sluices to grind offline
-🗺️ Explore new areas
+		🗺️ Explore new areas
 🏆 Become the ultimate prospector!
 
 Enjoy the game? Remember to like (👍) and favourite (🌟)!</div>
@@ -1862,6 +1915,203 @@ Enjoy the game? Remember to like (👍) and favourite (🌟)!</div>
                         <a href="#" onclick="launchGame('prospecting', 'roblox://placeId=129827112113663')" class="play-btn"><span
                                 class="material-icons">play_arrow</span></a>
                         <button class="fav-btn" data-game="prospecting" onclick="toggleFavorite('prospecting', this)"><span
+                                class="material-icons">star_border</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-hide-seek" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail"
+                        src="https://tr.rbxcdn.com/180DAY-c17b13acb45f07ec1517623969b81ec0/768/432/Image/Webp/noFilter"
+                        alt="Hide and Seek Extreme">
+                    <div class="description-box">Welcome to Hide and Seek Extreme.
+At the start of the game, one player gets chosen to be 'It'. 'It' has to try and find the other players. 'It' will not spawn with their default character, instead they will spawn with their equipped 'It' character. Every 'It' character has a special ability that can be used to help catch the hiders. 'It' characters can be purchased in the shop.
+
+Press 1 to use your 'It' ability
+Press T to taunt</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>Hide and Seek Extreme</h2>
+                        <p>By <a href="https://www.roblox.com/users/4563899/profile/" target="_blank"
+                                class="creator-link">Tim7775</a></p>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>18 Jan 2015</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Party / Casual</span></div>
+
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('hide-seek', 'roblox://placeId=205224386')" class="play-btn"><span
+                                class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="hide-seek" onclick="toggleFavorite('hide-seek', this)"><span
+                                class="material-icons">star_border</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-horrific-housing" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail"
+                        src="https://tr.rbxcdn.com/180DAY-a361113feebd101cd29510bfe3f610dd/768/432/Image/Webp/noFilter"
+                        alt="Horrific Housing">
+                    <div class="description-box">Just for a bit of fun.
+
+Can you survive a laundry list of exciting randomly chosen disasters? All you have is a small floating plot of land with a house - are you able to out live your opponents?
+
+pls thumb up 👍 and favourite ⭐</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>Horrific Housing</h2>
+                        <p>By <a href="https://www.roblox.com/communities/17171528/CookieScripts-games#!/about" target="_blank"
+                                class="creator-link">CookieScript's games</a></p>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>2 May 2015</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival</span></div>
+
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('horrific-housing', 'roblox://placeId=263761432')" class="play-btn"><span
+                                class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="horrific-housing" onclick="toggleFavorite('horrific-housing', this)"><span
+                                class="material-icons">star_border</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-brookhaven" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail"
+                        src="https://tr.rbxcdn.com/180DAY-a4fb7b266105fa038d92bf425d58ee53/768/432/Image/Webp/noFilter"
+                        alt="Brookhaven 🏡RP">
+                    <div class="description-box">A place to play with with like minded people and roleplay. Own and live in amazing houses, drive cool vehicles and explore the city. Be whoever you want to be in Brookhaven RP.
+
+Thanks for playing! 
+
+Private Server Benefits:
+· Prop Saving
+· Server-Wide Music
+· Server-Wide Announcements
+· Remove or Lock Props
+· Check Prop Owners
+· Set Players as Admins
+· Kick / Temp Ban Players
+· Set Day of the Week
+· Set Time by the Hour
+· Change Weather and Lighting
+· Speed up Time
+· Server Theme Controls
+· No Wait Time for Changing House 
+· Spawn Up to Three Vehicles
+· Prop Limit Increased
+· Freecam for PC users (Shift+P)</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>Brookhaven 🏡RP</h2>
+                        <p>By <a href="https://www.roblox.com/communities/3104358/Brookhaven-by-Voldex#!/about" target="_blank"
+                                class="creator-link">Brookhaven by Voldex</a></p>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>20 Apr 2020</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Roleplay</span></div>
+
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('brookhaven', 'roblox://placeId=4924922222')" class="play-btn"><span
+                                class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="brookhaven" onclick="toggleFavorite('brookhaven', this)"><span
+                                class="material-icons">star_border</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-rivals" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail"
+                        src="https://tr.rbxcdn.com/180DAY-eb783deba3b661ff753ab9be4089188d/768/432/Image/Webp/noFilter"
+                        alt="RIVALS">
+                    <div class="description-box">Welcome to RIVALS, the most intense first person shooter game on Roblox! Challenge other players in 1v1 to 5v5 FPS duels where the first to 5 wins!
+
+🔫 Challenge someone by stepping on a duel pad!
+🔑 Earn keys to unlock new weapons & skins!
+📜 Complete contracts to unlock exclusive rewards!
+🏆 Show off your win streak and climb the leaderboards! 
+
+🎮 Available on Desktop, Phones, Tablets, XBOX, & PlayStation 5!
+💜 Like and join the group for exclusive rewards!
+
+⚠️ WARNING: Cheaters will be permanently banned with no second chances, our anticheat & moderators will catch you. Abusing glitches & using sketchy farming methods are also not allowed!
+
+🏆 RIA25 Best Shooter Experience!</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>RIVALS</h2>
+                        <p>By <a href="https://www.roblox.com/communities/3461453/Nosniy-Games#!/about" target="_blank"
+                                class="creator-link">Nosniy Games</a></p>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>26 May 2024</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Shooter</span></div>
+
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('rivals', 'roblox://placeId=17625359962')" class="play-btn"><span
+                                class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="rivals" onclick="toggleFavorite('rivals', this)"><span
+                                class="material-icons">star_border</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-flee-facility" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail"
+                        src="https://tr.rbxcdn.com/180DAY-f3e6bca490d2d655cde4894e502e5989/768/432/Image/Webp/noFilter"
+                        alt="Flee the Facility">
+                    <div class="description-box">RUN, HIDE, ESCAPE! Run from the beast, unlock the exits, and flee the facility!
+This game runs well on phones, tablets, PC, Xbox, and PlayStation.
+
+📋GAME RULES📋
+https://devforum.roblox.com/t/flee-the-facility-game-rules/3941301
+
+⭐CREDITS⭐
+https://devforum.roblox.com/t/flee-the-facility-credits/2026108</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>Flee the Facility</h2>
+                        <p>By <a href="https://www.roblox.com/communities/3182154/A-W-Apps#!/about" target="_blank"
+                                class="creator-link">A.W. Apps</a></p>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>30 Jun 2017</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Genre</span><span>Survival / Action</span></div>
+
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('flee-facility', 'roblox://placeId=893973440')" class="play-btn"><span
+                                class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="flee-facility" onclick="toggleFavorite('flee-facility', this)"><span
                                 class="material-icons">star_border</span></button>
                     </div>
                 </div>
@@ -1899,7 +2149,12 @@ Enjoy the game? Remember to like (👍) and favourite (🌟)!</div>
             'robots2': { title: 'Build to Survive the Robots 2', img: 'https://tr.rbxcdn.com/180DAY-8d80a4c1885d64b1d8903f6dfb6c485f/768/432/Image/Webp/noFilter', page: 'game-detail-robots2' },
             'tower': { title: 'Tower of Hell', img: 'https://tr.rbxcdn.com/180DAY-20a372111085c33de1e64004e4dca1d8/768/432/Image/Webp/noFilter', page: 'game-detail-tower' },
             'prison': { title: 'Prison Life', img: 'https://tr.rbxcdn.com/180DAY-7e4ac70bc3496ea7e4d039f3cd60b6a4/768/432/Image/Webp/noFilter', page: 'game-detail-prison' },
-            'prospecting': { title: 'Prospecting! 💎', img: 'https://tr.rbxcdn.com/180DAY-e18515933a4c6208e2176d2f0351f12c/768/432/Image/Webp/noFilter', page: 'game-detail-prospecting' }
+            'prospecting': { title: 'Prospecting! 💎', img: 'https://tr.rbxcdn.com/180DAY-e18515933a4c6208e2176d2f0351f12c/768/432/Image/Webp/noFilter', page: 'game-detail-prospecting' },
+            'hide-seek': { title: 'Hide and Seek Extreme', img: 'https://tr.rbxcdn.com/180DAY-c17b13acb45f07ec1517623969b81ec0/768/432/Image/Webp/noFilter', page: 'game-detail-hide-seek' },
+            'horrific-housing': { title: 'Horrific Housing', img: 'https://tr.rbxcdn.com/180DAY-a361113feebd101cd29510bfe3f610dd/768/432/Image/Webp/noFilter', page: 'game-detail-horrific-housing' },
+            'brookhaven': { title: 'Brookhaven 🏡RP', img: 'https://tr.rbxcdn.com/180DAY-a4fb7b266105fa038d92bf425d58ee53/768/432/Image/Webp/noFilter', page: 'game-detail-brookhaven' },
+            'rivals': { title: 'RIVALS', img: 'https://tr.rbxcdn.com/180DAY-eb783deba3b661ff753ab9be4089188d/768/432/Image/Webp/noFilter', page: 'game-detail-rivals' },
+            'flee-facility': { title: 'Flee the Facility', img: 'https://tr.rbxcdn.com/180DAY-f3e6bca490d2d655cde4894e502e5989/768/432/Image/Webp/noFilter', page: 'game-detail-flee-facility' }
         };
 
         function searchGames() {
