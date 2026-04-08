@@ -49,9 +49,16 @@
             z-index: 1000;
         }
 
+        .logo-container {
+            padding: 10px 15px;
+            margin-left: -15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
         .navbar img.logo {
             height: 20px;
-            cursor: pointer;
             filter: invert(1);
             mix-blend-mode: screen;
         }
@@ -405,15 +412,85 @@
             color: white;
             border: 1px solid #333;
         }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 400px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-mode .modal-content {
+            background-color: #232527;
+            color: white;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #757575;
+        }
+
+        .close-modal:hover {
+            color: #393b3d;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background-color: #02b757;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            border: 1px solid #019c4a;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .download-btn:hover {
+            background-color: #019c4a;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="navbar">
-        <img class="logo"
-            src="https://see.fontimg.com/api/rf5/v6dO/ZjY2YTVmYmNjNTEwNDg2N2I1MzM2YjU4OThmYjQ1OTQudHRm/QkVUVEVSQkxPWA/roblox-2017.png?r=fs&h=104&w=1000&fg=000000&bg=FFFFFF&tb=1&s=104"
-            alt="BETTERBLOX" onclick="showPage('home')">
+        <div class="logo-container" onclick="showPage('home')">
+            <img class="logo"
+                src="https://see.fontimg.com/api/rf5/v6dO/ZjY2YTVmYmNjNTEwNDg2N2I1MzM2YjU4OThmYjQ1OTQudHRm/QkVUVEVSQkxPWA/roblox-2017.png?r=fs&h=104&w=1000&fg=000000&bg=FFFFFF&tb=1&s=104"
+                alt="BETTERBLOX">
+        </div>
 
         <div class="search-container">
             <input type="text" id="search-bar" class="search-bar" placeholder="Search games..." onkeyup="searchGames()">
@@ -2119,6 +2196,18 @@ https://devforum.roblox.com/t/flee-the-facility-credits/2026108</div>
         </div>
     </div>
 
+    <div id="launch-modal" class="modal hidden" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 style="margin-top: 0;">Launched in Roblox!</h2>
+            <p>Your game is now launching in the Roblox client. If you don't have Roblox installed, you can download it below.</p>
+            <div class="modal-actions">
+                <a href="https://roblox.com/download/" target="_blank" class="download-btn">Download Roblox</a>
+                <a href="https://www.roblox.com/download/client?os=win" target="_blank" class="download-btn" style="background-color: #0074BD; border-color: #005a91;">Windows Download</a>
+            </div>
+        </div>
+    </div>
+
     <script>
         const gamesData = {
             'piggy': { title: 'Piggy', img: 'https://tr.rbxcdn.com/180DAY-9a6167eabc17cccd69511f6213e94b03/768/432/Image/Webp/noFilter', page: 'game-detail-piggy' },
@@ -2288,6 +2377,11 @@ https://devforum.roblox.com/t/flee-the-facility-credits/2026108</div>
             localStorage.setItem('recentBetterbloxGame', gameId);
             loadRecentGame();
             window.location.href = url;
+            document.getElementById('launch-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('launch-modal').classList.add('hidden');
         }
 
         function clearRecent() {
