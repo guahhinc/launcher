@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Betterblox Launcher</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Classic 2017 Theme */
+        * {
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+        
+        body {
+            background-color: #f2f4f5;
+            margin: 0;
+            padding: 0;
+            color: #393b3d;
+        }
+        .navbar {
+            background-color: #0074BD;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            height: 40px; 
+        }
+        .navbar img.logo { 
+            height: 20px; 
+            cursor: pointer; 
+            filter: invert(1);
+            mix-blend-mode: screen; 
+        }
+        
+        /* Search Bar */
+        .search-container { flex: 1; display: flex; justify-content: center; padding: 0 20px; }
+        .search-bar { width: 100%; max-width: 400px; padding: 6px 12px; border-radius: 4px; border: none; font-size: 14px; outline: none; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        
+        .nav-links { display: flex; align-items: center; position: relative; gap: 15px; }
+        
+        .container { max-width: 95%; margin: 20px auto; padding: 20px; }
+        .box {
+            background-color: white; border: 1px solid #c3c3c3; border-radius: 4px;
+            padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px;
+        }
+
+        .greeting-title { font-size: 36px; font-weight: bold; margin: 10px 0 30px 0; }
+        h2.section-title { font-size: 24px; font-weight: normal; border-bottom: 1px solid #c3c3c3; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        .games-grid { display: flex; flex-wrap: wrap; gap: 20px; }
+        .game-card { background: white; border: 1px solid #c3c3c3; border-radius: 4px; width: 300px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; }
+        .game-card:hover { border-color: #00a2ff; }
+        .game-thumbnail { width: 100%; height: 168px; object-fit: cover; border-bottom: 1px solid #e3e3e3; }
+        .game-info { padding: 15px; }
+        /* Removed bolding from home screen titles */
+        .game-title { font-size: 20px; font-weight: normal; margin: 0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .game-layout { display: flex; gap: 20px; }
+        .main-column { flex: 2; }
+        .side-column { flex: 1; padding: 20px; background-color: #fdfdfd; border: 1px solid #e3e3e3; border-radius: 4px; }
+        
+        .big-thumbnail { width: 100%; border-radius: 4px; border: 1px solid #c3c3c3; }
+        .description-box { margin-top: 20px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+        .game-header-side h2 { margin: 0 0 5px 0; font-size: 32px; font-weight: bold; } 
+        .game-header-side p { margin: 0 0 15px 0; font-size: 14px; color: #757575; }
+        /* Removed bolding from developer links */
+        .creator-link { color: #00a2ff; text-decoration: none; font-weight: normal; }
+        .creator-link:hover { text-decoration: underline; }
+        
+        /* Action Buttons Row */
+        .action-row { display: flex; gap: 10px; margin-bottom: 20px; height: 45px; }
+        
+        .play-btn {
+            flex: 1; background-color: #02b757; color: white; border-radius: 4px; 
+            border: 1px solid #019c4a; cursor: pointer; display: flex; justify-content: center; 
+            align-items: center; text-decoration: none; transition: 0.2s;
+        }
+        .play-btn:hover { background-color: #019c4a; }
+        .play-btn .material-icons { font-size: 36px; }
+
+        .fav-btn {
+            width: 45px; background-color: #f1c40f; color: white; border-radius: 4px; 
+            border: 1px solid #d4ac0d; cursor: pointer; display: flex; justify-content: center; 
+            align-items: center; transition: 0.2s;
+        }
+        .fav-btn:hover { background-color: #d4ac0d; }
+        .fav-btn .material-icons { font-size: 28px; }
+
+        .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; color: #757575; }
+        /* Removed bolding from stat row answers */
+        .stat-row span:last-child { color: #393b3d; font-weight: normal; }
+
+        .hidden { display: none !important; }
+
+        /* SETTINGS & NOTIFICATIONS */
+        .dropdown-container { position: relative; display: inline-block; display: flex; align-items: center; }
+        .nav-icon { font-size: 24px; cursor: pointer; color: white; user-select: none; }
+        .dropdown-menu {
+            position: absolute; right: 0; top: 35px; background: white; border: 1px solid #c3c3c3;
+            border-radius: 4px; padding: 5px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); min-width: 200px; z-index: 100;
+            color: #393b3d;
+        }
+        /* Increased settings text size */
+        .dropdown-menu button { 
+            width: 100%; text-align: left; background: none; border: none; padding: 12px 15px; 
+            cursor: pointer; font-size: 16px; color: inherit;
+        }
+        .dropdown-menu button:hover { background-color: #f2f4f5; }
+        .notification-item { padding: 12px 15px; border-bottom: 1px solid #eee; }
+        .notification-item:last-child { border-bottom: none; }
+        /* Removed bolding and increased notification sizes */
+        .notification-title { font-weight: normal; font-size: 16px; margin-bottom: 5px; }
+        .notification-desc { font-size: 14px; color: #757575; }
+
+        /* DARK MODE STYLES */
+        body.dark-mode { background-color: #111214; color: #e1e1e1; }
+        .dark-mode .box { background-color: #232527; border-color: #111; box-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+        .dark-mode .game-card { background-color: #232527; border-color: #111; }
+        .dark-mode .game-thumbnail { border-bottom-color: #111; }
+        .dark-mode .game-title { color: #fff; }
+        .dark-mode h2.section-title { border-bottom-color: #333; color: #fff; }
+        .dark-mode .side-column { background-color: #1b1c1e; border-color: #111; }
+        .dark-mode .stat-row { border-bottom-color: #333; }
+        .dark-mode .stat-row span:last-child { color: #fff; }
+        .dark-mode .big-thumbnail { border-color: #111; }
+        .dark-mode .dropdown-menu { background-color: #232527; border-color: #111; color: #e1e1e1; }
+        .dark-mode .dropdown-menu button:hover { background-color: #111214; }
+        .dark-mode .notification-item { border-bottom-color: #333; }
+        .dark-mode .notification-desc { color: #aaa; }
+        .dark-mode .search-bar { background-color: #1b1c1e; color: white; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <img class="logo" src="https://see.fontimg.com/api/rf5/v6dO/ZjY2YTVmYmNjNTEwNDg2N2I1MzM2YjU4OThmYjQ1OTQudHRm/QkVUVEVSQkxPWA/roblox-2017.png?r=fs&h=104&w=1000&fg=000000&bg=FFFFFF&tb=1&s=104" alt="BETTERBLOX" onclick="showPage('home')">
+        
+        <div class="search-container">
+            <input type="text" id="search-bar" class="search-bar" placeholder="Search games..." onkeyup="searchGames()">
+        </div>
+
+        <div class="nav-links">
+            <div class="dropdown-container">
+                <span class="material-icons nav-icon" onclick="toggleMenu('notifications-menu')">notifications</span>
+                <div id="notifications-menu" class="dropdown-menu hidden">
+                    <div class="notification-item">
+                        <div class="notification-title">Welcome to Betterblox!</div>
+                        <div class="notification-desc">Launcher setup is complete. New games added.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown-container">
+                <span class="material-icons nav-icon" onclick="toggleMenu('settings-menu')">settings</span>
+                <div id="settings-menu" class="dropdown-menu hidden">
+                    <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+                    <button onclick="changeName()">Change Name</button>
+                    <button onclick="window.open('https://www.roblox.com/users/inventory#!/accessories', '_blank')">Inventory</button>
+                    <button onclick="window.open('https://en.help.roblox.com/hc/en-us', '_blank')">Help & Safety</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="home" class="container page-view">
+        
+        <div class="greeting-title"><span id="greeting-time">Hello</span>, <span id="greeting-name">Player</span>!</div>
+
+        <div id="continue-playing-section" class="hidden">
+            <h2 class="section-title">Continue Playing</h2>
+            <div class="games-grid" id="recent-game-container" style="margin-bottom: 40px;">
+                </div>
+        </div>
+
+        <div id="favorites-section" class="hidden">
+            <h2 class="section-title">Favourites</h2>
+            <div class="games-grid" id="favorites-container" style="margin-bottom: 40px;">
+                </div>
+        </div>
+
+        <h2 class="section-title">All Games</h2>
+        <div class="games-grid" id="all-games-container">
+            
+            <div class="game-card" onclick="showPage('game-detail-piggy')">
+                <img class="game-thumbnail" src="https://tr.rbxcdn.com/180DAY-9a6167eabc17cccd69511f6213e94b03/768/432/Image/Webp/noFilter" alt="Piggy">
+                <div class="game-info">
+                    <h3 class="game-title">Piggy</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">MiniToon</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-3008')">
+                <img class="game-thumbnail" src="https://tr.rbxcdn.com/180DAY-1393cf4ea0d2cb4e97bc0a05938822e6/768/432/Image/Webp/noFilter" alt="3008">
+                <div class="game-info">
+                    <h3 class="game-title">3008</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">uglyburger0</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-smile')">
+                <img class="game-thumbnail" src="https://tr.rbxcdn.com/180DAY-792578a0730d4dcf6dbac9fd15de33e0/768/432/Image/Webp/noFilter" alt="Infectious Smile">
+                <div class="game-info">
+                    <h3 class="game-title">Infectious Smile</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">laughablehaha</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-epic')">
+                <img class="game-thumbnail" src="https://tr.rbxcdn.com/180DAY-7ee35d19e13cefd730129cf99268792c/768/432/Image/Webp/noFilter" alt="Epic Minigames">
+                <div class="game-info">
+                    <h3 class="game-title">Epic Minigames ✨</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">TypicalType</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-shark')">
+                <img class="game-thumbnail" src="https://tr.rbxcdn.com/180DAY-8af54bd04cab100361501d9c38211f4e/768/432/Image/Webp/noFilter" alt="SharkBite Classic">
+                <div class="game-info">
+                    <h3 class="game-title">SharkBite Classic 🦈</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Abracadabra</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-phantom')">
+                <img class="game-thumbnail" src="https://tr.rbxcdn.com/180DAY-bf6f7058336de36c002dc58d33e9c101/768/432/Image/Webp/noFilter" alt="Phantom Forces">
+                <div class="game-info">
+                    <h3 class="game-title">Phantom Forces</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">StyLiS Studios</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-murdurr')">
+                <img class="game-thumbnail" src="https://tr.rbxcdn.com/180DAY-bfdb4c4f5bad565d32ce203e375dc288/768/432/Image/Webp/noFilter" alt="MurDurr">
+                <div class="game-info">
+                    <h3 class="game-title">MurDurr</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Legobirdd</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-untitled')">
+                <img class="game-thumbnail" src="https://tr.rbxcdn.com/180DAY-cd834c110aa147df9bc89a79fece32ea/768/432/Image/Webp/noFilter" alt="untitled tag game">
+                <div class="game-info">
+                    <h3 class="game-title">untitled tag game</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">_create</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-retro')">
+                <img class="game-thumbnail" src="https://tr.rbxcdn.com/180DAY-9e4fae118735bc44c824d52e7c7799f0/768/432/Image/Webp/noFilter" alt="RetroStudio">
+                <div class="game-info">
+                    <h3 class="game-title">RetroStudio</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Retro Dev</span></div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-combat')">
+                <img class="game-thumbnail" src="https://tr.rbxcdn.com/180DAY-6c257588551cecd73f962d8165e6b9f1/768/432/Image/Webp/noFilter" alt="Combat Initiation">
+                <div class="game-info">
+                    <h3 class="game-title">Combat Initiation</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Windforce Interactive</span></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="game-detail-piggy" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-9a6167eabc17cccd69511f6213e94b03/768/432/Image/Webp/noFilter" alt="Piggy">
+                    <div class="description-box">Do you have what it takes to escape Piggy and uncover the mysteries surrounding the beast?
+
+Controls:
+Pick up items / Use items - Click, Tap or Right Trigger
+Crouch / Place trap - CTRL, Tap or B
+
+Credits:
+IK3As - Building
+Optikk & Epic_Tank - Build Mode
+TenuousFlea - Models
+For You to Stay © 2019 Mira K.</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>Piggy</h2>
+                        <p>By <a href="https://www.roblox.com/users/21823494/profile/" target="_blank" class="creator-link">MiniToon</a></p>
+                    </div>
+                    
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('piggy', 'roblox://placeId=4623386862')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="piggy" onclick="toggleFavorite('piggy', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>23 Jan 2020</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Horror</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-3008" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-1393cf4ea0d2cb4e97bc0a05938822e6/768/432/Image/Webp/noFilter" alt="3008">
+                    <div class="description-box">Thumbnail by: PlagueDoctor_Dash
+---
+Welcome to 3008, the unusually large furniture store. Wander through the vast horror land of home hardware located within 3008-1. Build a base, survive from employees.</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>3008</h2>
+                        <p>By <a href="https://www.roblox.com/users/22718068/profile/" target="_blank" class="creator-link">uglyburger0</a></p>
+                    </div>
+                    
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('3008', 'roblox://placeId=2768379856')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="3008" onclick="toggleFavorite('3008', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>21 Jan 2019</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Horror / Survival</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-smile" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-792578a0730d4dcf6dbac9fd15de33e0/768/432/Image/Webp/noFilter" alt="Infectious Smile">
+                    <div class="description-box">As ordinary people we all strive to find true happiness in life. But no... not like this.... something is REALLY off about this...
+
+This game serves to remind us that life is much more complicated than finding true happiness. Sadness, struggle, and anger are a part of the human experience. If your only emotion is happiness... then.. are you really human?
+
+For Server Owners you can use :regen & :disaster & :choosemap
+
+laughablehaha - Scripter
+yurgzen & ItsByskyWrecker - Building
+sirener55 & Vinniie3D - Thumbnail & Scripting & Design</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>Infectious Smile</h2>
+                        <p>By <a href="https://www.roblox.com/communities/5054016/laughablehaha#!/about" target="_blank" class="creator-link">laughablehaha</a></p>
+                    </div>
+                    
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('smile', 'roblox://placeId=5985232436')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="smile" onclick="toggleFavorite('smile', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>22 Nov 2020</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival / Infection</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-epic" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-7ee35d19e13cefd730129cf99268792c/768/432/Image/Webp/noFilter" alt="Epic Minigames">
+                    <div class="description-box">Welcome to Epic Minigames, the game where you can enjoy a collection of 140 unique and exciting minigames! 🕹️
+
+Level up and earn coins by winning rounds, and spend your coins on gear, pets, effects, and other fun stuff for your character. 🌟
+
+As well as the main minigame mode, there's also Epic Party 🎲, a board game where you can compete against a group of friends or strangers to see who can gather the most crystals! 💎</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>Epic Minigames ✨</h2>
+                        <p>By <a href="https://www.roblox.com/users/7568292/profile/" target="_blank" class="creator-link">TypicalType</a></p>
+                    </div>
+                    
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('epic', 'roblox://placeId=277751860')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="epic" onclick="toggleFavorite('epic', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>29 July 2015</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-shark" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-8af54bd04cab100361501d9c38211f4e/768/432/Image/Webp/noFilter" alt="SharkBite Classic">
+                    <div class="description-box">In SharkBite either become the shark or join your friends in a battle of survival against the boat eating shark. Use your weapon to fight off the shark or avoid it all cost! At the end of each round use your shark teeth to buy more exciting items! Developers: Simoon68 & Opplo</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>SharkBite Classic 🦈</h2>
+                        <p>By <a href="https://www.roblox.com/communities/997074/Abracadabra#!/about" target="_blank" class="creator-link">Abracadabra</a></p>
+                    </div>
+                    
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('shark', 'roblox://placeId=734159876')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="shark" onclick="toggleFavorite('shark', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>11 Apr 2017</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-phantom" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-bf6f7058336de36c002dc58d33e9c101/768/432/Image/Webp/noFilter" alt="Phantom Forces">
+                    <div class="description-box">If you are on PS5 or XBOX, visit the StyLiS Group to find the Console version!
+
+[Update Notes]
+We're taking a different approach to dynamic scalable menu so the new menu may not scale perfectly to all screens
+Try playing around with /menuscale: and /menuaspectratio: commands to see what works best for you
+
+Thank you for continuing support for PF for over 10 years!</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>Phantom Forces</h2>
+                        <p>By <a href="https://www.roblox.com/communities/1103278/StyLiS-Studios" target="_blank" class="creator-link">StyLiS Studios</a></p>
+                    </div>
+                    
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('phantom', 'roblox://placeId=292439477')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="phantom" onclick="toggleFavorite('phantom', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>31 Aug 2015</span></div>
+                    <div class="stat-row"><span>Genre</span><span>FPS</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-murdurr" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-bfdb4c4f5bad565d32ce203e375dc288/768/432/Image/Webp/noFilter" alt="MurDurr">
+                    <div class="description-box">Durr has turned evil… and he is hungry.
+
+Warning: Flashing lights, blood, loud noises.
+
+RESTART = UPDATE
+JOIN OUR SOCIAL SERVERS!
+Inspired by Orange the killer: Deluxe, You VS Homer, etc
+(games new and has bugs)
+Tags: Horror, Asym, Scary, Escape, Survival, Durr, Emojis, Forsaken, Gubby, Retro, Durr, Earnest, Retro, Retro Studio, Classic, 2016 , 2017, Roblox, Retro Roblox, Fortnite, Durr, 2012</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>MurDurr</h2>
+                        <p>By <a href="https://www.roblox.com/users/296867003/profile/" target="_blank" class="creator-link">Legobirdd</a></p>
+                    </div>
+                    
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('murdurr', 'roblox://placeId=79735281630764')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="murdurr" onclick="toggleFavorite('murdurr', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>11 Jan 2026</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-untitled" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-cd834c110aa147df9bc89a79fece32ea/768/432/Image/Webp/noFilter" alt="untitled tag game">
+                    <div class="description-box">play variations of tag with advanced movement, such as climbing, sliding, rolling, vaulting, swinging, and more! 
+
+untitled tag game is a nostalgic parkour tag game inspired by roblox brickbattle games & other classics.
+this game is a remake and continuation of it's legacy counterpart, all made from scratch.
+
+join the communications server for updates!
+make sure to like and favorite the game!
+
+[W] - run
+[LMB] - tag
+[B] - shop
+[I] - inventory
+[G] - emote
+[Q] - menu
+
+this game has no copyrighted tracks. almost all music was made by the untitled tag game community.
+thank you for playing! &lt;3</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>untitled tag game</h2>
+                        <p>By <a href="https://www.roblox.com/communities/6682631/create" target="_blank" class="creator-link">_create</a></p>
+                    </div>
+                    
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('untitled', 'roblox://placeId=14044547200')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="untitled" onclick="toggleFavorite('untitled', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>13 July 2023</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Action</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-retro" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-9e4fae118735bc44c824d52e7c7799f0/768/432/Image/Webp/noFilter" alt="RetroStudio">
+                    <div class="description-box">Nominated for Builderman Award of Excellence 2022
+
+Create and play your own classic Roblox games.
+
+Our engine can simulate any time period between early 2009 to mid 2015!</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>RetroStudio</h2>
+                        <p>By <a href="https://www.roblox.com/communities/5264310/Retro-Dev#!/about" target="_blank" class="creator-link">Retro Dev</a></p>
+                    </div>
+                    
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('retro', 'roblox://placeId=5846386835')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="retro" onclick="toggleFavorite('retro', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>19 Oct 2020</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Simulation</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-combat" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-6c257588551cecd73f962d8165e6b9f1/768/432/Image/Webp/noFilter" alt="Combat Initiation">
+                    <div class="description-box">[Beta v2.2.2] 
+
+Gather a team, choose your weapons, select your tools, and ascend the spire of certain death. Do you have what it takes? 
+
+Combat Initiation is a fast-paced arena brickbattle game that puts you in a max group of 6 against all varying threats standing in your way. With all your 7 granted branching weapons to choose from, blaze through every army as you seek to reach the top. 
+
+Inspired by many games, most notably a hit game named ULTRAKILL.</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>Combat Initiation</h2>
+                        <p>By <a href="https://www.roblox.com/communities/32454792/Windforce-Interactive#!/about" target="_blank" class="creator-link">Windforce Interactive</a></p>
+                    </div>
+                    
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('combat', 'roblox://placeId=13559635034')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="combat" onclick="toggleFavorite('combat', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+
+                    <div class="stat-row"><span>Created</span><span>27 May 2023</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Action</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gamesData = {
+            'piggy': { title: 'Piggy', img: 'https://tr.rbxcdn.com/180DAY-9a6167eabc17cccd69511f6213e94b03/768/432/Image/Webp/noFilter', page: 'game-detail-piggy' },
+            '3008': { title: '3008', img: 'https://tr.rbxcdn.com/180DAY-1393cf4ea0d2cb4e97bc0a05938822e6/768/432/Image/Webp/noFilter', page: 'game-detail-3008' },
+            'smile': { title: 'Infectious Smile', img: 'https://tr.rbxcdn.com/180DAY-792578a0730d4dcf6dbac9fd15de33e0/768/432/Image/Webp/noFilter', page: 'game-detail-smile' },
+            'epic': { title: 'Epic Minigames ✨', img: 'https://tr.rbxcdn.com/180DAY-7ee35d19e13cefd730129cf99268792c/768/432/Image/Webp/noFilter', page: 'game-detail-epic' },
+            'shark': { title: 'SharkBite Classic 🦈', img: 'https://tr.rbxcdn.com/180DAY-8af54bd04cab100361501d9c38211f4e/768/432/Image/Webp/noFilter', page: 'game-detail-shark' },
+            'phantom': { title: 'Phantom Forces', img: 'https://tr.rbxcdn.com/180DAY-bf6f7058336de36c002dc58d33e9c101/768/432/Image/Webp/noFilter', page: 'game-detail-phantom' },
+            'murdurr': { title: 'MurDurr', img: 'https://tr.rbxcdn.com/180DAY-bfdb4c4f5bad565d32ce203e375dc288/768/432/Image/Webp/noFilter', page: 'game-detail-murdurr' },
+            'untitled': { title: 'untitled tag game', img: 'https://tr.rbxcdn.com/180DAY-cd834c110aa147df9bc89a79fece32ea/768/432/Image/Webp/noFilter', page: 'game-detail-untitled' },
+            'retro': { title: 'RetroStudio', img: 'https://tr.rbxcdn.com/180DAY-9e4fae118735bc44c824d52e7c7799f0/768/432/Image/Webp/noFilter', page: 'game-detail-retro' },
+            'combat': { title: 'Combat Initiation', img: 'https://tr.rbxcdn.com/180DAY-6c257588551cecd73f962d8165e6b9f1/768/432/Image/Webp/noFilter', page: 'game-detail-combat' }
+        };
+
+        function searchGames() {
+            const input = document.getElementById('search-bar').value.toLowerCase();
+            const cards = document.querySelectorAll('#all-games-container .game-card');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('.game-title').textContent.toLowerCase();
+                if (title.includes(input)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            showPage('home'); 
+        }
+
+        function loadGreetingTime() {
+            const hour = new Date().getHours();
+            let greeting = "Good Evening";
+            if (hour < 12) greeting = "Good Morning";
+            else if (hour < 18) greeting = "Good Afternoon";
+            document.getElementById('greeting-time').textContent = greeting;
+        }
+
+        function loadName() {
+            const savedName = localStorage.getItem('betterbloxName') || 'Player';
+            document.getElementById('greeting-name').textContent = savedName;
+        }
+
+        function changeName() {
+            const newName = prompt("Enter your new name:");
+            if (newName && newName.trim() !== "") {
+                localStorage.setItem('betterbloxName', newName.trim());
+                loadName();
+            }
+            document.getElementById('settings-menu').classList.add('hidden'); 
+        }
+
+        function loadTheme() {
+            const isDark = localStorage.getItem('betterbloxDarkMode') === 'true';
+            if (isDark) document.body.classList.add('dark-mode');
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('betterbloxDarkMode', isDark);
+            document.getElementById('settings-menu').classList.add('hidden'); 
+        }
+
+        function renderFavorites() {
+            const favs = JSON.parse(localStorage.getItem('betterbloxFavs') || '[]');
+            const container = document.getElementById('favorites-container');
+            const section = document.getElementById('favorites-section');
+            
+            if (favs.length > 0) {
+                container.innerHTML = ''; 
+                favs.forEach(id => {
+                    if (gamesData[id]) {
+                        const game = gamesData[id];
+                        container.innerHTML += `
+                            <div class="game-card" onclick="showPage('${game.page}')">
+                                <img class="game-thumbnail" src="${game.img}" alt="${game.title}">
+                                <div class="game-info">
+                                    <h3 class="game-title">${game.title}</h3>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+
+        function toggleFavorite(gameId, btnElement) {
+            let favs = JSON.parse(localStorage.getItem('betterbloxFavs') || '[]');
+            const icon = btnElement.querySelector('.material-icons');
+            
+            if (favs.includes(gameId)) {
+                favs = favs.filter(id => id !== gameId); 
+                icon.textContent = 'star_border';
+            } else {
+                favs.push(gameId); 
+                icon.textContent = 'star';
+            }
+            
+            localStorage.setItem('betterbloxFavs', JSON.stringify(favs));
+            renderFavorites(); 
+        }
+
+        function loadFavorites() {
+            let favs = JSON.parse(localStorage.getItem('betterbloxFavs') || '[]');
+            document.querySelectorAll('.fav-btn').forEach(btn => {
+                const gameId = btn.getAttribute('data-game');
+                const icon = btn.querySelector('.material-icons');
+                if (favs.includes(gameId)) {
+                    icon.textContent = 'star';
+                } else {
+                    icon.textContent = 'star_border';
+                }
+            });
+            renderFavorites(); 
+        }
+
+        function loadRecentGame() {
+            const recentId = localStorage.getItem('recentBetterbloxGame');
+            const container = document.getElementById('recent-game-container');
+            const section = document.getElementById('continue-playing-section');
+
+            if (recentId && gamesData[recentId]) {
+                const game = gamesData[recentId];
+                container.innerHTML = `
+                    <div class="game-card" onclick="showPage('${game.page}')">
+                        <img class="game-thumbnail" src="${game.img}" alt="${game.title}">
+                        <div class="game-info">
+                            <h3 class="game-title">${game.title}</h3>
+                        </div>
+                    </div>
+                `;
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+
+        function launchGame(gameId, url) {
+            localStorage.setItem('recentBetterbloxGame', gameId);
+            loadRecentGame(); 
+            window.location.href = url; 
+        }
+
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page-view');
+            pages.forEach(page => page.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        function toggleMenu(menuId) {
+            const menus = document.querySelectorAll('.dropdown-menu');
+            menus.forEach(menu => {
+                if(menu.id !== menuId) menu.classList.add('hidden');
+            });
+            document.getElementById(menuId).classList.toggle('hidden');
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.nav-icon')) {
+                const dropdowns = document.getElementsByClassName("dropdown-menu");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    let openDropdown = dropdowns[i];
+                    if (!openDropdown.classList.contains('hidden')) {
+                        openDropdown.classList.add('hidden');
+                    }
+                }
+            }
+        }
+
+        // Initialize on load
+        loadGreetingTime();
+        loadName();
+        loadTheme();
+        loadRecentGame();
+        loadFavorites();
+    </script>
+
+</body>
+</html>
