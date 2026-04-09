@@ -451,6 +451,27 @@ h2.section-title {
     font-size: 28px;
 }
 
+.server-btn {
+    width: 45px;
+    background-color: #757575;
+    color: white;
+    border-radius: 4px;
+    border: 1px solid #616161;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.2s;
+}
+
+.server-btn:hover {
+    background-color: #616161;
+}
+
+.server-btn .material-icons {
+    font-size: 28px;
+}
+
 .stat-row {
     display: flex;
     justify-content: space-between;
@@ -617,6 +638,8 @@ body.dark-mode {
     color: white;
     border-color: #444;
 }
+
+/* Server button is consistent grey in both modes */
 
 /* Dark Mode Marketplace */
 .dark-mode .item-card {
