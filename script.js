@@ -40,7 +40,11 @@ const gamesData = {
     'robot64': { title: 'Robot 64', developer: 'zKevin', genre: 'Obby / Platformer', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-f1e38127294c9673738306a5d002b372/768/432/Image/Webp/noFilter', page: 'game-detail-robot64', launchUrl: 'roblox://placeId=1111083356', placeId: '1111083356', tags: ['Obby', 'Platformer', 'Adventure', 'Collection'], description: 'Robot 64 is a modern 3D Platformer with a large array of movements. Explore wacky worlds and collect ice cream!' },
     'markers': { title: 'Find the Markers', developer: 'markers epic memers', genre: 'Adventure / Scavenger Hunt', year: 2021, img: 'https://tr.rbxcdn.com/180DAY-666aa1bde55fa5557827dc36e10c6c8d/768/432/Image/Webp/noFilter', page: 'game-detail-markers', launchUrl: 'roblox://placeId=7896264844', placeId: '7896264844', tags: ['Adventure', 'Scavenger Hunt', 'Puzzle', 'Collection'], description: 'this game was highly inspired by a lot of "find the" games, specifically "find the domos". Marker originated from the web series known as \'battle for dream island\'.' },
     'deforestation': { title: 'deforestation therapy || alpha', developer: 'The Fartering Few', genre: 'Simulation', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-fedb2d4f532dbb6ccc21a9050a9dc750/768/432/Image/Webp/noFilter', page: 'game-detail-deforestation', launchUrl: 'roblox://placeId=18216750738', placeId: '18216750738', tags: ['Simulation', 'Satisfying', 'Retro', 'Atmospheric'], description: 'a calm game where you (and your friends) deforest a forest full of trees! The game doesn\'t try to stress or rush you, just keep you in peace of mind. Uses classic roblox and 90s asthetics.' },
-    'sbb': { title: 'SBB Marathon', developer: 'Maelstronomer', genre: 'Sports / Racing', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-ec5fc17541e2ab2233bbfe151926261c/768/432/Image/Webp/noFilter', page: 'game-detail-sbb', launchUrl: 'roblox://placeId=4999134338', placeId: '4999134338', tags: ['Sports', 'Racing', 'Classic', 'Fast-paced'], description: 'From the creator of Super Blocky Ball, All 15 maps put together! Now with backwards racing!!' }
+    'sbb': { title: 'SBB Marathon', developer: 'Maelstronomer', genre: 'Sports / Racing', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-ec5fc17541e2ab2233bbfe151926261c/768/432/Image/Webp/noFilter', page: 'game-detail-sbb', launchUrl: 'roblox://placeId=4999134338', placeId: '4999134338', tags: ['Sports', 'Racing', 'Classic', 'Fast-paced'], description: 'From the creator of Super Blocky Ball, All 15 maps put together! Now with backwards racing!!' },
+    'banana-eats': { title: 'Banana Eats', developer: 'RyCitrus', genre: 'Survival', year: 2019, img: 'https://tr.rbxcdn.com/180DAY-9c13ad9096e592d4afadec6f7913e46c/768/432/Image/Webp/noFilter', page: 'game-detail-banana-eats', launchUrl: 'roblox://placeId=4448566543', placeId: '4448566543', tags: ['Survival', 'Escape', 'Puzzles', 'Killer', 'Skins'], description: 'Hide from Banana, complete hidden puzzles, and escape when exits open! Survive, earn coins, and unlock over 500 playable skins! Can you survive the killer banana?' },
+    'arsenal': { title: 'Arsenal', developer: 'ROLVe', genre: 'Shooter', year: 2015, img: 'https://tr.rbxcdn.com/180DAY-05dd752d8a8bced5c802236d64cf7809/768/432/Image/Webp/noFilter', page: 'game-detail-arsenal', launchUrl: 'roblox://placeId=286090429', placeId: '286090429', tags: ['Shooter', 'Fast-paced', 'Arcade', 'Weapons', 'Competitive'], description: 'Race to the top through a massive Arsenal of weapons! Conquer the day in fast paced arcade gameplay, from bazookas to spell books, each weapon will keep you guessing on what\'s next! Earn BattleBucks and trick out your game with a huge cast of characters, melees, kill effects, skins and more!' },
+    'demonology': { title: 'Demonology🕯️', developer: 'Blaqk Magic Blue', genre: 'Horror', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-73d277df7a233a3aaf2afb060b5f7452/768/432/Image/Webp/noFilter', page: 'game-detail-demonology', launchUrl: 'roblox://placeId=18199615050', placeId: '18199615050', tags: ['Horror', 'Ghost-hunting', 'Identity', 'Investigation', 'Evil'], description: '🕯️Use the tools at your disposal to hunt down and identify the evil spirits haunting your jobsite! For the best experience, play with max graphic settings! 🎙️ Sadly, voice chat can\'t be used to ask questions to the Spirit Box or Umbra Board. Demonology\'s music is custom & copyright free, feel free to use it in videos!' },
+    'pizza-place': { title: '🍕Work at a Pizza Place', developer: 'Dued1', genre: 'Roleplay & Avatar Sim', year: 2008, img: 'https://tr.rbxcdn.com/180DAY-95a48d9b2051185ec0e8c98c21d48319/768/432/Image/Webp/noFilter', page: 'game-detail-pizza-place', launchUrl: 'roblox://placeId=192800', placeId: '192800', tags: ['Roleplay', 'Teamwork', 'Food', 'House-upgrade', 'Simulation'], description: '🤝Work as a team to fulfill food orders. 🏠Use your work earnings to upgrade your house and buy furniture.' }
 };
 
 function searchGames() {
@@ -430,14 +434,7 @@ function launchGame(gameKey, url) {
 
     loadRecentGame();
 
-    const activeAcc = localStorage.getItem('betterbloxActiveAccount');
-    let finalUrl = url;
-    if (activeAcc) {
-        // Assuming url already has placeId, we append username
-        finalUrl += `&username=${encodeURIComponent(activeAcc)}`;
-    }
-
-    window.location.href = finalUrl;
+    window.location.href = url;
     document.getElementById('launch-modal').classList.remove('hidden');
 }
 
@@ -537,175 +534,9 @@ window.onclick = function (event) {
     }
 }
 
-function openLoginModal() {
-    document.getElementById('account-menu').classList.add('hidden');
-    document.getElementById('login-modal').classList.remove('hidden');
-}
 
-function closeLoginModal() {
-    document.getElementById('login-modal').classList.add('hidden');
-}
 
-// ====== ROBLOX OAUTH2 PKCE IMPLEMENTATION ======
-// Set this to your actual Client ID from the Roblox Developer Portal!
-const OAUTH_CLIENT_ID = "9102062315667697258";
-const OAUTH_REDIRECT_URI = window.location.href.split('?')[0];
 
-function generateRandomString(length) {
-    const array = new Uint32Array(length / 2);
-    window.crypto.getRandomValues(array);
-    return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
-}
-
-async function generateCodeChallenge(verifier) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(verifier);
-    const digest = await window.crypto.subtle.digest('SHA-256', data);
-    return btoa(String.fromCharCode(...new Uint8Array(digest)))
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
-async function startRobloxOAuth() {
-    if (OAUTH_CLIENT_ID === "YOUR_CLIENT_ID_HERE") {
-        alert("Developer Note: You need to register an app on Roblox Open Cloud and set the OAUTH_CLIENT_ID near the bottom of this file before this button will function.");
-        return;
-    }
-
-    const verifier = generateRandomString(64);
-    const state = generateRandomString(32);
-    localStorage.setItem('roblox_oauth_verifier', verifier);
-    localStorage.setItem('roblox_oauth_state', state);
-
-    const challenge = await generateCodeChallenge(verifier);
-
-    const authUrl = new URL("https://apis.roblox.com/oauth/v1/authorize");
-    authUrl.searchParams.append("client_id", OAUTH_CLIENT_ID);
-    authUrl.searchParams.append("redirect_uri", OAUTH_REDIRECT_URI);
-    authUrl.searchParams.append("scope", "openid profile");
-    authUrl.searchParams.append("response_type", "code");
-    authUrl.searchParams.append("state", state);
-    authUrl.searchParams.append("code_challenge", challenge);
-    authUrl.searchParams.append("code_challenge_method", "S256");
-
-    window.location.href = authUrl.toString();
-}
-
-async function checkOAuthCallback() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    const state = urlParams.get('state');
-
-    if (code && state) {
-        const savedState = localStorage.getItem('roblox_oauth_state');
-        const verifier = localStorage.getItem('roblox_oauth_verifier');
-
-        if (state !== savedState) {
-            console.error("OAuth State Mismatch");
-            return;
-        }
-
-        try {
-            const response = await fetch("https://apis.roblox.com/oauth/v1/token", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams({
-                    client_id: OAUTH_CLIENT_ID,
-                    grant_type: "authorization_code",
-                    code: code,
-                    redirect_uri: OAUTH_REDIRECT_URI,
-                    code_verifier: verifier
-                })
-            });
-
-            const data = await response.json();
-            if (data.access_token) {
-                const userRes = await fetch("https://apis.roblox.com/oauth/v1/userinfo", {
-                    headers: { "Authorization": `Bearer ${data.access_token}` }
-                });
-                const userData = await userRes.json();
-
-                let accounts = JSON.parse(localStorage.getItem('betterbloxAccounts') || '[]');
-                const newAcc = {
-                    username: userData.preferred_username || userData.nickname || "User",
-                    avatar: userData.picture || "https://tr.rbxcdn.com/38c6edcb50633730e9159382f54506eb/150/150/AvatarHeadshot/Webp"
-                };
-
-                if (!accounts.some(acc => acc.username === newAcc.username)) {
-                    accounts.push(newAcc);
-                    localStorage.setItem('betterbloxAccounts', JSON.stringify(accounts));
-                }
-
-                localStorage.setItem('betterbloxActiveAccount', newAcc.username);
-                window.history.replaceState({}, document.title, window.location.pathname);
-                loadAccounts();
-            }
-        } catch (e) {
-            console.error("OAuth Validation Error:", e);
-        }
-    }
-}
-
-function loadAccounts() {
-    let accounts = JSON.parse(localStorage.getItem('betterbloxAccounts') || '[]');
-    const activeAcc = localStorage.getItem('betterbloxActiveAccount');
-    const list = document.getElementById('accounts-list');
-    if (!list) return;
-    list.innerHTML = '';
-
-    const iconContainer = document.getElementById('current-account-icon-container');
-
-    if (activeAcc && accounts.some(acc => acc.username === activeAcc)) {
-        const activeData = accounts.find(acc => acc.username === activeAcc);
-        iconContainer.innerHTML = `<img src="${activeData.avatar}" class="nav-avatar" onclick="toggleMenu('account-menu')">`;
-    } else {
-        iconContainer.innerHTML = `<span class="material-icons nav-icon" onclick="toggleMenu('account-menu')">account_circle</span>`;
-    }
-
-    accounts.forEach(acc => {
-        const isActive = acc.username === activeAcc;
-        const container = document.createElement('div');
-        container.style.display = 'flex';
-        container.style.alignItems = 'center';
-        container.className = `account-item ${isActive ? 'active' : ''}`;
-
-        container.innerHTML = `
-            <div style="flex:1; display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="switchAccount('${acc.username}')">
-                <img src="${acc.avatar}" alt="Avatar">
-                <span style="font-size: 16px;">${acc.username}</span>
-                ${isActive ? '<span class="material-icons" style="font-size: 18px; color: #02b757; margin-left:5px;">check_circle</span>' : ''}
-            </div>
-            <span class="material-icons remove-acc-btn" title="Remove Account" onclick="event.stopPropagation(); removeAccount('${acc.username}')">logout</span>
-        `;
-        list.appendChild(container);
-    });
-
-    if (accounts.length === 0) {
-        list.innerHTML = '<div style="padding: 10px 15px; color: #757575; font-size: 14px;">No accounts added.</div>';
-    }
-}
-
-function switchAccount(username) {
-    localStorage.setItem('betterbloxActiveAccount', username);
-    loadAccounts();
-    document.getElementById('account-menu').classList.add('hidden');
-}
-
-function removeAccount(username) {
-    let accounts = JSON.parse(localStorage.getItem('betterbloxAccounts') || '[]');
-    accounts = accounts.filter(acc => acc.username !== username);
-    localStorage.setItem('betterbloxAccounts', JSON.stringify(accounts));
-
-    const activeAcc = localStorage.getItem('betterbloxActiveAccount');
-    if (activeAcc === username) {
-        if (accounts.length > 0) {
-            localStorage.setItem('betterbloxActiveAccount', accounts[0].username);
-        } else {
-            localStorage.removeItem('betterbloxActiveAccount');
-        }
-    }
-
-    loadAccounts();
-}
 
 
 
@@ -723,9 +554,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadGreetingTime();
     loadName();
     loadTheme();
-    checkOAuthCallback().then(() => {
-        loadAccounts();
-    });
     loadRecentGame();
     loadFavorites();
     loadRecommendations();

@@ -46,23 +46,9 @@
         </div>
 
         <div class="nav-links">
-            <div class="dropdown-container">
-                <div id="current-account-icon-container" style="display:flex; align-items:center;">
-                    <span class="material-icons nav-icon" onclick="toggleMenu('account-menu')">account_circle</span>
+                <div id="friends-link-container" style="display:flex; align-items:center;">
+                    <span class="material-icons nav-icon" onclick="window.open('https://www.roblox.com/users/friends#!/friends', '_blank')" title="Friends">people</span>
                 </div>
-                <div id="account-menu" class="dropdown-menu hidden" style="width: 250px; padding: 10px 0;">
-                    <div
-                        style="font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #eee; padding: 0 15px 10px 15px;">
-                        Accounts</div>
-                    <div id="accounts-list">
-                    </div>
-                    <button onclick="openLoginModal()"
-                        style="color: #00a2ff; font-weight: bold; padding: 10px 15px; margin-top: 5px;">
-                        <span class="material-icons" style="font-size: 20px; vertical-align: middle;">add</span> Add
-                        Account
-                    </button>
-                </div>
-            </div>
 
             <div class="dropdown-container">
                 <span class="material-icons nav-icon" onclick="toggleMenu('settings-menu')">settings</span>
@@ -71,8 +57,7 @@
                     <button onclick="changeName()">Change Name</button>
                     <button onclick="clearRecent()">Clear Recently Played</button>
                     <button onclick="clearTasteProfile()">Clear Recommendation Knowledge</button>
-                    <button
-                        onclick="window.open('https://www.roblox.com/users/inventory#!/accessories', '_blank')">Inventory</button>
+
                     <button onclick="window.open('https://en.help.roblox.com/hc/en-us', '_blank')">Help &
                         Safety</button>
                 </div>
@@ -575,6 +560,50 @@
                 <div class="game-info">
                     <h3 class="game-title">SBB Marathon</h3>
                     <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Maelstronomer</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-banana-eats')">
+                <img class="game-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-9c13ad9096e592d4afadec6f7913e46c/768/432/Image/Webp/noFilter"
+                    alt="Banana Eats">
+                <div class="game-info">
+                    <h3 class="game-title">Banana Eats</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">RyCitrus</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-arsenal')">
+                <img class="game-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-05dd752d8a8bced5c802236d64cf7809/768/432/Image/Webp/noFilter"
+                    alt="Arsenal">
+                <div class="game-info">
+                    <h3 class="game-title">Arsenal</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">ROLVe</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-demonology')">
+                <img class="game-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-73d277df7a233a3aaf2afb060b5f7452/768/432/Image/Webp/noFilter"
+                    alt="Demonology🕯️">
+                <div class="game-info">
+                    <h3 class="game-title">Demonology🕯️</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Blaqk Magic Blue</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="showPage('game-detail-pizza-place')">
+                <img class="game-thumbnail"
+                    src="https://tr.rbxcdn.com/180DAY-95a48d9b2051185ec0e8c98c21d48319/768/432/Image/Webp/noFilter"
+                    alt="🍕Work at a Pizza Place">
+                <div class="game-info">
+                    <h3 class="game-title">🍕Work at a Pizza Place</h3>
+                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Dued1</span>
                     </div>
                 </div>
             </div>
@@ -2287,6 +2316,115 @@
         </div>
     </div>
 
+    <!-- New Games -->
+    <div id="game-detail-banana-eats" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-9c13ad9096e592d4afadec6f7913e46c/768/432/Image/Webp/noFilter" alt="Banana Eats">
+                    <div class="description-box">Hide from Banana, complete hidden puzzles, and escape when exits open! Survive, earn coins, and unlock over 500 playable skins! Can you survive the killer banana? 
+
+RIPE BONUS: 
+• Get bonus coins every round with Premium! 
+• Join our Roblox Community for a FREE Skin!
+• Get Double XP Every Weekend!</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>Banana Eats</h2>
+                        <p>By <a href="https://www.roblox.com/users/21746001/profile/" target="_blank" class="creator-link">RyCitrus</a></p>
+                    </div>
+                    <div class="stat-row"><span>Created</span><span>23 Nov 2019</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span id="times-played-banana-eats">0</span></div>
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('banana-eats', 'roblox://placeId=4448566543')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="banana-eats" onclick="toggleFavorite('banana-eats', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-arsenal" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-05dd752d8a8bced5c802236d64cf7809/768/432/Image/Webp/noFilter" alt="Arsenal">
+                    <div class="description-box">Race to the top through a massive Arsenal of weapons! 
+Conquer the day in fast paced arcade gameplay, from bazookas to spell books, each weapon will keep you guessing on what's next! 
+Earn BattleBucks and trick out your game with a huge cast of characters, melees, kill effects, skins and more!</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>Arsenal</h2>
+                        <p>By <a href="https://www.roblox.com/communities/2613928/ROLVe#!/about" target="_blank" class="creator-link">ROLVe</a></p>
+                    </div>
+                    <div class="stat-row"><span>Created</span><span>18 Aug 2015</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Shooter</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span id="times-played-arsenal">0</span></div>
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('arsenal', 'roblox://placeId=286090429')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="arsenal" onclick="toggleFavorite('arsenal', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-demonology" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-73d277df7a233a3aaf2afb060b5f7452/768/432/Image/Webp/noFilter" alt="Demonology🕯️">
+                    <div class="description-box">🕯️Use the tools at your disposal to hunt down and identify the evil spirits haunting your jobsite!
+👁️ For the best experience, play with max graphic settings!
+🎙️ Sadly, voice chat can't be used to ask questions to the Spirit Box or Umbra Board.
+Demonology's music is custom & copyright free, feel free to use it in videos!</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>Demonology🕯️</h2>
+                        <p>By <a href="https://www.roblox.com/communities/32847485/Blaqk Magic Blue#!/about" target="_blank" class="creator-link">Blaqk Magic Blue</a></p>
+                    </div>
+                    <div class="stat-row"><span>Created</span><span>24 Jun 2024</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Horror</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span id="times-played-demonology">0</span></div>
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('demonology', 'roblox://placeId=18199615050')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="demonology" onclick="toggleFavorite('demonology', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-detail-pizza-place" class="container page-view hidden">
+        <div class="box">
+            <div class="game-layout">
+                <div class="main-column">
+                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-95a48d9b2051185ec0e8c98c21d48319/768/432/Image/Webp/noFilter" alt="🍕Work at a Pizza Place">
+                    <div class="description-box">🤝Work as a team to fulfill food orders.
+🏠Use your work earnings to upgrade your house and buy furniture.
+Don't forget to 👍 and ⭐! It really helps!</div>
+                </div>
+                <div class="side-column">
+                    <div class="game-header-side">
+                        <h2>🍕Work at a Pizza Place</h2>
+                        <p>By <a href="https://www.roblox.com/users/82471/profile/" target="_blank" class="creator-link">Dued1</a></p>
+                    </div>
+                    <div class="stat-row"><span>Created</span><span>28 Mar 2008</span></div>
+                    <div class="stat-row"><span>Genre</span><span>Roleplay & Avatar Sim</span></div>
+                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span id="times-played-pizza-place">0</span></div>
+                    <div class="action-row">
+                        <a href="#" onclick="launchGame('pizza-place', 'roblox://placeId=192800')" class="play-btn"><span class="material-icons">play_arrow</span></a>
+                        <button class="fav-btn" data-game="pizza-place" onclick="toggleFavorite('pizza-place', this)"><span class="material-icons">star_border</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="game-detail-sbb" class="container page-view hidden">
         <div class="box">
             <div class="game-layout">
@@ -2331,23 +2469,7 @@
         </div>
     </div>
 
-    <div id="login-modal" class="modal hidden" onclick="closeLoginModal()">
-        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 350px; text-align: center;">
-            <span class="close-modal" onclick="closeLoginModal()">&times;</span>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Roblox_Corporation_2025_logo.svg/960px-Roblox_Corporation_2025_logo.svg.png"
-                class="roblox-modal-logo" alt="Roblox">
-            <h2 style="margin-top: 0; font-size: 20px;">THIS IS NOT WORKING YET IT WILL GIVE YOU AN ERROR</h2>
-            <div style="text-align: center; margin-top: 30px;">
-                <button onclick="startRobloxOAuth()"
-                    style="background-color: #000; color: white; padding: 12px 20px; font-size: 16px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; display: block; width: 100%; transition: transform 0.2s;">
-                    Sign in with Roblox
-                </button>
-            </div>
-            <p style="font-size: 12px; color: #757575; margin-top: 20px;">Signing in is not required but recommended if
-                you have multiple accounts.
-                Authentication is handled securely by Roblox OAuth 2.0 API.</p>
-        </div>
-    </div>
+
 
     <div id="launch-modal" class="modal hidden" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
@@ -2358,9 +2480,7 @@
             <p>Your game is now launching in the Roblox client. If you don't have Roblox installed, you can download it
                 below.</p>
             <div class="modal-actions">
-                <a href="https://roblox.com/download/" target="_blank" class="download-btn">Download Roblox</a>
-                <a href="https://www.roblox.com/download/client?os=win" target="_blank" class="download-btn"
-                    style="background-color: #0074BD; border-color: #005a91;">Windows Download</a>
+                <a href="https://roblox.com/download/" target="_blank" class="download-btn" style="width: 100%; text-align: center;">Download Roblox</a>
             </div>
         </div>
     </div>
