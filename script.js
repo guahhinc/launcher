@@ -1,46 +1,46 @@
 const gamesData = {
-    'piggy': { title: 'Piggy', developer: 'MiniToon', genre: 'Horror', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-9a6167eabc17cccd69511f6213e94b03/768/432/Image/Webp/noFilter', page: 'game-detail-piggy', launchUrl: 'roblox://placeId=4623386862', description: 'Do you have what it takes to escape Piggy and uncover the mysteries surrounding the beast?' },
-    '3008': { title: '3008', developer: 'uglyburger0', genre: 'Horror', year: 2019, img: 'https://tr.rbxcdn.com/180DAY-1393cf4ea0d2cb4e97bc0a05938822e6/768/432/Image/Webp/noFilter', page: 'game-detail-3008', launchUrl: 'roblox://placeId=2768379856', description: 'Wander through the vast horror land of home hardware located within 3008-1. Build a base, survive from employees.' },
-    'smile': { title: 'Infectious Smile', developer: 'Laughable_Sponge', genre: 'Survival', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-792578a0730d4dcf6dbac9fd15de33e0/768/432/Image/Webp/noFilter', page: 'game-detail-smile', launchUrl: 'roblox://placeId=5985232436', description: 'As ordinary people we all strive to find true happiness in life. But no... not like this.... something is REALLY off about this...' },
-    'epic': { title: 'Epic Minigames ✨', developer: 'TypicalType', genre: 'Party', year: 2015, img: 'https://tr.rbxcdn.com/180DAY-7ee35d19e13cefd730129cf99268792c/768/432/Image/Webp/noFilter', page: 'game-detail-epic', launchUrl: 'roblox://placeId=277751860', description: 'Enjoy a collection of 140 unique and exciting minigames! Level up and earn coins by winning rounds.' },
-    'shark': { title: 'SharkBite Classic 🦈', developer: 'Abracadabra', genre: 'Survival', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-8af54bd04cab100361501d9c38211f4e/768/432/Image/Webp/noFilter', page: 'game-detail-shark', launchUrl: 'roblox://placeId=734159876', description: 'Join your friends in a battle of survival against the boat eating shark. Use your weapon to fight off the shark.' },
-    'phantom': { title: 'Phantom Forces', developer: 'Stylis Studios', genre: 'Shooter', year: 2015, img: 'https://tr.rbxcdn.com/180DAY-bf6f7058336de36c002dc58d33e9c101/768/432/Image/Webp/noFilter', page: 'game-detail-phantom', launchUrl: 'roblox://placeId=292439477', description: 'Intense tactical first person shooter. Thank you for continuing support for PF for over 10 years!' },
-    'murdurr': { title: 'MurDurr', developer: 'braxworks', genre: 'Horror', year: 2025, img: 'https://tr.rbxcdn.com/180DAY-bfdb4c4f5bad565d32ce203e375dc288/768/432/Image/Webp/noFilter', page: 'game-detail-murdurr', launchUrl: 'roblox://placeId=79735281630764', description: 'Durr has turned evil… and he is hungry. Inspired by orange the killer and you vs homer.' },
-    'untitled': { title: 'untitled tag game', developer: 'typical_type', genre: 'Party', year: 2023, img: 'https://tr.rbxcdn.com/180DAY-cd834c110aa147df9bc89a79fece32ea/768/432/Image/Webp/noFilter', page: 'game-detail-untitled', launchUrl: 'roblox://placeId=14044547200', description: 'Play variations of tag with advanced movement, such as climbing, sliding, rolling, and vaulting!' },
-    'retro': { title: 'RetroStudio', developer: 'Retro Dev', genre: 'Social', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-9e4fae118735bc44c824d52e7c7799f0/768/432/Image/Webp/noFilter', page: 'game-detail-retro', launchUrl: 'roblox://placeId=5846386835', description: 'Create and play your own classic Roblox games. Simulation of any time period between 2009 and 2015.' },
-    'combat': { title: 'Combat Initiation', developer: 'Combat Devs', genre: 'Action', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-6c257588551cecd73f962d8165e6b9f1/768/432/Image/Webp/noFilter', page: 'game-detail-combat', launchUrl: 'roblox://placeId=13559635034', description: 'Fast-paced arena brickbattle game. Choose your weapons and tools to ascend the spire of death.' },
-    'knockout': { title: 'Knockout! 🐧', developer: 'braxworks', genre: 'Party', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-f75a05b251c9fdb0c762a3bd997a2901/768/432/Image/Webp/noFilter', page: 'game-detail-knockout', launchUrl: 'roblox://placeId=136764190843219', description: 'Out-maneuver to be the last penguin standing! Predicted movement and ice survival.' },
-    'adopt': { title: 'Adopt Me!', developer: 'Uplift Games', genre: 'RPG', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-dc544ac25d03f485d6a58f79efc51ed2/768/432/Image/Webp/noFilter', page: 'game-detail-adopt', launchUrl: 'roblox://placeId=920587237', description: 'Adopt and raise pets, trade and collect legendary pets, build your dream home, and roleplay with friends!' },
-    'garden': { title: 'Grow a Garden 🌶️', developer: 'The Garden Game', genre: 'Simulation', year: 2025, img: 'https://tr.rbxcdn.com/180DAY-edd534a57d371273de1f5d94c2b30583/768/432/Image/Webp/noFilter', page: 'game-detail-garden', launchUrl: 'roblox://placeId=126884695634066', description: 'Plant seeds, collect profits, and flex your fruits. Your garden grows even while you are offline.' },
-    'disaster': { title: 'Natural Disaster Survival', developer: 'Stickmasterluke', genre: 'Survival', year: 2008, img: 'https://tr.rbxcdn.com/180DAY-7ea7065a02f8cff80f8b0270a9ad2d3b/768/432/Image/Webp/noFilter', page: 'game-detail-disaster', launchUrl: 'roblox://placeId=189707', description: 'Quickly, run around in circles! Your life depends on it in this disaster survival classic.' },
-    'golf': { title: 'Super Golf!', developer: 'Nosniy Games', genre: 'Sports', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-28f42fb6bbd4bc16216d6d95b0c9a468/768/432/Image/Webp/noFilter', page: 'game-detail-golf', launchUrl: 'roblox://placeId=4468711919', description: 'Play against others on a variety of exciting courses, unlock cool rewards, and customize your ball.' },
-    'mm2': { title: 'Murder Mystery 2', developer: 'Nikilis', genre: 'Horror', year: 2014, img: 'https://tr.rbxcdn.com/180DAY-0a5d0d27fd60272237a869af29cbccb1/768/432/Image/Webp/noFilter', page: 'game-detail-mm2', launchUrl: 'roblox://placeId=142823291', description: 'Can you solve the mystery and survive each round? Run and hide from the murderer.' },
-    'pet99': { title: 'Pet Simulator 99', developer: 'BIG Games Pets', genre: 'Simulation', year: 2022, img: 'https://tr.rbxcdn.com/180DAY-59a871f1639e5a55e3c49273a0b34d6a/768/432/Image/Webp/noFilter', page: 'game-detail-pet99', launchUrl: 'roblox://placeId=8737899170', description: 'Create an army of the coolest pets! They will help you get rich. 2,000+ pets to collect!' },
-    'jujutsu': { title: 'Jujutsu Shenanigans', developer: 'Tze', genre: 'Action', year: 2022, img: 'https://tr.rbxcdn.com/180DAY-decec85a41b80e4ac0beca8bc2952a7f/768/432/Image/Webp/noFilter', page: 'game-detail-jujutsu', launchUrl: 'roblox://placeId=9391468976', description: 'Combat craziness based on many battleground games. Destruction and jujutsu shenanigans.' },
-    'overtone': { title: 'Overtone', developer: 'Overtone Projects', genre: 'Puzzle', year: 2026, img: 'https://tr.rbxcdn.com/180DAY-3523135b8468cb8c6663e021da5f78b5/768/432/Image/Webp/noFilter', page: 'game-detail-overtone', launchUrl: 'roblox://placeId=102779234672656', description: 'Multiplayer color card game where you mix translucent color cards to match a target.' },
-    'coolobby': { title: '[250] Cool Obby 2', developer: 'deadalready', genre: 'Obby', year: 2008, img: 'https://tr.rbxcdn.com/180DAY-44d4a95190453bbd14a4db3f84410433/768/432/Image/Webp/noFilter', page: 'game-detail-coolobby', launchUrl: 'roblox://placeId=4927387', description: 'Simplistic obby game with 5 themes to discover and explore over 250 stages.' },
-    'theme-park': { title: 'Theme Park Tycoon 2', developer: 'Den_S', genre: 'Simulation', year: 2012, img: 'https://tr.rbxcdn.com/180DAY-19d37e8208a9d390075158433face2cd/768/432/Image/Webp/noFilter', page: 'game-detail-theme-park', launchUrl: 'roblox://placeId=69184822', description: 'Build your own theme park together with your friends! Construct rides and roller coasters.' },
-    'bee-swarm': { title: 'Bee Swarm Simulator', developer: 'Onett', genre: 'Simulation', year: 2018, img: 'https://tr.rbxcdn.com/180DAY-0458177ee998eb2ffd882ad46207e4c5/768/432/Image/Webp/noFilter', page: 'game-detail-bee-swarm', launchUrl: 'roblox://placeId=1537690962', description: 'Grow your own swarm of bees, collect pollen, and make honey! Meet friendly bears and complete quests.' },
-    'homer': { title: 'You VS Homer', developer: 'dgk enterprises', genre: 'Horror', year: 2026, img: 'https://tr.rbxcdn.com/180DAY-6f65dd5173f9f11b026acbb7aef20740/768/432/Image/Webp/noFilter', page: 'game-detail-homer', launchUrl: 'roblox://placeId=108124933582607', description: 'Survive and hide as a Bart or become a Homer and seek. Adapted from classic Retro Studio tests.' },
-    'podcasts': { title: '[VC] Podcasts 🔊', developer: 'NDO Studios', genre: 'Social', year: 2026, img: 'https://tr.rbxcdn.com/180DAY-dd6388f386387a2d1d6f942eca4856fb/768/432/Image/Webp/noFilter', page: 'game-detail-podcasts', launchUrl: 'roblox://placeId=110584310129887', description: 'Grab a mic, create stages, and record hilarious debates in your own virtual podcast studio.' },
-    'ballaxe': { title: 'ball and axe', developer: 'DoctorPurpl', genre: 'Obby', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-a9d6d065668af8b6e08e7813168f18fa/768/432/Image/Webp/noFilter', page: 'game-detail-ballaxe', launchUrl: 'roblox://placeId=1242235469', description: 'Videogame. Advanced obby mechanics with ball and axe.' },
-    'robots2': { title: 'Build to Survive the Robots 2', developer: 'SheriffTaco', genre: 'Survival', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-8d80a4c1885d64b1d8903f6dfb6c485f/768/432/Image/Webp/noFilter', page: 'game-detail-robots2', launchUrl: 'roblox://placeId=103980862080286', description: 'Build a base before nightfall and survive the robots until morning. If you die, you become a robot!' },
-    'tower': { title: 'Tower of Hell', developer: 'YXceptional Studios', genre: 'Obby', year: 2018, img: 'https://tr.rbxcdn.com/180DAY-20a372111085c33de1e64004e4dca1d8/768/432/Image/Webp/noFilter', page: 'game-detail-tower', launchUrl: 'roblox://placeId=1962086868', description: 'Randomly generated obby with absolutely no checkpoints. Can you be the first to reach the top?' },
-    'prison': { title: 'Prison Life', developer: 'Aesthetical', genre: 'Action', year: 2014, img: 'https://tr.rbxcdn.com/180DAY-7e4ac70bc3496ea7e4d039f3cd60b6a4/768/432/Image/Webp/noFilter', page: 'game-detail-prison', launchUrl: 'roblox://placeId=155615604', description: 'Live life as a prisoner and escape, or become a guard and defend the prison!' },
-    'prospecting': { title: 'Prospecting! 💎', developer: 'Prospecting!', genre: 'Simulation', year: 2025, img: 'https://tr.rbxcdn.com/180DAY-e18515933a4c6208e2176d2f0351f12c/768/432/Image/Webp/noFilter', page: 'game-detail-prospecting', launchUrl: 'roblox://placeId=129827112113663', description: 'Grab your pan and head to the river in a relaxing gold-panning adventure! Discover rare gems.' },
-    'hide-seek': { title: 'Hide and Seek Extreme', developer: 'Tim7775', genre: 'Party', year: 2015, img: 'https://tr.rbxcdn.com/180DAY-c17b13acb45f07ec1517623969b81ec0/768/432/Image/Webp/noFilter', page: 'game-detail-hide-seek', launchUrl: 'roblox://placeId=205224386', description: 'Classic hide and seek with special abilities. At the start of the game, one player is chosen as It.' },
-    'horrific-housing': { title: 'Horrific Housing', developer: 'CookieScript', genre: 'Party', year: 2015, img: 'https://tr.rbxcdn.com/180DAY-a361113feebd101cd29510bfe3f610dd/768/432/Image/Webp/noFilter', page: 'game-detail-horrific-housing', launchUrl: 'roblox://placeId=263761432', description: 'Survive a laundry list of exciting disasters on a floating plot of land. Out-live your opponents!' },
-    'brookhaven': { title: 'Brookhaven 🏡RP', developer: 'Wolfpaq', genre: 'RPG', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-a4fb7b266105fa038d92bf425d58ee53/768/432/Image/Webp/noFilter', page: 'game-detail-brookhaven', launchUrl: 'roblox://placeId=4924922222', description: 'Roleplay with like minded people. Own amazing houses, drive cool vehicles, and explore the city.' },
-    'rivals': { title: 'RIVALS', developer: 'Nosniy Games', genre: 'Shooter', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-eb783deba3b661ff753ab9be4089188d/768/432/Image/Webp/noFilter', page: 'game-detail-rivals', launchUrl: 'roblox://placeId=17625359962', description: 'Intense first person shooter duels. First to 5 wins. available on desktop and consoles.' },
-    'flee-facility': { title: 'Flee the Facility', developer: 'MrWindy', genre: 'Horror', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-f3e6bca490d2d655cde4894e502e5989/768/432/Image/Webp/noFilter', page: 'game-detail-flee-facility', launchUrl: 'roblox://placeId=893973440', description: 'Run, hide, escape the murderer. Team up with fellow survivors to hack computers and escape!' },
-    'flood-escape': { title: 'Flood Escape: Classic', developer: 'Crazyblox', genre: 'Survival', year: 2010, img: 'https://tr.rbxcdn.com/180DAY-0317908608680ca27ade363ac0feb6c0/768/432/Image/Webp/noFilter', page: 'game-detail-flood-escape', launchUrl: 'roblox://placeId=32990482', description: 'Locked in a flooding facility, push buttons and find the way out before the flood takes you!' },
-    'cone': { title: 'CONE', developer: 'Defaultio', genre: 'Adventure / Puzzle', year: 2016, img: 'https://tr.rbxcdn.com/180DAY-3286dd029217592b49d830707e0bfcfa/768/432/Image/Webp/noFilter', page: 'game-detail-cone', launchUrl: 'roblox://placeId=378223328', description: 'CONE' },
-    'fling': { title: 'Fling Things and People', developer: 'Horomori', genre: 'Physics Sim', year: 2021, img: 'https://tr.rbxcdn.com/180DAY-20254f91c5043de87f6cc8adb218c624/768/432/Image/Webp/noFilter', page: 'game-detail-fling', launchUrl: 'roblox://placeId=6961824067', description: 'A place where you can play with or fling various objects and players.' },
-    'eg': { title: '🥚 Eg!', developer: 'Nimblz', genre: 'Exploration / Comedy', year: 2019, img: 'https://tr.rbxcdn.com/180DAY-96097b5752ff62cf014a214f427ba0c1/768/432/Image/Webp/noFilter', page: 'game-detail-eg', launchUrl: 'roblox://placeId=2747834912', description: '🥚 eg! is a silly social game about being an egg with legs! Explore a vast world with your friends!' },
-    'robot64': { title: 'Robot 64', developer: 'zKevin', genre: 'Obby / Platformer', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-f1e38127294c9673738306a5d002b372/768/432/Image/Webp/noFilter', page: 'game-detail-robot64', launchUrl: 'roblox://placeId=1111083356', description: 'Robot 64 is a modern 3D Platformer with a large array of movements. Explore wacky worlds and collect ice cream!' },
-    'markers': { title: 'Find the Markers', developer: 'markers epic memers', genre: 'Adventure / Scavenger Hunt', year: 2021, img: 'https://tr.rbxcdn.com/180DAY-666aa1bde55fa5557827dc36e10c6c8d/768/432/Image/Webp/noFilter', page: 'game-detail-markers', launchUrl: 'roblox://placeId=7896264844', description: 'this game was highly inspired by a lot of "find the" games, specifically "find the domos". Marker originated from the web series known as \'battle for dream island\'.' },
-    'deforestation': { title: 'deforestation therapy || alpha', developer: 'The Fartering Few', genre: 'Simulation', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-fedb2d4f532dbb6ccc21a9050a9dc750/768/432/Image/Webp/noFilter', page: 'game-detail-deforestation', launchUrl: 'roblox://placeId=18216750738', description: 'a calm game where you (and your friends) deforest a forest full of trees! The game doesn\'t try to stress or rush you, just keep you in peace of mind. Uses classic roblox and 90s asthetics.' },
-    'sbb': { title: 'SBB Marathon', developer: 'Maelstronomer', genre: 'Sports / Racing', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-ec5fc17541e2ab2233bbfe151926261c/768/432/Image/Webp/noFilter', page: 'game-detail-sbb', launchUrl: 'roblox://placeId=4999134338', description: 'From the creator of Super Blocky Ball, All 15 maps put together! Now with backwards racing!!' }
+    'piggy': { title: 'Piggy', developer: 'MiniToon', genre: 'Horror', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-9a6167eabc17cccd69511f6213e94b03/768/432/Image/Webp/noFilter', page: 'game-detail-piggy', launchUrl: 'roblox://placeId=4623386862', placeId: '4623386862', tags: ['Horror', 'Survival', 'Round-based', 'Escape'], description: 'Do you have what it takes to escape Piggy and uncover the mysteries surrounding the beast?' },
+    '3008': { title: '3008', developer: 'uglyburger0', genre: 'Horror', year: 2019, img: 'https://tr.rbxcdn.com/180DAY-1393cf4ea0d2cb4e97bc0a05938822e6/768/432/Image/Webp/noFilter', page: 'game-detail-3008', launchUrl: 'roblox://placeId=2768379856', placeId: '2768379856', tags: ['Horror', 'Survival', 'Building', 'Open World'], description: 'Wander through the vast horror land of home hardware located within 3008-1. Build a base, survive from employees.' },
+    'smile': { title: 'Infectious Smile', developer: 'Laughable_Sponge', genre: 'Survival', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-792578a0730d4dcf6dbac9fd15de33e0/768/432/Image/Webp/noFilter', page: 'game-detail-smile', launchUrl: 'roblox://placeId=5985232436', placeId: '5985232436', tags: ['Survival', 'Infection', 'Action', 'Round-based'], description: 'As ordinary people we all strive to find true happiness in life. But no... not like this.... something is REALLY off about this...' },
+    'epic': { title: 'Epic Minigames ✨', developer: 'TypicalType', genre: 'Party', year: 2015, img: 'https://tr.rbxcdn.com/180DAY-7ee35d19e13cefd730129cf99268792c/768/432/Image/Webp/noFilter', page: 'game-detail-epic', launchUrl: 'roblox://placeId=277751860', placeId: '277751860', tags: ['Party', 'Minigames', 'Competitive', 'Social'], description: 'Enjoy a collection of 140 unique and exciting minigames! Level up and earn coins by winning rounds.' },
+    'shark': { title: 'SharkBite Classic 🦈', developer: 'Abracadabra', genre: 'Survival', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-8af54bd04cab100361501d9c38211f4e/768/432/Image/Webp/noFilter', page: 'game-detail-shark', launchUrl: 'roblox://placeId=734159876', placeId: '734159876', tags: ['Survival', 'Vehicles', 'Action', 'Round-based'], description: 'Join your friends in a battle of survival against the boat eating shark. Use your weapon to fight off the shark.' },
+    'phantom': { title: 'Phantom Forces', developer: 'Stylis Studios', genre: 'Shooter', year: 2015, img: 'https://tr.rbxcdn.com/180DAY-bf6f7058336de36c002dc58d33e9c101/768/432/Image/Webp/noFilter', page: 'game-detail-phantom', launchUrl: 'roblox://placeId=292439477', placeId: '292439477', tags: ['Shooter', 'FPS', 'Tactical', 'Competitive'], description: 'Intense tactical first person shooter. Thank you for continuing support for PF for over 10 years!' },
+    'murdurr': { title: 'MurDurr', developer: 'braxworks', genre: 'Horror', year: 2025, img: 'https://tr.rbxcdn.com/180DAY-bfdb4c4f5bad565d32ce203e375dc288/768/432/Image/Webp/noFilter', page: 'game-detail-murdurr', launchUrl: 'roblox://placeId=79735281630764', placeId: '79735281630764', tags: ['Horror', 'Survival', 'Round-based', 'Retro'], description: 'Durr has turned evil… and he is hungry. Inspired by orange the killer and you vs homer.' },
+    'untitled': { title: 'untitled tag game', developer: 'typical_type', genre: 'Party', year: 2023, img: 'https://tr.rbxcdn.com/180DAY-cd834c110aa147df9bc89a79fece32ea/768/432/Image/Webp/noFilter', page: 'game-detail-untitled', launchUrl: 'roblox://placeId=14044547200', placeId: '14044547200', tags: ['Party', 'Movement', 'Parkour', 'Action'], description: 'Play variations of tag with advanced movement, such as climbing, sliding, rolling, and vaulting!' },
+    'retro': { title: 'RetroStudio', developer: 'Retro Dev', genre: 'Social', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-9e4fae118735bc44c824d52e7c7799f0/768/432/Image/Webp/noFilter', page: 'game-detail-retro', launchUrl: 'roblox://placeId=5846386835', placeId: '5846386835', tags: ['Social', 'Building', 'Retro', 'Simulation'], description: 'Create and play your own classic Roblox games. Simulation of any time period between 2009 and 2015.' },
+    'combat': { title: 'Combat Initiation', developer: 'Combat Devs', genre: 'Action', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-6c257588551cecd73f962d8165e6b9f1/768/432/Image/Webp/noFilter', page: 'game-detail-combat', launchUrl: 'roblox://placeId=13559635034', placeId: '13559635034', tags: ['Action', 'Retro', 'Arena', 'Movement'], description: 'Fast-paced arena brickbattle game. Choose your weapons and tools to ascend the spire of death.' },
+    'knockout': { title: 'Knockout! 🐧', developer: 'braxworks', genre: 'Party', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-f75a05b251c9fdb0c762a3bd997a2901/768/432/Image/Webp/noFilter', page: 'game-detail-knockout', launchUrl: 'roblox://placeId=136764190843219', placeId: '136764190843219', tags: ['Party', 'Minigames', 'Skill', 'Social'], description: 'Out-maneuver to be the last penguin standing! Predicted movement and ice survival.' },
+    'adopt': { title: 'Adopt Me!', developer: 'Uplift Games', genre: 'RPG', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-dc544ac25d03f485d6a58f79efc51ed2/768/432/Image/Webp/noFilter', page: 'game-detail-adopt', launchUrl: 'roblox://placeId=920587237', placeId: '920587237', tags: ['RPG', 'Roleplay', 'Social', 'Pets'], description: 'Adopt and raise pets, trade and collect legendary pets, build your dream home, and roleplay with friends!' },
+    'garden': { title: 'Grow a Garden 🌶️', developer: 'The Garden Game', genre: 'Simulation', year: 2025, img: 'https://tr.rbxcdn.com/180DAY-edd534a57d371273de1f5d94c2b30583/768/432/Image/Webp/noFilter', page: 'game-detail-garden', launchUrl: 'roblox://placeId=126884695634066', placeId: '126884695634066', tags: ['Simulation', 'Casual', 'Idle', 'Collection'], description: 'Plant seeds, collect profits, and flex your fruits. Your garden grows even while you are offline.' },
+    'disaster': { title: 'Natural Disaster Survival', developer: 'Stickmasterluke', genre: 'Survival', year: 2008, img: 'https://tr.rbxcdn.com/180DAY-7ea7065a02f8cff80f8b0270a9ad2d3b/768/432/Image/Webp/noFilter', page: 'game-detail-disaster', launchUrl: 'roblox://placeId=189707', placeId: '189707', tags: ['Survival', 'Classic', 'Chaos', 'Round-based'], description: 'Quickly, run around in circles! Your life depends on it in this disaster survival classic.' },
+    'golf': { title: 'Super Golf!', developer: 'Nosniy Games', genre: 'Sports', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-28f42fb6bbd4bc16216d6d95b0c9a468/768/432/Image/Webp/noFilter', page: 'game-detail-golf', launchUrl: 'roblox://placeId=4468711919', placeId: '4468711919', tags: ['Sports', 'Competitive', 'Casual', 'Skill'], description: 'Play against others on a variety of exciting courses, unlock cool rewards, and customize your ball.' },
+    'mm2': { title: 'Murder Mystery 2', developer: 'Nikilis', genre: 'Horror', year: 2014, img: 'https://tr.rbxcdn.com/180DAY-0a5d0d27fd60272237a869af29cbccb1/768/432/Image/Webp/noFilter', page: 'game-detail-mm2', launchUrl: 'roblox://placeId=142823291', placeId: '142823291', tags: ['Horror', 'Murderer', 'Social', 'Round-based'], description: 'Can you solve the mystery and survive each round? Run and hide from the murderer.' },
+    'pet99': { title: 'Pet Simulator 99', developer: 'BIG Games Pets', genre: 'Simulation', year: 2022, img: 'https://tr.rbxcdn.com/180DAY-59a871f1639e5a55e3c49273a0b34d6a/768/432/Image/Webp/noFilter', page: 'game-detail-pet99', launchUrl: 'roblox://placeId=8737899170', placeId: '8737899170', tags: ['Simulation', 'Collection', 'Pets', 'Progression'], description: 'Create an army of the coolest pets! They will help you get rich. 2,000+ pets to collect!' },
+    'jujutsu': { title: 'Jujutsu Shenanigans', developer: 'Tze', genre: 'Action', year: 2022, img: 'https://tr.rbxcdn.com/180DAY-decec85a41b80e4ac0beca8bc2952a7f/768/432/Image/Webp/noFilter', page: 'game-detail-jujutsu', launchUrl: 'roblox://placeId=9391468976', placeId: '9391468976', tags: ['Action', 'Fighting', 'Competitive', 'Destruction'], description: 'Combat craziness based on many battleground games. Destruction and jujutsu shenanigans.' },
+    'overtone': { title: 'Overtone', developer: 'Overtone Projects', genre: 'Puzzle', year: 2026, img: 'https://tr.rbxcdn.com/180DAY-3523135b8468cb8c6663e021da5f78b5/768/432/Image/Webp/noFilter', page: 'game-detail-overtone', launchUrl: 'roblox://placeId=102779234672656', placeId: '102779234672656', tags: ['Puzzle', 'Social', 'Educational', 'Multiplayer'], description: 'Multiplayer color card game where you mix translucent color cards to match a target.' },
+    'coolobby': { title: '[250] Cool Obby 2', developer: 'deadalready', genre: 'Obby', year: 2008, img: 'https://tr.rbxcdn.com/180DAY-44d4a95190453bbd14a4db3f84410433/768/432/Image/Webp/noFilter', page: 'game-detail-coolobby', launchUrl: 'roblox://placeId=4927387', placeId: '4927387', tags: ['Obby', 'Classic', 'Casual', 'Platformer'], description: 'Simplistic obby game with 5 themes to discover and explore over 250 stages.' },
+    'theme-park': { title: 'Theme Park Tycoon 2', developer: 'Den_S', genre: 'Simulation', year: 2012, img: 'https://tr.rbxcdn.com/180DAY-19d37e8208a9d390075158433face2cd/768/432/Image/Webp/noFilter', page: 'game-detail-theme-park', launchUrl: 'roblox://placeId=69184822', placeId: '69184822', tags: ['Simulation', 'Tycoon', 'Building', 'Social'], description: 'Build your own theme park together with your friends! Construct rides and roller coasters.' },
+    'bee-swarm': { title: 'Bee Swarm Simulator', developer: 'Onett', genre: 'Simulation', year: 2018, img: 'https://tr.rbxcdn.com/180DAY-0458177ee998eb2ffd882ad46207e4c5/768/432/Image/Webp/noFilter', page: 'game-detail-bee-swarm', launchUrl: 'roblox://placeId=1537690962', placeId: '1537690962', tags: ['Simulation', 'Progression', 'Pets', 'Quests'], description: 'Grow your own swarm of bees, collect pollen, and make honey! Meet friendly bears and complete quests.' },
+    'homer': { title: 'You VS Homer', developer: 'dgk enterprises', genre: 'Horror', year: 2026, img: 'https://tr.rbxcdn.com/180DAY-6f65dd5173f9f11b026acbb7aef20740/768/432/Image/Webp/noFilter', page: 'game-detail-homer', launchUrl: 'roblox://placeId=108124933582607', placeId: '108124933582607', tags: ['Horror', 'Survival', 'Round-based', 'Retro'], description: 'Survive and hide as a Bart or become a Homer and seek. Adapted from classic Retro Studio tests.' },
+    'podcasts': { title: '[VC] Podcasts 🔊', developer: 'NDO Studios', genre: 'Social', year: 2026, img: 'https://tr.rbxcdn.com/180DAY-dd6388f386387a2d1d6f942eca4856fb/768/432/Image/Webp/noFilter', page: 'game-detail-podcasts', launchUrl: 'roblox://placeId=110584310129887', placeId: '110584310129887', tags: ['Social', 'Voice Chat', 'Roleplay', 'Casual'], description: 'Grab a mic, create stages, and record hilarious debates in your own virtual podcast studio.' },
+    'ballaxe': { title: 'ball and axe', developer: 'DoctorPurpl', genre: 'Obby', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-a9d6d065668af8b6e08e7813168f18fa/768/432/Image/Webp/noFilter', page: 'game-detail-ballaxe', launchUrl: 'roblox://placeId=1242235469', placeId: '1242235469', tags: ['Obby', 'Skill', 'Physics', 'Action'], description: 'Videogame. Advanced obby mechanics with ball and axe.' },
+    'robots2': { title: 'Build to Survive the Robots 2', developer: 'SheriffTaco', genre: 'Survival', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-8d80a4c1885d64b1d8903f6dfb6c485f/768/432/Image/Webp/noFilter', page: 'game-detail-robots2', launchUrl: 'roblox://placeId=103980862080286', placeId: '103980862080286', tags: ['Survival', 'Building', 'Action', 'Co-op'], description: 'Build a base before nightfall and survive the robots until morning. If you die, you become a robot!' },
+    'tower': { title: 'Tower of Hell', developer: 'YXceptional Studios', genre: 'Obby', year: 2018, img: 'https://tr.rbxcdn.com/180DAY-20a372111085c33de1e64004e4dca1d8/768/432/Image/Webp/noFilter', page: 'game-detail-tower', launchUrl: 'roblox://placeId=1962086868', placeId: '1962086868', tags: ['Obby', 'Skill', 'Platformer', 'Competitive'], description: 'Randomly generated obby with absolutely no checkpoints. Can you be the first to reach the top?' },
+    'prison': { title: 'Prison Life', developer: 'Aesthetical', genre: 'Action', year: 2014, img: 'https://tr.rbxcdn.com/180DAY-7e4ac70bc3496ea7e4d039f3cd60b6a4/768/432/Image/Webp/noFilter', page: 'game-detail-prison', launchUrl: 'roblox://placeId=155615604', placeId: '155615604', tags: ['Action', 'Roleplay', 'Classic', 'Open World'], description: 'Live life as a prisoner and escape, or become a guard and defend the prison!' },
+    'prospecting': { title: 'Prospecting! 💎', developer: 'Prospecting!', genre: 'Simulation', year: 2025, img: 'https://tr.rbxcdn.com/180DAY-e18515933a4c6208e2176d2f0351f12c/768/432/Image/Webp/noFilter', page: 'game-detail-prospecting', launchUrl: 'roblox://placeId=129827112113663', placeId: '129827112113663', tags: ['Simulation', 'Casual', 'Nature', 'Collection'], description: 'Grab your pan and head to the river in a relaxing gold-panning adventure! Discover rare gems.' },
+    'hide-seek': { title: 'Hide and Seek Extreme', developer: 'Tim7775', genre: 'Party', year: 2015, img: 'https://tr.rbxcdn.com/180DAY-c17b13acb45f07ec1517623969b81ec0/768/432/Image/Webp/noFilter', page: 'game-detail-hide-seek', launchUrl: 'roblox://placeId=205224386', placeId: '205224386', tags: ['Party', 'Social', 'Round-based', 'Classic'], description: 'Classic hide and seek with special abilities. At the start of the game, one player is chosen as It.' },
+    'horrific-housing': { title: 'Horrific Housing', developer: 'CookieScript', genre: 'Party', year: 2015, img: 'https://tr.rbxcdn.com/180DAY-a361113feebd101cd29510bfe3f610dd/768/432/Image/Webp/noFilter', page: 'game-detail-horrific-housing', launchUrl: 'roblox://placeId=263761432', placeId: '263761432', tags: ['Party', 'Chaos', 'Round-based', 'Social'], description: 'Survive a laundry list of exciting disasters on a floating plot of land. Out-live your opponents!' },
+    'brookhaven': { title: 'Brookhaven 🏡RP', developer: 'Wolfpaq', genre: 'RPG', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-a4fb7b266105fa038d92bf425d58ee53/768/432/Image/Webp/noFilter', page: 'game-detail-brookhaven', launchUrl: 'roblox://placeId=4924922222', placeId: '4924922222', tags: ['RPG', 'Roleplay', 'Social', 'Open World'], description: 'Roleplay with like minded people. Own amazing houses, drive cool vehicles, and explore the city.' },
+    'rivals': { title: 'RIVALS', developer: 'Nosniy Games', genre: 'Shooter', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-eb783deba3b661ff753ab9be4089188d/768/432/Image/Webp/noFilter', page: 'game-detail-rivals', launchUrl: 'roblox://placeId=17625359962', placeId: '17625359962', tags: ['Shooter', 'FPS', 'Competitive', 'Fast-paced'], description: 'Intense first person shooter duels. First to 5 wins. available on desktop and consoles.' },
+    'flee-facility': { title: 'Flee the Facility', developer: 'MrWindy', genre: 'Horror', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-f3e6bca490d2d655cde4894e502e5989/768/432/Image/Webp/noFilter', page: 'game-detail-flee-facility', launchUrl: 'roblox://placeId=893973440', placeId: '893973440', tags: ['Horror', 'Survival', 'Round-based', 'Escape'], description: 'Run, hide, escape the murderer. Team up with fellow survivors to hack computers and escape!' },
+    'flood-escape': { title: 'Flood Escape: Classic', developer: 'Crazyblox', genre: 'Survival', year: 2010, img: 'https://tr.rbxcdn.com/180DAY-0317908608680ca27ade363ac0feb6c0/768/432/Image/Webp/noFilter', page: 'game-detail-flood-escape', launchUrl: 'roblox://placeId=32990482', placeId: '32990482', tags: ['Survival', 'Obby', 'Escape', 'Classic'], description: 'Locked in a flooding facility, push buttons and find the way out before the flood takes you!' },
+    'cone': { title: 'CONE', developer: 'Defaultio', genre: 'Adventure / Puzzle', year: 2016, img: 'https://tr.rbxcdn.com/180DAY-3286dd029217592b49d830707e0bfcfa/768/432/Image/Webp/noFilter', page: 'game-detail-cone', launchUrl: 'roblox://placeId=378223328', placeId: '378223328', tags: ['Adventure', 'Puzzle', 'Experimental', 'Atmospheric'], description: 'CONE' },
+    'fling': { title: 'Fling Things and People', developer: 'Horomori', genre: 'Physics Sim', year: 2021, img: 'https://tr.rbxcdn.com/180DAY-20254f91c5043de87f6cc8adb218c624/768/432/Image/Webp/noFilter', page: 'game-detail-fling', launchUrl: 'roblox://placeId=6961824067', placeId: '6961824067', tags: ['Physics', 'Social', 'Chaos', 'Comedy'], description: 'A place where you can play with or fling various objects and players.' },
+    'eg': { title: '🥚 Eg!', developer: 'Nimblz', genre: 'Exploration / Comedy', year: 2019, img: 'https://tr.rbxcdn.com/180DAY-96097b5752ff62cf014a214f427ba0c1/768/432/Image/Webp/noFilter', page: 'game-detail-eg', launchUrl: 'roblox://placeId=2747834912', placeId: '2747834912', tags: ['Exploration', 'Comedy', 'Social', 'Abstract'], description: '🥚 eg! is a silly social game about being an egg with legs! Explore a vast world with your friends!' },
+    'robot64': { title: 'Robot 64', developer: 'zKevin', genre: 'Obby / Platformer', year: 2017, img: 'https://tr.rbxcdn.com/180DAY-f1e38127294c9673738306a5d002b372/768/432/Image/Webp/noFilter', page: 'game-detail-robot64', launchUrl: 'roblox://placeId=1111083356', placeId: '1111083356', tags: ['Obby', 'Platformer', 'Adventure', 'Collection'], description: 'Robot 64 is a modern 3D Platformer with a large array of movements. Explore wacky worlds and collect ice cream!' },
+    'markers': { title: 'Find the Markers', developer: 'markers epic memers', genre: 'Adventure / Scavenger Hunt', year: 2021, img: 'https://tr.rbxcdn.com/180DAY-666aa1bde55fa5557827dc36e10c6c8d/768/432/Image/Webp/noFilter', page: 'game-detail-markers', launchUrl: 'roblox://placeId=7896264844', placeId: '7896264844', tags: ['Adventure', 'Scavenger Hunt', 'Puzzle', 'Collection'], description: 'this game was highly inspired by a lot of "find the" games, specifically "find the domos". Marker originated from the web series known as \'battle for dream island\'.' },
+    'deforestation': { title: 'deforestation therapy || alpha', developer: 'The Fartering Few', genre: 'Simulation', year: 2024, img: 'https://tr.rbxcdn.com/180DAY-fedb2d4f532dbb6ccc21a9050a9dc750/768/432/Image/Webp/noFilter', page: 'game-detail-deforestation', launchUrl: 'roblox://placeId=18216750738', placeId: '18216750738', tags: ['Simulation', 'Satisfying', 'Retro', 'Atmospheric'], description: 'a calm game where you (and your friends) deforest a forest full of trees! The game doesn\'t try to stress or rush you, just keep you in peace of mind. Uses classic roblox and 90s asthetics.' },
+    'sbb': { title: 'SBB Marathon', developer: 'Maelstronomer', genre: 'Sports / Racing', year: 2020, img: 'https://tr.rbxcdn.com/180DAY-ec5fc17541e2ab2233bbfe151926261c/768/432/Image/Webp/noFilter', page: 'game-detail-sbb', launchUrl: 'roblox://placeId=4999134338', placeId: '4999134338', tags: ['Sports', 'Racing', 'Classic', 'Fast-paced'], description: 'From the creator of Super Blocky Ball, All 15 maps put together! Now with backwards racing!!' }
 };
 
 function searchGames() {
@@ -189,53 +189,75 @@ function loadRecommendations() {
         let score = 0;
 
         // 1. Direct Keyword Matches (Highest weights)
-        if (taste.genres[game.genre]) score += taste.genres[game.genre] * 18;
-        if (taste.devs[game.developer]) score += taste.devs[game.developer] * 12;
+        if (taste.genres[game.genre]) score += taste.genres[game.genre] * 20;
+        if (taste.devs[game.developer]) score += taste.devs[game.developer] * 15;
 
-        // 2. Title Keyword Matching (New!)
+        // 2. Gameplay Tag Synergy (New!)
+        const recentTags = [];
+        history.slice(0, 5).forEach(k => {
+            if (gamesData[k] && gamesData[k].tags) {
+                recentTags.push(...gamesData[k].tags);
+            }
+        });
+
+        if (game.tags) {
+            game.tags.forEach(tag => {
+                const tagCount = recentTags.filter(t => t === tag).length;
+                score += tagCount * 8; // Boost based on how many times this tag appears in recent history
+            });
+        }
+
+        // 3. Title Keyword Matching
         const recentTitles = history.slice(0, 3).map(k => gamesData[k].title.toLowerCase());
         const targetTitle = game.title.toLowerCase();
 
         titleKeywords.forEach(word => {
             const lowWord = word.toLowerCase();
-            // If you played games with this word in the title recently
             if (recentTitles.some(t => t.includes(lowWord)) && targetTitle.includes(lowWord)) {
-                score += 25; // Significant boost for name matching (e.g. Simulator -> Simulator)
+                score += 30;
             }
         });
 
-        // 3. Genre Synergy Cluster
+        // 4. Genre Synergy Cluster
         Object.keys(taste.genres).forEach(favGenre => {
             const related = genreWeights[favGenre] || [];
             if (related.includes(game.genre)) {
-                score += taste.genres[favGenre] * 6;
+                score += taste.genres[favGenre] * 8;
             }
         });
 
-        // 4. Era Span Analysis (±3 year window)
+        // 5. Era Span Analysis
         Object.keys(taste.years).forEach(favYear => {
             const diff = Math.abs(parseInt(favYear) - game.year);
-            if (diff === 0) score += taste.years[favYear] * 10; // Exact Year
-            else if (diff <= 2) score += taste.years[favYear] * 5; // Close Era
-            else if (diff <= 4) score += taste.years[favYear] * 2; // Broad Era
+            if (diff === 0) score += taste.years[favYear] * 12;
+            else if (diff <= 2) score += taste.years[favYear] * 6;
         });
 
-        // 5. Developer Consistency
+        // 6. Developer Consistency
         const recentDevs = history.slice(0, 3).map(k => gamesData[k].developer);
-        if (recentDevs.includes(game.developer)) score += 15;
+        if (recentDevs.includes(game.developer)) score += 20;
 
-        // 7. Frequent Plays (Loyalty bonus)
+        // 7. Frequent Plays & Recency (Loyalty + Active Interest)
+        const now = Date.now();
+        const lastPlay = taste.lastPlays ? (taste.lastPlays[key] || 0) : 0;
+        const daysSinceLastPlay = (now - lastPlay) / (1000 * 60 * 60 * 24);
+
         if (taste.opens && taste.opens[key]) {
-            score += Math.min(taste.opens[key] * 5, 50); // Up to 50pts for frequent play
+            let frequencyScore = taste.opens[key] * 10;
+            // Boost if played in the last 3 days
+            if (daysSinceLastPlay <= 3) {
+                frequencyScore *= 2; 
+            }
+            score += Math.min(frequencyScore, 100);
         }
 
-        // 8. Favorite Status (Huge boost)
+        // 8. Favorite Status
         if (favorites.includes(key)) {
-            score += 40;
+            score += 50;
         }
 
-        // 6. Random discovery jitter
-        score += Math.random() * 8;
+        // 9. Random discovery jitter
+        score += Math.random() * 10;
 
         scores.push({ key, score });
     });
@@ -243,7 +265,7 @@ function loadRecommendations() {
     // Sort by score
     scores.sort((a, b) => b.score - a.score);
 
-    const topGames = scores.filter(s => s.score > 10).slice(0, 6);
+    const topGames = scores.filter(s => s.score > 20).slice(0, 6);
 
     if (topGames.length === 0) {
         section.classList.add('hidden');
@@ -260,7 +282,10 @@ function loadRecommendations() {
             <div style="position: relative;">
                 <img class="game-thumbnail" src="${game.img}" alt="${game.title}">
             </div>
-            <div class="game-info">
+            <div class="game-info" style="position: relative;">
+                <div class="quick-play-btn-square" onclick="event.stopPropagation(); launchGame('${item.key}', '${game.launchUrl}')">
+                    <span class="material-icons">play_arrow</span>
+                </div>
                 <h3 class="game-title">${game.title}</h3>
                 <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">${game.developer}</span></div>
             </div>
@@ -315,11 +340,11 @@ function renderFavorites() {
                 const game = gamesData[id];
                 container.innerHTML += `
                     <div class="game-card" onclick="showPage('${game.page}')">
-                        <div class="quick-play-btn-square" onclick="event.stopPropagation(); launchGame('${id}', '${game.launchUrl}')">
-                            <span class="material-icons">play_arrow</span>
-                        </div>
                         <img class="game-thumbnail" src="${game.img}" alt="${game.title}">
-                        <div class="game-info">
+                        <div class="game-info" style="position: relative;">
+                            <div class="quick-play-btn-square" onclick="event.stopPropagation(); launchGame('${id}', '${game.launchUrl}')">
+                                <span class="material-icons">play_arrow</span>
+                            </div>
                             <h3 class="game-title">${game.title}</h3>
                         </div>
                     </div>
@@ -376,11 +401,11 @@ function loadRecentGame() {
                 card.className = 'game-card';
                 card.onclick = () => showPage(game.page);
                 card.innerHTML = `
-                    <div class="quick-play-btn-square" onclick="event.stopPropagation(); launchGame('${gameKey}', '${game.launchUrl}')">
-                        <span class="material-icons">play_arrow</span>
-                    </div>
                     <img class="game-thumbnail" src="${game.img}" alt="${game.title}">
-                    <div class="game-info">
+                    <div class="game-info" style="position: relative;">
+                        <div class="quick-play-btn-square" onclick="event.stopPropagation(); launchGame('${gameKey}', '${game.launchUrl}')">
+                            <span class="material-icons">play_arrow</span>
+                        </div>
                         <h3 class="game-title">${game.title}</h3>
                     </div>
                 `;
@@ -444,12 +469,52 @@ function showPage(pageId) {
     // Handle Nav Tab Active States
     document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
     if (pageId === 'home') document.getElementById('tab-home').classList.add('active');
-    if (pageId === 'marketplace') document.getElementById('tab-marketplace').classList.add('active');
 
     if (pageId.startsWith('game-detail-')) {
         const gameKey = pageId.replace('game-detail-', '');
         updateTimesPlayedDisplay(gameKey);
+        
+        // Auto-inject server button if missing
+        const actionRow = targetPage.querySelector('.action-row');
+        if (actionRow && !actionRow.querySelector('.server-btn')) {
+            const game = gamesData[gameKey];
+            if (game && game.placeId) {
+                const sBtn = document.createElement('button');
+                sBtn.className = 'server-btn';
+                sBtn.onclick = () => window.open(`https://www.roblox.com/games/${game.placeId}/#!/game-instances`, '_blank');
+                sBtn.innerHTML = '<span class="material-icons">dns</span>';
+                actionRow.appendChild(sBtn);
+            }
+        }
     }
+}
+
+function initStaticCards() {
+    const cards = document.querySelectorAll('#all-games-container .game-card');
+    cards.forEach(card => {
+        const onclick = card.getAttribute('onclick');
+        if (!onclick) return;
+        const match = onclick.match(/game-detail-([a-z0-9-]+)/);
+        if (!match) return;
+        const gameKey = match[1];
+        const game = gamesData[gameKey];
+        if (!game) return;
+
+        if (card.querySelector('.quick-play-btn-square')) return;
+
+        const info = card.querySelector('.game-info');
+        if (info) {
+            info.style.position = 'relative';
+            const playBtn = document.createElement('div');
+            playBtn.className = 'quick-play-btn-square';
+            playBtn.onclick = (e) => {
+                e.stopPropagation();
+                launchGame(gameKey, game.launchUrl);
+            };
+            playBtn.innerHTML = '<span class="material-icons">play_arrow</span>';
+            info.appendChild(playBtn);
+        }
+    });
 }
 
 function toggleMenu(menuId) {
@@ -642,24 +707,7 @@ function removeAccount(username) {
     loadAccounts();
 }
 
-function filterMarketplace(type) {
-    const cards = document.querySelectorAll('#marketplace .item-card');
-    const pills = document.querySelectorAll('.market-filter-pill');
 
-    pills.forEach(pill => {
-        pill.classList.remove('active');
-        if (pill.textContent.trim() === type) pill.classList.add('active');
-    });
-
-    cards.forEach(card => {
-        const itemType = card.getAttribute('data-type');
-        if (type === 'All' || itemType === type) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-}
 
 // Register Service Worker
 if ('serviceWorker' in navigator) {
@@ -681,4 +729,5 @@ document.addEventListener('DOMContentLoaded', () => {
     loadRecentGame();
     loadFavorites();
     loadRecommendations();
+    initStaticCards();
 });
