@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="miniOS">
@@ -18,17 +18,18 @@
             --glass-border: rgba(255, 255, 255, 0.2);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         html, body {
-            margin: 0; padding: 0; width: 100vw; height: 100vh;
+            margin: 0; padding: 0; width: 100vw; 
+            height: 100vh; height: 100dvh; 
             font-family: var(--font); background: #000; color: #fff;
             overflow: hidden; user-select: none; -webkit-user-select: none;
             overscroll-behavior: none; font-weight: 200;
         }
 
         #screen { 
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; 
             overflow: hidden; background: #000;
         }
 
@@ -36,7 +37,7 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
             background-size: cover; background-position: center;
             transform: scale(1.4) translateZ(0); filter: blur(0px);
-            transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1), filter 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), filter 0.4s cubic-bezier(0.32, 0.72, 0, 1);
             will-change: transform, filter;
             backface-visibility: hidden;
         }
@@ -44,6 +45,7 @@
 
         .layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; }
         .glass { background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
+        .dark-glass { background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); }
 
         /* --- SETUP SCREEN --- */
         #setup {
@@ -55,34 +57,12 @@
         .btn { background: #007AFF; color: white; padding: 15px 30px; border-radius: 25px; font-size: 18px; margin-top: 20px; text-align: center; width: 250px; font-weight: 300; cursor: pointer; }
         input[type="file"] { display: none; }
 
-        /* --- LOCK SCREEN --- */
-        #lock {
-            z-index: 50; display: flex; flex-direction: column; align-items: center;
-            transition: opacity 0.4s ease, transform 0.4s ease;
-            will-change: opacity, transform;
-        }
-        #lock-texts { display: flex; flex-direction: column; align-items: center; width: 100%; transition: transform 0.1s linear; will-change: transform; }
-        #lock-time { font-size: 85px; font-weight: 100; margin-top: calc(10vh + env(safe-area-inset-top, 20px)); text-shadow: 0 1px 15px rgba(0,0,0,0.2); letter-spacing: -2px; }
-        #lock-date { font-size: 22px; font-weight: 300; text-shadow: 0 1px 15px rgba(0,0,0,0.2); }
-        #lock-notifications { flex-grow: 1; width: 90%; margin-top: 20px; overflow-y: auto; padding-bottom: 20px; overflow-x: hidden; }
-        
-        .slider-container {
-            position: absolute; bottom: calc(60px + env(safe-area-inset-bottom, 15px)); width: 100%; height: 50px;
-            display: flex; justify-content: center; align-items: center; text-align: center;
-            font-size: 26px; font-weight: 200; color: rgba(255,255,255,0.7);
-            background: linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0.4) 100%);
-            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: shine 3s linear infinite; pointer-events: none;
-        }
-        @keyframes shine { to { background-position: 200% center; } }
-
         /* --- HOME SCREEN --- */
         #home { 
             z-index: 20; display: flex; flex-direction: column; justify-content: space-between; 
-            visibility: hidden; transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease; 
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease; 
             will-change: transform, opacity;
         }
-        #home.unlocked { visibility: visible; }
         #home.app-open { opacity: 0; pointer-events: none; }
 
         #app-grid { 
@@ -90,46 +70,68 @@
             padding: calc(20px + env(safe-area-inset-top, 20px)) 10px 0; align-content: start; 
             height: calc(100% - (110px + env(safe-area-inset-bottom, 15px))); 
         }
+        
         #dock { 
-            height: calc(110px + env(safe-area-inset-bottom, 15px)); width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center; 
-            padding: 15px 10px calc(15px + env(safe-area-inset-bottom, 15px)); border-top: 1px solid var(--glass-border); border-radius: 0; 
+            height: calc(110px + env(safe-area-inset-bottom, 15px)); width: 100%; 
+            display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center; 
+            padding: 15px 10px calc(15px + env(safe-area-inset-bottom, 15px)); 
+            border-top: 1px solid rgba(255, 255, 255, 0.2); 
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(35px);
+            -webkit-backdrop-filter: blur(35px);
+            z-index: 5;
         }
         
-        .app { display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 0; width: 100%; will-change: transform; }
-        .app-icon { width: 80px; height: 80px; margin: 0 auto; border-radius: 18px; background-size: contain; background-repeat: no-repeat; background-position: center; transition: filter 0.1s ease; will-change: transform; }
-        .app-icon:active { filter: brightness(0.4); }
-        .app-label { margin-top: 6px; font-size: 13px; font-weight: 300; text-shadow: 0 1px 3px rgba(0,0,0,0.6); text-align: center; width: 100%; display: block; }
-
-        /* Fly-In Entrance (Blur removed for smooth performance) */
-        .app.fly-in { animation: flyIn 0.8s cubic-bezier(0.2, 0.8, 0.1, 1) forwards; }
-        @keyframes flyIn {
-            0% { transform: translate3d(var(--fly-x), var(--fly-y), 0) scale(1.5); opacity: 0; }
-            100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+        .app { display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 1; width: 100%; will-change: transform; }
+        .app-icon { 
+            width: 80px; height: 80px; margin: 0 auto; border-radius: 18px; 
+            background-size: contain; background-repeat: no-repeat; background-position: center; 
+            transition: filter 0.1s ease; will-change: transform; 
+            box-shadow: none; border: none;
         }
+        .app-icon:active { filter: brightness(0.5); }
+        .app-label { margin-top: 6px; font-size: 13px; font-weight: 300; text-shadow: 0 1px 3px rgba(0,0,0,0.6); text-align: center; width: 100%; display: block; }
 
         .editing .app-icon { animation: jiggle 0.3s infinite; }
         .editing .app-icon:nth-child(even) { animation: jiggle2 0.3s infinite; }
         @keyframes jiggle { 0% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } 100% { transform: rotate(-2deg); } }
         @keyframes jiggle2 { 0% { transform: rotate(2deg); } 50% { transform: rotate(-2deg); } 100% { transform: rotate(2deg); } }
 
-        /* No scaling when moving an app */
         .sortable-drag .app-icon, .sortable-ghost .app-icon, .sortable-chosen .app-icon {
             animation: none !important;
-            filter: brightness(0.8);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            filter: brightness(0.5) !important;
+            box-shadow: none !important;
+            outline: none !important;
         }
 
         /* --- SPOTLIGHT SEARCH --- */
-        #spotlight { z-index: 40; visibility: hidden; transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s, visibility 0.3s; transform: translateY(-100%); opacity: 0; padding-top: calc(50px + env(safe-area-inset-top, 20px)); pointer-events: none; }
-        #spotlight.active { transform: translateY(0); opacity: 1; pointer-events: auto; visibility: visible; }
-        #search-bar { width: 90%; margin: 0 auto; background: rgba(255,255,255,0.4); padding: 12px 15px; border-radius: 12px; display: flex; }
+        #spotlight { 
+            z-index: 40; visibility: hidden; 
+            transition: opacity 0.3s, visibility 0.3s; 
+            opacity: 0; padding-top: calc(30px + env(safe-area-inset-top, 20px)); pointer-events: none; 
+            display: flex; flex-direction: column;
+        }
+        #spotlight.active { opacity: 1; pointer-events: auto; visibility: visible; }
+        
+        #spotlight-tabs { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; font-size: 18px; }
+        .sp-tab { cursor: pointer; transition: color 0.2s, font-weight 0.2s; }
+        
+        #search-bar { width: 90%; margin: 0 auto; background: rgba(255,255,255,0.25); padding: 12px 15px; border-radius: 12px; display: flex; border: 1px solid rgba(255,255,255,0.1); }
         #search-bar input { border: none; background: transparent; width: 100%; font-size: 18px; outline: none; color: #fff; font-family: var(--font); font-weight: 300; }
-        #search-bar input::placeholder { color: rgba(255,255,255,0.7); }
-        #spotlight-results { width: 90%; margin: 20px auto; max-height: 70vh; overflow-y: auto; }
-        .search-result { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); font-size: 18px; font-weight: 300; cursor: pointer; }
-        .search-result small { display: block; font-size: 13px; color: #eee; margin-top: 4px; }
+        #search-bar input::placeholder { color: rgba(255,255,255,0.6); }
+        
+        #spotlight-results { width: 90%; margin: 20px auto; max-height: calc(100vh - 200px); overflow-y: auto; }
+        .search-result { padding: 15px; background: rgba(255,255,255,0.15); border-radius: 12px; margin-bottom: 10px; font-size: 18px; font-weight: 300; cursor: pointer; }
+        .search-result small { display: block; font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 4px; }
 
-        /* --- APP CONTAINER (Hero Animation) --- */
+        #sp-notif-view { width: 90%; margin: 0 auto; max-height: calc(100vh - 120px); overflow-y: auto; overflow-x: hidden; display: none; padding-bottom: 30px; }
+        .sp-notif { 
+            background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.1); color: #fff;
+            padding: 15px; border-radius: 14px; margin-bottom: 12px; display:flex; align-items:center; cursor: pointer;
+            will-change: transform, opacity;
+        }
+
+        /* --- APP CONTAINER --- */
         #app-container {
             z-index: 80; background: #fff; color: #000;
             position: absolute; overflow: hidden; pointer-events: none; opacity: 0; visibility: hidden;
@@ -144,7 +146,28 @@
             background: transparent; pointer-events: auto;
         }
 
-        /* --- NOTIFICATIONS --- */
+        /* --- EDGE SWIPE HOME BUBBLE --- */
+        #home-bubble {
+            position: absolute;
+            top: 50%;
+            left: -70px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #007AFF;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            transform: translateY(-50%) scale(0.4);
+            transition: transform 0.1s ease, left 0.1s ease, opacity 0.1s ease;
+            z-index: 99999;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        /* --- TOASTS & IOS UI --- */
         .toast { 
             position: absolute; top: calc(15px + env(safe-area-inset-top, 20px)); left: 5%; width: 90%; border-radius: 14px; padding: 12px; z-index: 1000; 
             transform: translateY(-150%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
@@ -152,14 +175,7 @@
             font-size: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-weight: 300; display:flex; align-items:center;
         }
         .toast.show { transform: translateY(0); }
-        
-        .lock-notif { 
-            background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); color: #fff;
-            padding: 12px; border-radius: 14px; margin-bottom: 10px; display:flex; align-items:center; cursor: pointer;
-            will-change: transform, opacity;
-        }
 
-        /* --- SETTINGS/NATIVE UI CSS --- */
         .ios-list { background: #fff; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;}
         .ios-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; color: #000; font-size: 18px; cursor: pointer;}
         .ios-item:last-child { border-bottom: none; }
@@ -168,7 +184,6 @@
         .ios-nav { display: flex; align-items: center; padding: calc(45px + env(safe-area-inset-top, 20px)) 20px 10px; background: #f8f8f8; border-bottom: 1px solid #ddd; }
         .ios-back { color: #007AFF; font-size: 18px; cursor: pointer; display:flex; align-items:center; }
 
-        /* --- CALCULATOR CSS --- */
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 85px; gap: 4px; padding: 4px; background: #000; align-content: end; padding-bottom: calc(30px + env(safe-area-inset-bottom, 15px));}
         .calc-btn { display: flex; justify-content: center; align-items: center; font-size: 35px; font-weight: 300; border-radius: 0; color: #fff; background: #333; cursor: pointer; transition: filter 0.1s;}
         .calc-btn:active { filter: brightness(1.5); }
@@ -180,7 +195,7 @@
         .calc-screen { display: flex; justify-content: flex-end; align-items: flex-end; padding: 10px 20px 30px; font-size: 85px; color: #fff; font-weight: 200; overflow: hidden; height: calc(180px + env(safe-area-inset-top, 20px)); }
 
         .filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px; background: #000; border-top: 1px solid #333; }
-        .filter-btn { padding: 8px 12px; background: #222; color: #fff; border: 1px solid #444; font-family: var(--font); cursor: pointer; border-radius: 6px; }
+        .filter-btn { padding: 8px 12px; background: #222; color: #fff; border: 1px solid #444; font-family: var(--font); cursor: pointer; border-radius: 6px; flex-shrink: 0; }
         .filter-btn.active { background: #007AFF; border-color: #007AFF; }
         .mirrored { transform: scaleX(-1) !important; }
     </style>
@@ -200,38 +215,38 @@
         </label>
     </div>
 
-    <!-- LOCK SCREEN -->
-    <div id="lock" class="layer">
-        <div id="lock-texts">
-            <div id="lock-time">10:41</div>
-            <div id="lock-date">Tuesday, June 30</div>
-        </div>
-        <div id="lock-notifications"></div>
-        <div class="slider-container" id="slider">
-            <div style="display:flex; justify-content:center; align-items:center; width: 100%;">
-                <span class="material-icons" style="font-size:24px; opacity:0.6; margin-right:5px; vertical-align:middle;">chevron_right</span> slide to unlock
-            </div>
-        </div>
-    </div>
-
-    <!-- SPOTLIGHT -->
-    <div id="spotlight" class="layer glass">
-        <div id="search-bar">
-            <input type="text" id="search-input" placeholder="Search apps, notes, reminders..." oninput="handleSearch()">
-        </div>
-        <div id="spotlight-results"></div>
-    </div>
-
     <!-- HOME SCREEN -->
     <div id="home" class="layer">
         <div id="app-grid"></div>
-        <div id="dock" class="glass"></div>
+        <div id="dock"></div>
+    </div>
+
+    <!-- SPOTLIGHT OVERLAY -->
+    <div id="spotlight" class="layer dark-glass">
+        <div id="spotlight-tabs">
+            <span id="tab-search" class="sp-tab" onclick="switchSpTab('search')" style="font-weight: 500; color: white;">Search</span>
+            <span id="tab-notifs" class="sp-tab" onclick="switchSpTab('notifs')" style="font-weight: 300; color: rgba(255,255,255,0.5);">Notifications</span>
+        </div>
+
+        <div id="sp-search-view">
+            <div id="search-bar">
+                <input type="text" id="search-input" placeholder="Search apps, notes, reminders..." oninput="handleSearch()">
+            </div>
+            <div id="spotlight-results"></div>
+        </div>
+
+        <div id="sp-notif-view"></div>
     </div>
 
     <!-- APP OPEN CONTAINER -->
     <div id="app-container" class="layer">
         <div id="app-edge-handle"></div>
         <div id="app-ui"></div>
+    </div>
+
+    <!-- EDGE HOME BUBBLE -->
+    <div id="home-bubble">
+        <span class="material-icons" style="font-size:28px;">home</span>
     </div>
 
     <!-- CUSTOM NATIVE IOS POPUP OVERLAY -->
@@ -273,7 +288,7 @@
     ];
 
     let state = {
-        version: 8, setupDone: false,
+        version: 11, setupDone: false,
         wallpaper: WALLPAPERS[0],
         gridApps: ['Weather', 'Reminders', 'Clock', 'Calendar', 'Maps', 'Calculator', 'Photo Booth', 'Music', 'Settings'],
         dockApps: ['Contacts', 'Camera', 'Photos', 'Notes'],
@@ -282,6 +297,22 @@
             { id: 1, title: "Welcome to miniOS", text: "Welcome to miniOS!\n\nThis app automatically saves what you type.", date: "6/30/26" }
         ]
     };
+
+    // Global Interactive Music State
+    let musicState = {
+        playing: false,
+        currentTrackIndex: 0,
+        progress: 0, 
+        currentTime: 0,
+        intervalId: null,
+        tracks: [
+            { title: "Midnight City", artist: "M83", album: "Hurry Up, We're Dreaming", cover: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)", duration: 243, url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+            { title: "Get Lucky", artist: "Daft Punk", album: "Random Access Memories", cover: "linear-gradient(135deg, #f6d365 0%, #fda085 100%)", duration: 248, url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+            { title: "Ocean Eyes", artist: "Billie Eilish", album: "Don't Smile at Me", cover: "linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)", duration: 200, url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" }
+        ]
+    };
+
+    window.musicAudio = window.musicAudio || new Audio();
 
     function showiOSAlert(title, message, buttons = []) {
         const overlay = document.getElementById('ios-alert-overlay');
@@ -320,12 +351,12 @@
         let saved = localStorage.getItem('minios_state');
         if (saved) {
             let parsed = JSON.parse(saved);
-            if (parsed.version !== 8) { 
-                parsed.version = 8; 
+            if (parsed.version !== 11) { 
+                parsed.version = 11; 
                 parsed.gridApps = state.gridApps; 
                 parsed.dockApps = state.dockApps; 
-                delete parsed.emails; // Removing Mail legacy traces
-                delete parsed.chats;  // Removing Messages legacy traces
+                delete parsed.emails;
+                delete parsed.chats;
                 parsed.contacts = parsed.contacts || [
                     {first: "Craig", last: "Federighi", phone: "555-456-7890"},
                     {first: "Steve", last: "Jobs", phone: "555-197-6200"}
@@ -338,7 +369,7 @@
             state = parsed;
         }
         applyState();
-        renderLockNotifications();
+        renderSpotlightNotifications();
     }
     
     function saveState() { localStorage.setItem('minios_state', JSON.stringify(state)); }
@@ -354,7 +385,14 @@
         }
     }
 
-    function startSetup() { state.setupDone = true; saveState(); applyState(); unlockScreen(); }
+    function startSetup() { state.setupDone = true; saveState(); applyState(); }
+    
+    function confirmBackup() {
+        showiOSAlert("Backup Data", "Save a copy of your miniOS data?", [
+            { text: "Cancel", color: "#888" },
+            { text: "Backup", bold: true, onClick: createBackup }
+        ]);
+    }
     function createBackup() {
         let a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
         a.download = "minios_backup.json"; a.click();
@@ -363,7 +401,7 @@
     function restoreBackup(e) {
         let reader = new FileReader();
         reader.onload = function(evt) {
-            try { let parsed = JSON.parse(evt.target.result); parsed.version = 8; state = parsed; saveState(); window.location.reload(); } 
+            try { let parsed = JSON.parse(evt.target.result); parsed.version = 11; state = parsed; saveState(); window.location.reload(); } 
             catch(err) { showiOSAlert("Restore Error", "Invalid backup JSON file."); }
         }; reader.readAsText(e.target.files[0]);
     }
@@ -403,6 +441,8 @@
         return div;
     }
 
+    window.addEventListener('touchend', () => { setTimeout(() => isDragging = false, 100); });
+
     function enableEditMode() { 
         if(isEditing) return;
         isEditing = true; 
@@ -419,115 +459,48 @@
     document.getElementById('home').addEventListener('click', (e) => { if(isEditing && !e.target.closest('.app')) disableEditMode(); });
     function saveOrder() { state.gridApps = Array.from(document.getElementById('app-grid').children).map(c => c.dataset.id); state.dockApps = Array.from(document.getElementById('dock').children).map(c => c.dataset.id); saveState(); }
 
-    // --- LOCK SCREEN LOGIC & FULL SWIPE TO UNLOCK ---
-    const lockScreen = document.getElementById('lock'), lockTexts = document.getElementById('lock-texts'), home = document.getElementById('home'), slider = document.getElementById('slider');
-    let lockStartX = 0, isUnlocking = false;
-
-    function unlockScreen() {
-        lockScreen.style.opacity = '0'; lockScreen.style.pointerEvents = 'none';
-        home.classList.add('unlocked');
-        
-        // Remove heavy blur from unlocking loop for fluid performance
-        document.querySelectorAll('.app').forEach((app, index) => {
-            app.classList.remove('fly-in'); void app.offsetWidth; 
-            app.style.animationDelay = (index * 0.03) + 's'; app.classList.add('fly-in');
-        });
-        setTimeout(() => { lockScreen.style.display = 'none'; }, 400); 
-    }
-
-    // Attach unlock logic to whole lockscreen wrapper
-    lockScreen.addEventListener('touchstart', e => {
-        // Prevent unlock initiation if touching notification swipe area
-        if (e.target.closest('.lock-notif')) return;
-        lockStartX = e.touches[0].clientX;
-        isUnlocking = true;
-    });
-    
-    lockScreen.addEventListener('touchmove', e => {
-        if (isUnlocking) {
-            let delta = Math.max(0, e.touches[0].clientX - lockStartX);
-            slider.style.transform = `translateX(${delta}px)`;
-            slider.style.opacity = 1 - (delta / 250);
-            lockTexts.style.transform = `translateX(${delta * 1.5}px)`;
-        }
-    });
-    
-    lockScreen.addEventListener('touchend', e => {
-        if (isUnlocking) {
-            isUnlocking = false;
-            let delta = e.changedTouches[0].clientX - lockStartX;
-            if(delta > 130) { unlockScreen(); } 
-            else { 
-                slider.style.transition = 'all 0.3s ease';
-                lockTexts.style.transition = 'all 0.3s ease';
-                slider.style.transform = 'translateX(0)'; slider.style.opacity = '1'; lockTexts.style.transform = 'translateX(0)';
-                setTimeout(() => { slider.style.transition = ''; lockTexts.style.transition = 'transform 0.1s linear'; }, 300);
-            }
-        }
-    });
-
     document.addEventListener('keydown', e => {
         if (e.code === 'Space' && state.setupDone) {
-            e.preventDefault();
-            if (lockScreen.style.display !== 'none') unlockScreen();
-            else if (appContainer.classList.contains('open')) closeApp();
-        }
-    });
-
-    let homeSwipeStartX = 0, isSwipingHome = false;
-    home.addEventListener('touchstart', e => {
-        if (isEditing) return;
-        if (e.touches[0].clientX < 40) {
-            homeSwipeStartX = e.touches[0].clientX;
-            isSwipingHome = true;
-        }
-    });
-    
-    home.addEventListener('touchmove', e => {
-        if (isSwipingHome) {
-            let dx = e.touches[0].clientX - homeSwipeStartX;
-            if (dx > 0) { e.preventDefault(); home.style.transform = `translateX(${dx}px)`; }
-        }
-    });
-    
-    home.addEventListener('touchend', e => {
-        if (isSwipingHome) {
-            isSwipingHome = false;
-            let dx = e.changedTouches[0].clientX - homeSwipeStartX;
-            if (dx > 100) { lockDevice(); } 
-            else {
-                home.style.transition = 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
-                home.style.transform = 'translateX(0)';
-                setTimeout(() => home.style.transition = '', 400);
+            if (appContainer.classList.contains('open')) {
+                e.preventDefault(); closeApp();
             }
         }
     });
 
-    function lockDevice() {
-        slider.style.transition = ''; lockTexts.style.transition = '';
-        slider.style.transform = 'translateX(0)'; slider.style.opacity = '1';
-        lockTexts.style.transform = 'translateX(0)';
-
-        lockScreen.style.display = 'flex'; void lockScreen.offsetWidth;
-        lockScreen.style.opacity = '1'; lockScreen.style.pointerEvents = 'auto';
-        home.classList.remove('unlocked'); home.style.transform = 'translateX(0)';
-        renderLockNotifications();
-    }
-
-    // --- SPOTLIGHT ---
+    // --- SPOTLIGHT & NOTIFICATIONS LOGIC ---
     let homeStartY = 0; const spotlight = document.getElementById('spotlight');
     home.addEventListener('touchstart', e => { if(!isEditing) homeStartY = e.touches[0].clientY; });
     home.addEventListener('touchend', e => {
         if(!isEditing && (e.changedTouches[0].clientY - homeStartY) > 60) {
-            spotlight.classList.add('active'); document.getElementById('search-input').focus();
+            spotlight.classList.add('active'); 
+            if (document.getElementById('sp-search-view').style.display !== 'none') {
+                document.getElementById('search-input').focus();
+            }
         }
     });
     
     spotlight.addEventListener('touchstart', e => {
-        if(e.touches[0].clientY > 150 && !e.target.closest('#search-bar') && !e.target.closest('#spotlight-results')) closeSpotlight();
+        if(e.target === spotlight) closeSpotlight();
     });
     
-    function closeSpotlight() { spotlight.classList.remove('active'); document.getElementById('search-input').value = ''; document.getElementById('spotlight-results').innerHTML = ''; }
+    function closeSpotlight() { 
+        spotlight.classList.remove('active'); 
+        document.getElementById('search-input').value = ''; 
+        document.getElementById('spotlight-results').innerHTML = ''; 
+    }
+
+    function switchSpTab(tab) {
+        document.getElementById('sp-search-view').style.display = tab === 'search' ? 'block' : 'none';
+        document.getElementById('sp-notif-view').style.display = tab === 'notifs' ? 'block' : 'none';
+        
+        document.getElementById('tab-search').style.fontWeight = tab === 'search' ? '500' : '300';
+        document.getElementById('tab-search').style.color = tab === 'search' ? 'white' : 'rgba(255,255,255,0.5)';
+        
+        document.getElementById('tab-notifs').style.fontWeight = tab === 'notifs' ? '500' : '300';
+        document.getElementById('tab-notifs').style.color = tab === 'notifs' ? 'white' : 'rgba(255,255,255,0.5)';
+
+        if(tab === 'search') document.getElementById('search-input').focus();
+    }
     
     function handleSearch() {
         let q = document.getElementById('search-input').value.toLowerCase(); let resDiv = document.getElementById('spotlight-results');
@@ -538,9 +511,9 @@
         state.reminders.forEach(r => { if(r.text.toLowerCase().includes(q)) results.push({type: 'Reminder', text: r.text}); });
         
         resDiv.innerHTML = results.map(r => `
-            <div class="search-result glass" onclick="closeSpotlight(); ${r.type==='App'?`openApp('${r.text}')`:'openApp(\''+r.type+'s\')'}">
+            <div class="search-result" onclick="closeSpotlight(); ${r.type==='App'?`openApp('${r.text}')`:'openApp(\''+r.type+'s\')'}">
                 <div style="display:flex; align-items:center;">
-                    ${r.type === 'App' ? `<img src="${r.icon}" style="width:28px; height:28px; margin-right:12px; border-radius:6px;">` : `<span class="material-icons" style="margin-right:12px; opacity:0.7;">${r.type==='Note'?'description':'check_circle'}</span>`}
+                    ${r.type === 'App' ? `<img src="${r.icon}" style="width:34px; height:34px; margin-right:15px; border-radius:8px;">` : `<span class="material-icons" style="margin-right:15px; opacity:0.8; font-size:30px;">${r.type==='Note'?'description':'check_circle'}</span>`}
                     <div>
                         <strong style="display:block;">${r.text}</strong>
                         <small style="margin-top:2px;">${r.type}</small>
@@ -549,13 +522,88 @@
             </div>`).join('');
     }
 
-    // --- APP CONTAINER & HERO ANIMATION ---
+    let notifStartX = 0;
+    let swipedNotif = null;
+    const spNotifContainer = document.getElementById('sp-notif-view');
+
+    function renderSpotlightNotifications() {
+        spNotifContainer.innerHTML = state.notifications.length ? state.notifications.map((n, idx) => {
+            let iconUrl = APP_DEFS[n.title] || APP_DEFS['Settings'];
+            return `
+                <div class="sp-notif" data-id="${idx}" data-app="${n.title}">
+                    <img src="${iconUrl}" style="width:42px; height:42px; border-radius:10px; margin-right:14px;">
+                    <div style="flex:1;">
+                        <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:2px;">
+                            <strong style="font-size:16px; font-weight:500;">${n.title}</strong>
+                            <span style="font-size:12px; opacity:0.6; font-weight:300;">${n.date}</span>
+                        </div>
+                        <span style="font-size:14px; font-weight:300; opacity:0.9;">${n.body}</span>
+                    </div>
+                </div>`;
+        }).join('') : '<div style="text-align:center; padding: 40px; color:rgba(255,255,255,0.5); font-weight:300;">No Recent Notifications</div>';
+    }
+
+    spNotifContainer.addEventListener('touchstart', e => {
+        const notif = e.target.closest('.sp-notif');
+        if (notif) {
+            swipedNotif = notif;
+            notifStartX = e.touches[0].clientX;
+            notif.style.transition = 'none';
+        }
+    });
+
+    spNotifContainer.addEventListener('touchmove', e => {
+        if (swipedNotif) {
+            let dx = e.touches[0].clientX - notifStartX;
+            if (dx < 0) { 
+                e.stopPropagation(); 
+                swipedNotif.style.transform = `translateX(${dx}px)`;
+                swipedNotif.style.opacity = 1 - Math.abs(dx)/200;
+            }
+        }
+    });
+
+    spNotifContainer.addEventListener('touchend', e => {
+        if (swipedNotif) {
+            let dx = e.changedTouches[0].clientX - notifStartX;
+            if (dx < -70) {
+                e.stopPropagation();
+                swipedNotif.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                swipedNotif.style.transform = `translateX(-120%)`;
+                swipedNotif.style.opacity = '0';
+                const idx = parseInt(swipedNotif.dataset.id);
+                setTimeout(() => {
+                    state.notifications.splice(idx, 1);
+                    saveState();
+                    renderSpotlightNotifications();
+                }, 300);
+            } else if (Math.abs(dx) < 10) {
+                const appName = swipedNotif.dataset.app;
+                if (APP_DEFS[appName] || appName === 'Notes' || appName === 'Reminders') {
+                    closeSpotlight();
+                    setTimeout(() => openApp(appName), 100);
+                }
+            } else {
+                swipedNotif.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                swipedNotif.style.transform = 'translateX(0)';
+                swipedNotif.style.opacity = '1';
+            }
+            swipedNotif = null;
+        }
+    });
+
+    // --- APP CONTAINER & STATE MANAGER ---
     const appContainer = document.getElementById('app-container');
     let activeAppId = null;
+    let isAppTransitioning = false;
 
     function openApp(id, iconElement) {
-        if (!APP_DEFS[id] && id !== 'Notes' && id !== 'Reminders') return; // Validations
+        if (isAppTransitioning || appContainer.classList.contains('open')) return;
+        if (!APP_DEFS[id] && id !== 'Notes' && id !== 'Reminders') return;
+        
+        isAppTransitioning = true;
         activeAppId = id;
+        
         const ui = document.getElementById('app-ui');
         ui.innerHTML = '';
 
@@ -584,11 +632,13 @@
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                appContainer.style.transition = 'all 0.6s cubic-bezier(0.32, 0.72, 0, 1)';
+                appContainer.style.transition = 'all 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
                 appContainer.style.top = '0px'; appContainer.style.left = '0px';
-                appContainer.style.width = '100vw'; appContainer.style.height = '100vh';
+                appContainer.style.width = '100vw'; appContainer.style.height = '100dvh';
                 appContainer.style.borderRadius = '0px';
                 appContainer.classList.add('open');
+                
+                setTimeout(() => { isAppTransitioning = false; }, 450);
             });
         });
     }
@@ -597,25 +647,57 @@
     const edgeHandle = document.getElementById('app-edge-handle');
 
     edgeHandle.addEventListener('touchstart', e => {
+        if (isAppTransitioning) return;
         appSwipeStartX = e.touches[0].clientX; appSwipeStartY = e.touches[0].clientY;
         isSwipingApp = true; appContainer.style.transition = 'none';
+        
+        const bubble = document.getElementById('home-bubble');
+        bubble.style.transition = 'none';
+        bubble.style.opacity = '1';
     });
+    
     edgeHandle.addEventListener('touchmove', e => {
         if(isSwipingApp) {
             let dx = e.touches[0].clientX - appSwipeStartX;
-            if (dx > 0) { e.preventDefault(); appContainer.style.transform = `translate3d(${dx}px,0,0)`; }
+            if (dx > 0) { 
+                e.preventDefault(); 
+                appContainer.style.transform = `translate3d(${dx * 0.15}px,0,0)`; 
+                
+                const bubble = document.getElementById('home-bubble');
+                let targetLeft = Math.min(dx - 60, 40); 
+                bubble.style.left = targetLeft + 'px';
+                
+                let targetScale = Math.min(0.4 + (dx / 120), 1.25);
+                bubble.style.transform = `translateY(-50%) scale(${targetScale})`;
+            }
         }
     });
+    
     edgeHandle.addEventListener('touchend', e => {
         if(isSwipingApp) {
             isSwipingApp = false;
             let dx = e.changedTouches[0].clientX - appSwipeStartX;
-            if(dx > 80) { appContainer.style.transform = 'translate3d(0,0,0)'; closeApp(); } 
-            else { appContainer.style.transition = 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)'; appContainer.style.transform = 'translate3d(0,0,0)'; }
+            
+            const bubble = document.getElementById('home-bubble');
+            bubble.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1), left 0.3s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease';
+            bubble.style.left = '-70px';
+            bubble.style.transform = 'translateY(-50%) scale(0.4)';
+            bubble.style.opacity = '0';
+
+            if(dx > 95) { 
+                appContainer.style.transform = 'translate3d(0,0,0)'; 
+                closeApp(); 
+            } else { 
+                appContainer.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)'; 
+                appContainer.style.transform = 'translate3d(0,0,0)'; 
+            }
         }
     });
 
     function closeApp() {
+        if (isAppTransitioning) return;
+        isAppTransitioning = true;
+        
         if(window.cameraStream) { window.cameraStream.getTracks().forEach(t => t.stop()); window.cameraStream = null; }
 
         document.getElementById('wallpaper').classList.remove('app-open');
@@ -631,7 +713,7 @@
                 const targetWidth = rect.width - pad;
                 const targetHeight = rect.height - pad;
 
-                appContainer.style.transition = 'top 0.6s cubic-bezier(0.32, 0.72, 0, 1), left 0.6s cubic-bezier(0.32, 0.72, 0, 1), width 0.6s cubic-bezier(0.32, 0.72, 0, 1), height 0.6s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.6s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.15s cubic-bezier(0.32, 0.72, 0, 1) 0.45s';
+                appContainer.style.transition = 'top 0.4s cubic-bezier(0.32, 0.72, 0, 1), left 0.4s cubic-bezier(0.32, 0.72, 0, 1), width 0.4s cubic-bezier(0.32, 0.72, 0, 1), height 0.4s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.12s cubic-bezier(0.32, 0.72, 0, 1) 0.28s';
                 appContainer.style.top = targetTop + 'px'; appContainer.style.left = targetLeft + 'px';
                 appContainer.style.width = targetWidth + 'px'; appContainer.style.height = targetHeight + 'px';
                 appContainer.style.borderRadius = '18px';
@@ -644,7 +726,8 @@
             appContainer.style.visibility = 'hidden';
             document.getElementById('app-ui').innerHTML = ''; 
             activeAppId = null; 
-        }, 600);
+            isAppTransitioning = false;
+        }, 420);
     }
 
     // --- APP UI BUILDERS ---
@@ -710,6 +793,8 @@
             ui.style.background = '#000'; ui.innerHTML = renderClockApp();
         } else if (id === 'Photo Booth') {
             ui.style.background = '#000'; renderPhotoBooth();
+        } else if (id === 'Music') {
+            ui.style.background = '#fff'; renderMusicApp();
         } else if (id === 'Maps') {
             ui.style.background = '#fff';
             ui.innerHTML = `
@@ -722,6 +807,187 @@
         }
     }
 
+    // --- APP LOGIC (PHOTOS FULLSCREEN & DELETION) ---
+    function fullscreenPhoto(src) {
+        const overlay = document.createElement('div');
+        overlay.id = 'photo-fullscreen-overlay';
+        overlay.style.cssText = `
+            position: absolute; top:0; left:0; width:100%; height:100%; 
+            background:#000; z-index:100; display:flex; flex-direction:column;
+            justify-content:center; align-items:center; opacity:0; transition:opacity 0.3s ease;
+        `;
+        overlay.innerHTML = `
+            <img src="${src}" style="max-width:100%; max-height:85%; object-fit:contain;">
+            <div style="position:absolute; bottom:40px; width:100%; display:flex; justify-content:center; gap:50px; z-index:101; pointer-events:auto;">
+                <div onclick="deleteFullscreenPhoto('${src}', event)" style="width:50px; height:50px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; cursor:pointer;">
+                    <span class="material-icons" style="color:#ff3b30; font-size:28px;">delete</span>
+                </div>
+                <div onclick="closeFullscreenPhoto(event)" style="width:50px; height:50px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; cursor:pointer;">
+                    <span class="material-icons" style="color:#fff; font-size:28px;">close</span>
+                </div>
+            </div>
+        `;
+        document.getElementById('app-ui').appendChild(overlay);
+        requestAnimationFrame(() => overlay.style.opacity = '1');
+    }
+
+    function deleteFullscreenPhoto(src, event) {
+        event.stopPropagation();
+        showiOSAlert("Delete Photo", "Are you sure you want to delete this photo?", [
+            { text: "Cancel", color: "#888" },
+            { text: "Delete", color: "#ff3b30", bold: true, onClick: () => {
+                state.photos = state.photos.filter(p => p !== src);
+                saveState();
+                closeFullscreenPhoto();
+                buildAppUI('Photos', document.getElementById('app-ui'));
+            }}
+        ]);
+    }
+
+    function closeFullscreenPhoto(event) {
+        if(event) event.stopPropagation();
+        const overlay = document.getElementById('photo-fullscreen-overlay');
+        if(overlay) {
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.remove(), 300);
+        }
+    }
+
+    // --- APP LOGIC (MUSIC APP) ---
+    function renderMusicApp() {
+        const ui = document.getElementById('app-ui');
+        const track = musicState.tracks[musicState.currentTrackIndex];
+        
+        ui.innerHTML = `
+            <div style="padding: 60px 20px 20px; display: flex; flex-direction: column; height: 100%; background: #fff; color: #000; justify-content:space-between;">
+                <div>
+                    <h1 class="ios-title" style="margin-bottom:10px;">Music</h1>
+                    <div id="music-library-list" style="max-height: calc(100vh - 430px); overflow-y: auto; padding-right:5px;">
+                        ${musicState.tracks.map((t, idx) => `
+                            <div class="music-item" onclick="playMusicTrack(${idx})" style="display:flex; align-items:center; padding:12px; border-radius:12px; margin-bottom:10px; cursor:pointer; background: ${idx === musicState.currentTrackIndex ? '#007AFF' : '#f2f2f6'}; color: ${idx === musicState.currentTrackIndex ? '#fff' : '#000'}; transition: all 0.2s;">
+                                <div style="width:40px; height:40px; border-radius:8px; background:${t.cover}; margin-right:12px; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff; font-size:12px;">M</div>
+                                <div style="flex:1; overflow:hidden;">
+                                    <div style="font-weight:600; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.title}</div>
+                                    <div style="font-size:12px; opacity:0.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.artist}</div>
+                                </div>
+                                ${idx === musicState.currentTrackIndex && musicState.playing ? `<span class="material-icons" style="font-size:20px;">volume_up</span>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- NOW PLAYING COMPONENT -->
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 20px; border: 1px solid #eee; display: flex; flex-direction: column; align-items: center;">
+                    <div id="music-track-cover" style="width: 100px; height: 100px; border-radius: 18px; background: ${track.cover}; margin-bottom: 15px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-weight:600; color:#fff; font-size:24px;">Cover</div>
+                    <div style="text-align: center; width: 100%; margin-bottom: 12px;">
+                        <div id="music-track-title" style="font-size: 18px; font-weight: 600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${track.title}</div>
+                        <div id="music-track-artist" style="font-size: 14px; color: #666; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;">${track.artist}</div>
+                    </div>
+
+                    <!-- Seeker -->
+                    <div style="width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; font-size: 11px; color:#888;">
+                        <span id="music-curr-time">0:00</span>
+                        <input id="music-progress-bar" type="range" min="0" max="100" value="0" oninput="seekMusicTrack(this.value)" style="flex:1; margin: 0 10px; accent-color:#007AFF; cursor:pointer;">
+                        <span id="music-total-time">${formatMusicTime(track.duration)}</span>
+                    </div>
+
+                    <!-- Audio Controls -->
+                    <div style="display: flex; align-items: center; gap: 30px;">
+                        <span class="material-icons" onclick="prevMusicTrack()" style="font-size: 32px; color: #000; cursor: pointer;">skip_previous</span>
+                        <div onclick="toggleMusicPlayback()" style="width: 55px; height: 55px; border-radius: 50%; background: #007AFF; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff;">
+                            <span id="music-play-icon" class="material-icons" style="font-size: 32px;">${musicState.playing ? 'pause' : 'play_arrow'}</span>
+                        </div>
+                        <span class="material-icons" onclick="nextMusicTrack()" style="font-size: 32px; color: #000; cursor: pointer;">skip_next</span>
+                    </div>
+                </div>
+            </div>`;
+        
+        syncMusicTicker();
+    }
+
+    function formatMusicTime(secs) {
+        let m = Math.floor(secs / 60);
+        let s = Math.floor(secs % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    function syncMusicTicker() {
+        if (musicState.playing) {
+            startMusicInterval();
+        }
+    }
+
+    function startMusicInterval() {
+        clearInterval(musicState.intervalId);
+        musicState.intervalId = setInterval(() => {
+            if (window.musicAudio.duration) {
+                musicState.currentTime = window.musicAudio.currentTime;
+                musicState.progress = (musicState.currentTime / window.musicAudio.duration) * 100;
+                
+                const curEl = document.getElementById('music-curr-time');
+                const progBar = document.getElementById('music-progress-bar');
+                if (curEl) curEl.innerText = formatMusicTime(musicState.currentTime);
+                if (progBar) progBar.value = musicState.progress;
+                
+                if (window.musicAudio.ended) {
+                    nextMusicTrack();
+                }
+            }
+        }, 500);
+    }
+
+    window.playMusicTrack = function(index) {
+        if (musicState.currentTrackIndex !== index || !window.musicAudio.src) {
+            musicState.currentTrackIndex = index;
+            window.musicAudio.src = musicState.tracks[index].url;
+            musicState.currentTime = 0;
+            musicState.progress = 0;
+        }
+        musicState.playing = true;
+        window.musicAudio.play().catch(() => {});
+        startMusicInterval();
+        
+        // Re-draw if UI is open
+        if (activeAppId === 'Music') renderMusicApp();
+    }
+
+    window.toggleMusicPlayback = function() {
+        if (musicState.playing) {
+            window.musicAudio.pause();
+            musicState.playing = false;
+            clearInterval(musicState.intervalId);
+        } else {
+            if (!window.musicAudio.src) {
+                window.musicAudio.src = musicState.tracks[musicState.currentTrackIndex].url;
+            }
+            window.musicAudio.play().catch(() => {});
+            musicState.playing = true;
+            startMusicInterval();
+        }
+        if (activeAppId === 'Music') renderMusicApp();
+    }
+
+    window.nextMusicTrack = function() {
+        let next = (musicState.currentTrackIndex + 1) % musicState.tracks.length;
+        playMusicTrack(next);
+    }
+
+    window.prevMusicTrack = function() {
+        let prev = (musicState.currentTrackIndex - 1 + musicState.tracks.length) % musicState.tracks.length;
+        playMusicTrack(prev);
+    }
+
+    window.seekMusicTrack = function(val) {
+        if (window.musicAudio.duration) {
+            let newTime = (val / 100) * window.musicAudio.duration;
+            window.musicAudio.currentTime = newTime;
+            musicState.currentTime = newTime;
+            const curEl = document.getElementById('music-curr-time');
+            if (curEl) curEl.innerText = formatMusicTime(newTime);
+        }
+    }
+
+
     // --- APP LOGIC (SETTINGS) ---
     function renderSettingsPage(page) {
         const ui = document.getElementById('app-ui');
@@ -732,7 +998,7 @@
                     <div class="ios-list">
                         <div class="ios-item" onclick="renderSettingsPage('wallpapers')"><span>Wallpapers</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:18px;">chevron_right</span></span></div>
                         <div class="ios-item" onclick="renderSettingsPage('reset')"><span>Reset</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:18px;">chevron_right</span></span></div>
-                        <div class="ios-item" onclick="createBackup()"><span>Backup Data</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:18px;">chevron_right</span></span></div>
+                        <div class="ios-item" onclick="confirmBackup()"><span>Backup Data</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:18px;">chevron_right</span></span></div>
                         <div class="ios-item" onclick="renderSettingsPage('about')"><span>About</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:18px;">chevron_right</span></span></div>
                     </div>
                 </div>`;
@@ -756,7 +1022,11 @@
                 <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')"><span class="material-icons">chevron_left</span>Settings</span><span style="font-size:18px; font-weight:400; color:#000; margin-left:20px;">About</span></div>
                 <div style="padding: 30px 20px; text-align:center; color:#000;">
                     <div style="width:100px; height:100px; background:url('https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Settings.png') center/cover; margin:0 auto 20px; border-radius:22px;"></div>
-                    <h2 style="font-weight:300;">miniOS</h2><p style="color:#666;">Version 8.0</p>
+                    <h2 style="font-weight:300; margin-bottom:5px;">miniOS</h2>
+                    <p style="color:#666; margin-top:0;">Version 11.0</p>
+                    <div class="ios-list" style="margin-top:40px;">
+                        <div class="ios-item" onclick="window.location.reload()" style="color:#007AFF; font-weight:400; justify-content:center;">Check for Updates (Reload)</div>
+                    </div>
                 </div>`;
         }
     }
@@ -895,7 +1165,12 @@
         'chrome': 'contrast(110%) saturate(140%)',
         'sepia': 'sepia(90%)',
         'invert': 'invert(100%)',
-        'hue': 'hue-rotate(90deg)'
+        'hue': 'hue-rotate(90deg)',
+        'thermal': 'hue-rotate(240deg) saturate(300%) contrast(150%)',
+        'acid': 'hue-rotate(120deg) saturate(500%) contrast(180%)',
+        'xray': 'invert(100%) grayscale(100%) contrast(200%)',
+        'vintage': 'sepia(100%) contrast(120%) brightness(95%) saturate(140%)',
+        'ultra': 'hue-rotate(280deg) saturate(250%) contrast(130%)'
     };
     function renderPhotoBooth() {
         pbFilter = 'none'; const ui = document.getElementById('app-ui');
@@ -911,6 +1186,11 @@
                     <button class="filter-btn" id="f-sepia" onclick="setPBFilter('sepia')">Sepia</button>
                     <button class="filter-btn" id="f-invert" onclick="setPBFilter('invert')">Invert</button>
                     <button class="filter-btn" id="f-hue" onclick="setPBFilter('hue')">Hue Shift</button>
+                    <button class="filter-btn" id="f-thermal" onclick="setPBFilter('thermal')">Thermal</button>
+                    <button class="filter-btn" id="f-acid" onclick="setPBFilter('acid')">Neon Acid</button>
+                    <button class="filter-btn" id="f-xray" onclick="setPBFilter('xray')">X-Ray Solarize</button>
+                    <button class="filter-btn" id="f-vintage" onclick="setPBFilter('vintage')">Vintage Gold</button>
+                    <button class="filter-btn" id="f-ultra" onclick="setPBFilter('ultra')">Ultra Purple</button>
                 </div>
                 <div style="height:140px; background:#000; display:flex; justify-content:space-around; align-items:center; padding-bottom:20px;">
                     <div style="width:50px;"></div>
@@ -951,24 +1231,6 @@
         state.photos.unshift(c.toDataURL('image/jpeg', 0.85)); saveState(); notify("Photo Booth", "Photo saved with effect!");
         const flash = document.createElement('div'); flash.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:#fff;z-index:99;transition:opacity 0.4s; pointer-events:none;';
         document.getElementById('app-ui').appendChild(flash); setTimeout(() => flash.style.opacity = '0', 50); setTimeout(() => flash.remove(), 450);
-    }
-
-    // --- APP LOGIC (PHOTOS FULLSCREEN) ---
-    function fullscreenPhoto(src) {
-        const overlay = document.createElement('div');
-        overlay.id = 'photo-fullscreen-overlay';
-        overlay.style.cssText = `
-            position: absolute; top:0; left:0; width:100%; height:100%; 
-            background:#000; z-index:100; display:flex; justify-content:center; 
-            align-items:center; opacity:0; transition:opacity 0.3s ease;
-        `;
-        overlay.innerHTML = `<img src="${src}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
-        overlay.onclick = () => {
-            overlay.style.opacity = '0';
-            setTimeout(() => overlay.remove(), 300);
-        };
-        document.getElementById('app-ui').appendChild(overlay);
-        requestAnimationFrame(() => overlay.style.opacity = '1');
     }
 
     // --- APP LOGIC (NOTES) ---
@@ -1074,10 +1336,10 @@
         let iconUrl = APP_DEFS[title] || APP_DEFS['Settings']; 
         
         state.notifications.unshift({ title, body, date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-        if (state.notifications.length > 10) state.notifications.pop();
+        if (state.notifications.length > 20) state.notifications.pop();
         saveState();
 
-        renderLockNotifications();
+        renderSpotlightNotifications();
 
         let toast = document.createElement('div'); toast.className = 'toast';
         toast.innerHTML = `
@@ -1091,84 +1353,11 @@
         setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 4000);
     }
 
-    // Interactive Notifications on Lock Screen (Swipe right-to-left to dismiss, Tap to open)
-    let notifStartX = 0;
-    let swipedNotif = null;
-    const notifContainer = document.getElementById('lock-notifications');
-
-    function renderLockNotifications() {
-        notifContainer.innerHTML = state.notifications.map((n, idx) => {
-            let iconUrl = APP_DEFS[n.title] || APP_DEFS['Settings'];
-            return `
-                <div class="lock-notif" data-id="${idx}" data-app="${n.title}">
-                    <img src="${iconUrl}" style="width:38px; height:38px; border-radius:8px; margin-right:12px;">
-                    <div style="flex:1;">
-                        <div style="display:flex; justify-content:space-between; width:100%;">
-                            <strong style="font-size:14px; font-weight:500;">${n.title}</strong>
-                            <span style="font-size:11px; opacity:0.6; font-weight:300; margin-right:5px;">${n.date}</span>
-                        </div>
-                        <span style="font-size:13px; font-weight:300; opacity:0.9;">${n.body}</span>
-                    </div>
-                </div>`;
-        }).join('');
-    }
-
-    notifContainer.addEventListener('touchstart', e => {
-        const notif = e.target.closest('.lock-notif');
-        if (notif) {
-            swipedNotif = notif;
-            notifStartX = e.touches[0].clientX;
-            notif.style.transition = 'none';
-        }
-    });
-
-    notifContainer.addEventListener('touchmove', e => {
-        if (swipedNotif) {
-            let dx = e.touches[0].clientX - notifStartX;
-            if (dx < 0) { 
-                e.stopPropagation(); 
-                swipedNotif.style.transform = `translateX(${dx}px)`;
-                swipedNotif.style.opacity = 1 - Math.abs(dx)/200;
-            }
-        }
-    });
-
-    notifContainer.addEventListener('touchend', e => {
-        if (swipedNotif) {
-            let dx = e.changedTouches[0].clientX - notifStartX;
-            if (dx < -70) {
-                e.stopPropagation();
-                swipedNotif.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-                swipedNotif.style.transform = `translateX(-120%)`;
-                swipedNotif.style.opacity = '0';
-                const idx = parseInt(swipedNotif.dataset.id);
-                setTimeout(() => {
-                    state.notifications.splice(idx, 1);
-                    saveState();
-                    renderLockNotifications();
-                }, 300);
-            } else if (Math.abs(dx) < 10) {
-                const appName = swipedNotif.dataset.app;
-                if (APP_DEFS[appName] || appName === 'Notes' || appName === 'Reminders') {
-                    unlockScreen();
-                    setTimeout(() => openApp(appName), 400);
-                }
-            } else {
-                swipedNotif.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-                swipedNotif.style.transform = 'translateX(0)';
-                swipedNotif.style.opacity = '1';
-            }
-            swipedNotif = null;
-        }
-    });
-
     setInterval(() => {
         let d = new Date(), hrs = d.getHours().toString().padStart(2, '0'), mins = d.getMinutes().toString().padStart(2, '0'), t = `${hrs}:${mins}`;
-        let lt = document.getElementById('lock-time'); if(lt.innerText !== t) lt.innerText = t;
         let liveClock = document.getElementById('clock-live-display'); if(liveClock) liveClock.innerText = d.toLocaleTimeString('en-US', {hour12: false});
         state.reminders.forEach(r => { if(r.time === t && !r.notified) { notify("Reminder", r.text); r.notified = true; saveState(); } });
     }, 1000);
-    document.getElementById('lock-date').innerText = new Date().toLocaleDateString('en-US', {weekday:'long',month:'long',day:'numeric'});
 
     loadState();
 </script>
