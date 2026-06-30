@@ -21,16 +21,16 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         html, body {
-            margin: 0; padding: 0; width: 100%; 
-            height: 100%; height: -webkit-fill-available; /* Ultimate standalone viewport constraint */
+            margin: 0; padding: 0; width: 100vw; 
+            height: 100dvh; /* Unified single responsive viewport height style */
             font-family: var(--font); background: #000; color: #fff;
             overflow: hidden; user-select: none; -webkit-user-select: none;
             overscroll-behavior: none; font-weight: 200;
         }
 
         #screen { 
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            width: 100%; height: 100%; height: -webkit-fill-available; /* Prevents PWA black bars */
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            width: 100vw; height: 100dvh; 
             overflow: hidden; background: #000;
         }
 
@@ -252,16 +252,10 @@
 
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 85px; gap: 4px; padding: 4px; background: #000; align-content: end; padding-bottom: calc(30px + env(safe-area-inset-bottom, 15px));}
         .calc-btn { display: flex; justify-content: center; align-items: center; font-size: 35px; font-weight: 300; border-radius: 0; color: #fff; background: #333; cursor: pointer; transition: filter 0.1s; box-shadow: none !important; border: none; }
-        .calc-btn:active { filter: brightness(1.5); }
-        .calc-btn.op { background: #FF9F0A; color: #fff; }
-        .calc-btn.op:active { filter: brightness(1.2); }
-        .calc-btn.top { background: #A5A5A5; color: #000; }
-        .calc-btn.top:active { filter: brightness(0.8); }
-        .calc-btn.zero { grid-column: span 2; justify-content: flex-start; padding-left: 30px; }
         .calc-screen { display: flex; justify-content: flex-end; align-items: flex-end; padding: 10px 20px 30px; font-size: 85px; color: #fff; font-weight: 200; overflow: hidden; height: calc(180px + env(safe-area-inset-top, 20px)); }
 
         .filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px; background: #000; border-top: 1px solid #333; }
-        .filter-btn { padding: 8px 12px; background: #222; color: #fff; border: 1px solid #444; font-family: var(--font); cursor: pointer; border-radius: 6px; white-space: nowrap; box-shadow: none !important;}
+        .filter-btn { padding: 8px 12px; background: #222; color: #fff; border: 1px solid #444; font-family: var(--font); cursor: pointer; border-radius: 6px; white-space: nowrap; }
         .filter-btn.active { background: #007AFF; border-color: #007AFF; }
         .mirrored { transform: scaleX(-1) !important; }
 
@@ -336,7 +330,7 @@
         <span class="material-icons" style="font-size: 28px;">home</span>
     </div>
 
-    <!-- CUSTOM NATIVE IOS POPUP OVERLAY (FLATTENED WHITE BACKDROP) -->
+    <!-- CUSTOM NATIVE IOS POPUP OVERLAY (FLATTENED WHITE BACKDROP WITH NO SHADOWS) -->
     <div id="ios-alert-overlay">
         <div id="ios-alert" style="width:270px; border-radius:14px; color:#000; display:flex; flex-direction:column; overflow:hidden; background: #ffffff; box-shadow: none !important; transform:scale(1.2); transition:transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1.2); border: 1px solid rgba(0,0,0,0.15);">
             <div style="padding:20px; text-align:center;">
@@ -524,6 +518,7 @@
                 rowDiv.appendChild(btn);
             });
 
+            // Append matching right spacer to middle row
             if ((activeKey === 'abc' || activeKey === 'abc_shift') && rowIndex === 1) {
                 const rightSpacer = document.createElement('div');
                 rightSpacer.style.flex = '0.5';
@@ -720,36 +715,57 @@
             searchInput.addEventListener('input', handleSearch);
         }
         
-        // Multi-page touch swipe navigation controls
+        // Multi-page touch swipe navigation controls with robust rubber-banding physics
         const viewport = document.getElementById('pages-viewport');
+        const pagesContainer = document.getElementById('pages-container');
         let swipeTouchStartX = 0;
         let swipeTouchStartY = 0;
         let isPageSwiping = false;
+        let viewportWidth = 0;
 
         viewport.addEventListener('touchstart', e => {
             if (isEditing) return;
             swipeTouchStartX = e.touches[0].clientX;
             swipeTouchStartY = e.touches[0].clientY;
+            viewportWidth = window.innerWidth;
             isPageSwiping = true;
+            pagesContainer.style.transition = 'none'; // Lock animations while finger dragging
         }, { passive: true });
 
         viewport.addEventListener('touchmove', e => {
             if (!isPageSwiping) return;
             let dx = e.touches[0].clientX - swipeTouchStartX;
             let dy = e.touches[0].clientY - swipeTouchStartY;
+            
             if (Math.abs(dy) > Math.abs(dx)) {
                 isPageSwiping = false;
+                scrollToPage(currentPageIndex);
+                return;
             }
-        }, { passive: true });
+            
+            // Panning position with edge rubber-band resistance math
+            let targetOffset = -currentPageIndex * viewportWidth + dx;
+            
+            if (currentPageIndex === 0 && dx > 0) {
+                targetOffset = Math.pow(dx, 0.75); // Safe non-linear resistance curves
+            } else if (currentPageIndex === visiblePages.length - 1 && dx < 0) {
+                targetOffset = -currentPageIndex * viewportWidth - Math.pow(Math.abs(dx), 0.75);
+            }
+            
+            pagesContainer.style.transform = `translate3d(${targetOffset}px, 0, 0)`;
+        }, { passive: false });
 
         viewport.addEventListener('touchend', e => {
             if (!isPageSwiping) return;
             isPageSwiping = false;
             let dx = e.changedTouches[0].clientX - swipeTouchStartX;
-            if (dx > 50) {
+            
+            if (dx > 50 && currentPageIndex > 0) {
                 scrollToPage(currentPageIndex - 1);
-            } else if (dx < -50) {
+            } else if (dx < -50 && currentPageIndex < visiblePages.length - 1) {
                 scrollToPage(currentPageIndex + 1);
+            } else {
+                scrollToPage(currentPageIndex); // Automatically snap back to original page coordinates
             }
         }, { passive: true });
 
@@ -863,6 +879,7 @@
     let lastSpotlightCloseTime = 0;
     let currentPageIndex = 0;
     let pageFlipTimeout = null;
+    let visiblePages = [];
 
     function clearPageFlip() {
         if (pageFlipTimeout) {
@@ -873,36 +890,34 @@
 
     function scrollToPage(index, instant = false) {
         const container = document.getElementById('pages-container');
-        const totalPages = state.gridApps.length;
+        const totalPages = visiblePages.length;
         if (index < 0) index = 0;
         if (index >= totalPages) index = totalPages - 1;
         currentPageIndex = index;
         container.style.transition = instant ? 'none' : 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
         container.style.transform = `translate3d(-${currentPageIndex * 100}%, 0, 0)`;
         
-        const dots = document.getElementById('page-indicator').children;
-        Array.from(dots).forEach((dot, idx) => {
-            dot.style.background = idx === currentPageIndex ? '#fff' : 'rgba(255,255,255,0.4)';
-        });
+        updatePageDots();
     }
 
-    function checkPageManagement() {
-        // Automatically spawn a new page when grid content spills over
-        let lastPage = state.gridApps[state.gridApps.length - 1];
-        let hasApp = lastPage.some(app => app !== null);
-        if (hasApp && state.gridApps.length < 10) {
-            state.gridApps.push(Array(20).fill(null));
-        }
-        
-        // Remove trailing empty pages, keeping at least 2 pages
-        while (state.gridApps.length > 2) {
-            let penultPage = state.gridApps[state.gridApps.length - 2];
-            let lastPage = state.gridApps[state.gridApps.length - 1];
-            if (lastPage.every(app => app === null) && penultPage.every(app => app === null)) {
-                state.gridApps.pop();
-            } else {
-                break;
-            }
+    function updatePageDots() {
+        const indicator = document.getElementById('page-indicator');
+        indicator.innerHTML = '';
+        if (visiblePages.length >= 2) {
+            indicator.style.display = 'flex';
+            visiblePages.forEach((page, pageIdx) => {
+                const dot = document.createElement('span');
+                dot.style.cssText = `
+                    width: 8px; height: 8px; border-radius: 50%;
+                    background: ${pageIdx === currentPageIndex ? '#fff' : 'rgba(255,255,255,0.4)'};
+                    transition: background 0.3s;
+                    cursor: pointer;
+                `;
+                dot.onclick = () => scrollToPage(pageIdx);
+                indicator.appendChild(dot);
+            });
+        } else {
+            indicator.style.display = 'none';
         }
     }
 
@@ -997,13 +1012,29 @@
 
     function renderHome() {
         const container = document.getElementById('pages-container');
-        const indicator = document.getElementById('page-indicator');
         container.innerHTML = '';
-        indicator.innerHTML = '';
         
-        checkPageManagement();
+        // Setup initial trailing empty pages only when layout is actively edited
+        let lastPage = state.gridApps[state.gridApps.length - 1];
+        let lastHasApp = lastPage.some(app => app !== null);
+        if (isEditing && lastHasApp && state.gridApps.length < 10) {
+            state.gridApps.push(Array(20).fill(null));
+        }
+
+        // Only build and render visible occupied pages when not in edit mode
+        visiblePages = [];
+        state.gridApps.forEach((page, idx) => {
+            let hasApp = page.some(app => app !== null);
+            if (hasApp || idx === 0 || isEditing) {
+                visiblePages.push(page);
+            }
+        });
+
+        if (currentPageIndex >= visiblePages.length) {
+            currentPageIndex = visiblePages.length - 1;
+        }
         
-        state.gridApps.forEach((page, pageIdx) => {
+        visiblePages.forEach((page, pageIdx) => {
             const pageDiv = document.createElement('div');
             pageDiv.className = 'app-page';
             pageDiv.dataset.pageIndex = pageIdx;
@@ -1030,17 +1061,9 @@
             });
             
             container.appendChild(pageDiv);
-            
-            const dot = document.createElement('span');
-            dot.style.cssText = `
-                width: 8px; height: 8px; border-radius: 50%;
-                background: ${pageIdx === currentPageIndex ? '#fff' : 'rgba(255,255,255,0.4)'};
-                transition: background 0.3s;
-                cursor: pointer;
-            `;
-            dot.onclick = () => scrollToPage(pageIdx);
-            indicator.appendChild(dot);
         });
+
+        updatePageDots();
         
         const dock = document.getElementById('dock');
         dock.innerHTML = '';
@@ -1093,6 +1116,38 @@
         if(isEditing) return;
         isEditing = true; 
         document.body.classList.add('editing'); 
+        
+        // Dynamically insert trailing empty page nodes on edit start without causing Sortable active drag conflicts
+        const lastPage = state.gridApps[state.gridApps.length - 1];
+        const lastHasApp = lastPage.some(app => app !== null);
+        if (lastHasApp && state.gridApps.length < 10) {
+            state.gridApps.push(Array(20).fill(null));
+            const container = document.getElementById('pages-container');
+            const pageIdx = state.gridApps.length - 1;
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'app-page';
+            pageDiv.dataset.pageIndex = pageIdx;
+            pageDiv.style.cssText = `
+                min-width: 100%;
+                width: 100%;
+                height: 100%;
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(5, 1fr);
+                justify-items: center;
+                align-content: start;
+                gap: 15px 5px;
+                padding: calc(20px + env(safe-area-inset-top, 20px)) 10px 0;
+                box-sizing: border-box;
+            `;
+            for (let i = 0; i < 20; i++) {
+                pageDiv.appendChild(createEmptySlot(pageIdx, i));
+            }
+            container.appendChild(pageDiv);
+            new Sortable(pageDiv, sortableOptions);
+            visiblePages.push(state.gridApps[pageIdx]);
+            updatePageDots();
+        }
     }
     
     function disableEditMode() { 
@@ -1112,7 +1167,7 @@
             });
         });
         
-        // Filter out empty pages from home screen automatically when saving layout configs
+        // Filter out completely empty pages on layout configuration saves
         let filteredPages = [];
         tempGridPages.forEach((page, idx) => {
             let hasApp = page.some(app => app !== null);
@@ -1480,8 +1535,8 @@
             ui.style.background = 'linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%)';
             ui.innerHTML = `
                 <div style="padding-top: calc(80px + env(safe-area-inset-top, 20px)); color: #fff;">
-                    <h1 style="text-align:center; font-weight:300; font-size: 38px; margin-bottom: 0; text-shadow: none !important;">Melbourne</h1>
-                    <div id="weather-temp" style="font-size: 90px; font-weight: 100; text-align: center; margin-top: 10px; letter-spacing: -3px; text-shadow: none !important;">--°</div>
+                    <h1 style="text-align:center; font-weight:300; font-size: 38px; margin-bottom: 0;">Melbourne</h1>
+                    <div id="weather-temp" style="font-size: 90px; font-weight: 100; text-align: center; margin-top: 10px; letter-spacing: -3px;">--°</div>
                     <p id="weather-desc" style="text-align:center; font-size: 20px; margin-top: 10px; font-weight: 300;">Loading...</p>
                 </div>`;
             fetch('https://api.open-meteo.com/v1/forecast?latitude=-37.81&longitude=144.96&current_weather=true')
@@ -1505,7 +1560,10 @@
                 <div style="display: flex; flex-direction: column; height: 100%; background: #f2f2f6; color: #000;">
                     <!-- Sleek unified iOS 7 App Header Design -->
                     <div style="display:flex; align-items:center; padding: calc(45px + env(safe-area-inset-top, 20px)) 20px 10px; border-bottom: 1px solid #ddd; background:#f8f8f8; color:#000;">
-                        <span class="material-icons" style="font-size:28px; margin-right:8px; color:#ff3b30;">play_circle_filled</span>
+                        <!-- Custom Expanded Hitbox Back Button -->
+                        <span onclick="closeYouTubeWatch()" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin: -10px; margin-right: 5px;">
+                            <span class="material-icons" style="color:#ff3b30; font-size:28px;">play_circle_filled</span>
+                        </span>
                         <span style="font-size: 20px; font-weight: 500; letter-spacing: -0.5px;">YouTube</span>
                     </div>
                     <div id="yt-video-list" style="flex: 1; overflow-y: auto; padding: 15px 20px 30px;">
@@ -1521,7 +1579,7 @@
                         <div style="display:flex; align-items:center; gap:10px; width:100%;">
                             <span id="safari-back-btn" onclick="safariGoBack()" style="cursor:pointer; color:#007AFF; display:flex; align-items:center;"><span class="material-icons" style="font-size:28px;">chevron_left</span></span>
                             <span id="safari-forward-btn" onclick="safariGoForward()" style="cursor:pointer; color:#007AFF; display:flex; align-items:center;"><span class="material-icons" style="font-size:28px;">chevron_right</span></span>
-                            <div style="flex:1; background:#fff; border:1px solid #dcdcdc; border-radius:8px; display:flex; align-items:center; padding:6px 12px; gap:6px; box-shadow: none !important; border: 1px solid #dcdcdc;">
+                            <div style="flex:1; background:#fff; border:1px solid #dcdcdc; border-radius:8px; display:flex; align-items:center; padding:6px 12px; gap:6px; border: 1px solid #dcdcdc;">
                                 <span class="material-icons" style="font-size:16px; color:#4cd964;">lock</span>
                                 <input id="safari-url-bar" type="text" value="en.m.wikipedia.org" style="flex:1; border:none; background:transparent; font-size:14px; font-family:var(--font); outline:none; color:#000;" onkeydown="if(event.key==='Enter') safariNavigate()">
                                 <span class="material-icons" style="font-size:18px; color:#8e8e93; cursor:pointer;" onclick="safariReload()">refresh</span>
@@ -1565,17 +1623,21 @@
         if(!container) return;
         
         let html = '';
-        links.forEach((url, idx) => {
+        links.forEach((line, idx) => {
+            // Support "URL Description" line structures inside custom files
+            let parts = line.split(/\s+/);
+            let url = parts[0];
+            let descriptionTitle = parts.slice(1).join(' ').trim();
             const id = getYouTubeId(url);
             if(id) {
-                const tempTitle = YT_MOCK_METADATA[id] ? YT_MOCK_METADATA[id].title : "Loading video title...";
+                const tempTitle = descriptionTitle || (YT_MOCK_METADATA[id] ? YT_MOCK_METADATA[id].title : "Loading video title...");
                 const thumb = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
                 
                 // Classic unrounded (border-radius: 0) iOS 7 Cards - only displays title
                 html += `
-                    <div onclick="watchYouTubeVideo('${id}')" style="display:flex; flex-direction:column; margin-bottom:20px; cursor:pointer; background:#fff; overflow:hidden; border:1px solid #ddd; border-radius:0;">
-                        <div style="position:relative; width:100%; aspect-ratio:16/9; background:#000;">
-                            <img src="${thumb}" style="width:100%; height:100%; object-fit:cover; border-radius:0;">
+                    <div onclick="watchYouTubeVideo('${id}')" style="display:flex; flex-direction:column; margin-bottom:20px; cursor:pointer; background:#fff; overflow:hidden; border:1px solid #ddd; border-radius:0 !important;">
+                        <div style="position:relative; width:100%; aspect-ratio:16/9; background:#000; border-radius:0 !important;">
+                            <img src="${thumb}" style="width:100%; height:100%; object-fit:cover; border-radius:0 !important;">
                             <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center;">
                                 <span class="material-icons" style="color:#fff; font-size:36px;">play_arrow</span>
                             </div>
@@ -1585,21 +1647,23 @@
                         </div>
                     </div>`;
                     
-                // Dynamically fetch live title from URL oembed endpoint to prevent static placeholders
-                fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        const el = document.getElementById(`yt-title-${id}-${idx}`);
-                        if (el && data && data.title) {
-                            el.innerText = data.title;
-                        }
-                    })
-                    .catch(() => {
-                        const el = document.getElementById(`yt-title-${id}-${idx}`);
-                        if (el && el.innerText === "Loading video title...") {
-                            el.innerText = `YouTube Video`;
-                        }
-                    });
+                // Dynamically fetch live title from URL oembed endpoint if description parameter wasn't provided
+                if (!descriptionTitle) {
+                    fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            const el = document.getElementById(`yt-title-${id}-${idx}`);
+                            if (el && data && data.title) {
+                                el.innerText = data.title;
+                            }
+                        })
+                        .catch(() => {
+                            const el = document.getElementById(`yt-title-${id}-${idx}`);
+                            if (el && el.innerText === "Loading video title...") {
+                                el.innerText = `YouTube Video`;
+                            }
+                        });
+                }
             }
         });
         
@@ -1622,7 +1686,10 @@
         `;
         overlay.innerHTML = `
             <div style="height: calc(75px + env(safe-area-inset-top, 20px)); background: #000; display: flex; align-items: flex-end; padding: 0 20px 15px; z-index: 101; box-sizing: border-box;">
-                <span class="material-icons" style="color: #fff; font-size: 30px; cursor: pointer;" onclick="closeYouTubeWatch()">arrow_back</span>
+                <!-- Expanded hitbox targets on active system back button views -->
+                <span onclick="closeYouTubeWatch()" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin: -10px; margin-right: 5px;">
+                    <span class="material-icons" style="color: #fff; font-size: 30px;">arrow_back</span>
+                </span>
                 <span style="color:#fff; font-size:18px; margin-left:15px; font-weight:500; padding-bottom: 2px;">Now Playing</span>
             </div>
             <div style="flex:1; display:flex; justify-content:center; align-items:center;">
@@ -1891,13 +1958,16 @@
         html += `</div></div>`; return html;
     }
 
-    // --- APP LOGIC (CLOCK IN 12 HOUR TIME) ---
+    // --- APP LOGIC (CLOCK IN 12 HOUR TIME - COMPACT) ---
     function renderClockApp() {
+        let d = new Date();
+        let options = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
+        let cleanTime = d.toLocaleTimeString('en-US', options).replace(/\s*[AP]M\s*$/i, ''); // Strictly strip AM/PM
         return `
             <div style="display:flex; flex-direction:column; height:100%; background:#000; color:#fff;">
                 <div style="flex-grow:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-                    <div id="clock-live-display" data-active="true" style="font-size:75px; font-weight:100; letter-spacing: 2px;">${new Date().toLocaleTimeString('en-US', {hour12: true})}</div>
-                    <div style="color:#aaa; font-size:20px; margin-top:10px; font-weight: 300;">${new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'})}</div>
+                    <div id="clock-live-display" data-active="true" style="font-size:75px; font-weight:100; letter-spacing: 2px;">${cleanTime}</div>
+                    <div style="color:#aaa; font-size:20px; margin-top:10px; font-weight: 300;">${d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'})}</div>
                 </div>
             </div>`;
     }
@@ -2140,8 +2210,12 @@
     }
 
     setInterval(() => {
-        let d = new Date(), hrs = d.getHours().toString().padStart(2, '0'), mins = d.getMinutes().toString().padStart(2, '0'), t = `${hrs}:${mins}`;
-        let liveClock = document.getElementById('clock-live-display'); if(liveClock) liveClock.innerText = d.toLocaleTimeString('en-US', {hour12: true});
+        let d = new Date(), hrs = d.getHours().toString().padStart(2, '0'), mins = d.getMinutes().toString().padStart(2, '0');
+        let options = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
+        let cleanTime = d.toLocaleTimeString('en-US', options).replace(/\s*[AP]M\s*$/i, ''); // Strictly strip AM/PM
+        let liveClock = document.getElementById('clock-live-display'); 
+        if(liveClock) liveClock.innerText = cleanTime;
+        let t = `${hrs}:${mins}`;
         state.reminders.forEach(r => { if(r.time === t && !r.notified) { notify("Reminder", r.text); r.notified = true; saveState(); } });
     }, 1000);
 
