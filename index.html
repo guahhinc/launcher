@@ -83,18 +83,24 @@
             height: calc(100% - (110px + env(safe-area-inset-bottom, 15px))); 
         }
         
+        /* Dock repositioned as direct root child to capture wallpaper backdrop blurs */
         #dock { 
+            position: absolute;
+            bottom: 0;
+            left: 0;
             height: calc(110px + env(safe-area-inset-bottom, 15px)); width: 100%; 
             display: flex; justify-content: space-around; align-items: center;
             padding: 15px 15px calc(15px + env(safe-area-inset-bottom, 15px)); 
-            border-top: 1px solid rgba(255, 255, 255, 0.15) !important; 
-            background: rgba(255, 255, 255, 0.12) !important;
-            backdrop-filter: blur(30px) !important;
-            -webkit-backdrop-filter: blur(30px) !important;
-            z-index: 5;
+            border-top: 1px solid rgba(255, 255, 255, 0.2) !important; 
+            background: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(35px) !important;
+            -webkit-backdrop-filter: blur(35px) !important;
+            z-index: 25;
             transform: translate3d(0,0,0);
-            will-change: transform, backdrop-filter;
+            will-change: transform, opacity;
+            transition: transform 0.55s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease;
         }
+        #dock.app-open { opacity: 0; pointer-events: none; transform: translate3d(0, 30px, 0); }
         #dock .app { width: auto; }
         
         .app { display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 1; width: 100%; will-change: transform; }
@@ -182,38 +188,44 @@
             opacity: 0;
         }
 
-        /* --- CUSTOM BUILT-IN KEYBOARD STYLE --- */
+        /* --- LIGHT IOS KEYBOARD STYLE --- */
         #custom-keyboard {
             display: none; position: fixed; bottom: 0; left: 0; width: 100vw; 
-            background: rgba(20, 20, 20, 0.9);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            background: rgba(240, 243, 248, 0.96);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             z-index: 10000; 
-            padding: 10px 5px calc(10px + env(safe-area-inset-bottom, 15px)); 
-            border-top: 1px solid rgba(255,255,255,0.15); 
+            padding: 8px 5px calc(10px + env(safe-area-inset-bottom, 15px)); 
+            border-top: 1px solid rgba(0, 0, 0, 0.12); 
             transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); 
             transform: translateY(100%);
         }
-        #keyboard-notif-banner {
-            display: flex; justify-content: center; width: 100%; margin-bottom: 12px; height: 24px;
+        #keyboard-suggestions-bar {
+            display: flex; justify-content: space-around; width: 100%; margin-bottom: 8px; height: 38px; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 6px;
         }
-        #keyboard-notif-btn {
-            background: rgba(255,255,255,0.15); border-radius: 12px; padding: 4px 15px; font-size:12px; color:#fff; cursor: pointer;
+        .kb-suggestion {
+            flex: 1; text-align: center; font-size: 15px; color: #000; font-weight: 500;
+            cursor: pointer; padding: 6px 0; border-right: 1px solid rgba(0,0,0,0.1);
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
+        .kb-suggestion:last-child { border-right: none; }
+        .kb-suggestion:active { background: rgba(0,0,0,0.08); }
+
         .sp-tab-active { font-weight: 500; color: white !important; }
         .sp-tab-inactive { font-weight: 300; color: rgba(255,255,255,0.5) !important; }
 
         .kb-grid { display: flex; flex-direction: column; gap: 8px; max-width: 500px; margin: 0 auto; }
         .kb-row { display: flex; justify-content: center; gap: 5px; width: 100%; }
         .kb-key { 
-            flex: 1; height: 46px; border-radius: 6px; background: rgba(255,255,255,0.15); 
-            color: #fff; display: flex; align-items: center; justify-content: center; 
-            font-size: 18px; font-weight: 400; cursor: pointer; transition: background 0.1s; 
+            flex: 1; height: 46px; border-radius: 6px; background: #ffffff; 
+            color: #000; display: flex; align-items: center; justify-content: center; 
+            font-size: 19px; font-weight: 400; cursor: pointer; transition: background 0.08s; 
             user-select: none; -webkit-user-select: none;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15); border: none;
         }
-        .kb-key:active { background: rgba(255,255,255,0.4); }
-        .kb-key.wide { flex: 1.5; }
-        .kb-key.space { flex: 4; }
+        .kb-key:active { background: #d0d4dc !important; }
+        .kb-key.wide { flex: 1.5; background: #abb1bc; font-size: 14px; }
+        .kb-key.space { flex: 4; background: #ffffff; }
 
         /* --- TOASTS & IOS UI --- */
         .toast { 
@@ -243,7 +255,7 @@
         .calc-screen { display: flex; justify-content: flex-end; align-items: flex-end; padding: 10px 20px 30px; font-size: 85px; color: #fff; font-weight: 200; overflow: hidden; height: calc(180px + env(safe-area-inset-top, 20px)); }
 
         .filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px; background: #000; border-top: 1px solid #333; }
-        .filter-btn { padding: 8px 12px; background: #222; color: #fff; border: 1px solid #444; font-family: var(--font); cursor: pointer; border-radius: 6px; }
+        .filter-btn { padding: 8px 12px; background: #222; color: #fff; border: 1px solid #444; font-family: var(--font); cursor: pointer; border-radius: 6px; white-space: nowrap; }
         .filter-btn.active { background: #007AFF; border-color: #007AFF; }
         .mirrored { transform: scaleX(-1) !important; }
     </style>
@@ -266,8 +278,10 @@
     <!-- HOME SCREEN -->
     <div id="home" class="layer">
         <div id="app-grid"></div>
-        <div id="dock"></div>
     </div>
+    
+    <!-- REPOSITIONED DOCK DIRECTLY SIBLING TO WALLPAPER (BLUR RE-ENABLED) -->
+    <div id="dock"></div>
 
     <!-- SPOTLIGHT OVERLAY -->
     <div id="spotlight" class="layer dark-glass">
@@ -288,9 +302,7 @@
 
     <!-- CUSTOM ON-SCREEN KEYBOARD -->
     <div id="custom-keyboard">
-        <div id="keyboard-notif-banner">
-            <span id="keyboard-notif-btn" style="display:none;"></span>
-        </div>
+        <div id="keyboard-suggestions-bar"></div>
         <div class="kb-grid" id="kb-grid-keys"></div>
     </div>
 
@@ -373,7 +385,7 @@
         tracks: [
             { title: "Midnight City", artist: "M83", album: "Hurry Up, We're Dreaming", cover: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)", duration: 243, url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
             { title: "Get Lucky", artist: "Daft Punk", album: "Random Access Memories", cover: "linear-gradient(135deg, #f6d365 0%, #fda085 100%)", duration: 248, url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-            { title: "Ocean Eyes", artist: "Billie Eilish", album: "Don't Smile at Me", cover: "linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)", duration: 200, url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" }
+            { title: "Ocean Eyes", artist: "Billie Eilish", album: "Don't Highlight Me", cover: "linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)", duration: 200, url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" }
         ]
     };
 
@@ -432,6 +444,10 @@
             kb.style.transform = 'translateY(0)';
         }, 10);
         renderKeyboard();
+        
+        let start = activeInput.selectionStart;
+        let words = activeInput.value.substring(0, start).split(/\s+/);
+        evaluateAutocorrect(words[words.length - 1]);
     }
 
     function hideCustomKeyboard() {
@@ -444,7 +460,8 @@
             activeInput.blur();
             activeInput = null;
         }
-        document.getElementById('keyboard-notif-btn').style.display = 'none';
+        const sugBar = document.getElementById('keyboard-suggestions-bar');
+        if (sugBar) sugBar.innerHTML = '';
     }
 
     function renderKeyboard() {
@@ -466,10 +483,10 @@
                 btn.className = 'kb-key';
                 
                 if (['SHIFT', 'SHIFT_ACTIVE', 'BACKSPACE', '123', 'ABC', '#+=', 'DONE'].includes(key)) {
-                    btn.classList.add('kb-key-wide');
+                    btn.classList.add('wide');
                 }
                 if (key === 'SPACE') {
-                    btn.classList.add('kb-key-space');
+                    btn.classList.add('space');
                 }
                 
                 if (key === 'SHIFT') {
@@ -536,13 +553,8 @@
                 activeInput.setSelectionRange(start, start);
             }
         } else if (key === 'SPACE') {
-            const sug = document.getElementById('keyboard-notif-btn');
-            if (sug && sug.style.display !== 'none') {
-                applyAutocorrect(sug.innerText);
-            } else {
-                activeInput.value = val.substring(0, start) + ' ' + val.substring(end);
-                activeInput.setSelectionRange(start + 1, start + 1);
-            }
+            activeInput.value = val.substring(0, start) + ' ' + val.substring(end);
+            activeInput.setSelectionRange(start + 1, start + 1);
         } else {
             activeInput.value = val.substring(0, start) + key + val.substring(end);
             activeInput.setSelectionRange(start + 1, start + 1);
@@ -555,49 +567,79 @@
         
         activeInput.dispatchEvent(new Event('input', { bubbles: true }));
         
-        let words = activeInput.value.split(' ');
+        let words = activeInput.value.substring(0, activeInput.selectionStart).split(/\s+/);
         let lastWord = words[words.length - 1];
         evaluateAutocorrect(lastWord);
     }
 
     function evaluateAutocorrect(word) {
-        const sugBtn = document.getElementById('keyboard-notif-btn');
-        if (!word || word.length < 2) {
-            sugBtn.style.display = 'none';
+        const sugBar = document.getElementById('keyboard-suggestions-bar');
+        if (!sugBar) return;
+        
+        if (!word || word.length < 1) {
+            renderSuggestions(["the", "hello", "miniOS"]);
             return;
         }
         
-        let matchWord = null;
-        let minDistance = 3; 
+        let candidates = DICTIONARY.filter(w => w.toLowerCase().startsWith(word.toLowerCase()));
+        candidates.sort((a,b) => a.length - b.length);
         
-        for (let target of DICTIONARY) {
-            if (target.toLowerCase() === word.toLowerCase()) {
-                sugBtn.style.display = 'none';
-                return;
+        if (candidates.length < 3) {
+            let fuzzyMatches = [];
+            for (let target of DICTIONARY) {
+                if (candidates.includes(target)) continue;
+                let dist = calcLevenshtein(word.toLowerCase(), target.toLowerCase());
+                if (dist <= 2) {
+                    fuzzyMatches.push({ word: target, dist });
+                }
             }
-            let dist = calcLevenshtein(word.toLowerCase(), target.toLowerCase());
-            if (dist < minDistance) {
-                minDistance = dist;
-                matchWord = target;
-            }
+            fuzzyMatches.sort((a,b) => a.dist - b.dist);
+            fuzzyMatches.forEach(item => {
+                if (candidates.length < 3) candidates.push(item.word);
+            });
         }
         
-        if (matchWord) {
-            sugBtn.innerText = matchWord;
-            sugBtn.style.display = 'inline-block';
-            sugBtn.onclick = () => applyAutocorrect(matchWord);
-        } else {
-            sugBtn.style.display = 'none';
+        candidates = candidates.slice(0, 3);
+        if (candidates.length === 0) {
+            candidates = ["the", "receive", "please"].slice(0, 3);
         }
+        
+        renderSuggestions(candidates);
+    }
+
+    function renderSuggestions(list) {
+        const sugBar = document.getElementById('keyboard-suggestions-bar');
+        if (!sugBar) return;
+        sugBar.innerHTML = '';
+        list.forEach(word => {
+            const item = document.createElement('div');
+            item.className = 'kb-suggestion';
+            item.innerText = `"${word}"`;
+            item.addEventListener('touchstart', e => { e.preventDefault(); applyAutocorrect(word); });
+            item.addEventListener('mousedown', e => { e.preventDefault(); applyAutocorrect(word); });
+            sugBar.appendChild(item);
+        });
     }
 
     function applyAutocorrect(correctWord) {
         if (!activeInput) return;
-        let words = activeInput.value.split(' ');
+        let val = activeInput.value;
+        let start = activeInput.selectionStart;
+        
+        let beforeCursor = val.substring(0, start);
+        let afterCursor = val.substring(start);
+        
+        let words = beforeCursor.split(/\s+/);
         words[words.length - 1] = correctWord;
-        activeInput.value = words.join(' ') + ' ';
+        
+        let newBefore = words.join(' ') + ' ';
+        activeInput.value = newBefore + afterCursor;
+        
+        let newCursorPos = newBefore.length;
+        activeInput.setSelectionRange(newCursorPos, newCursorPos);
+        
         activeInput.dispatchEvent(new Event('input', { bubbles: true }));
-        document.getElementById('keyboard-notif-btn').style.display = 'none';
+        evaluateAutocorrect('');
     }
 
     function calcLevenshtein(a, b) {
@@ -638,7 +680,70 @@
                 hideCustomKeyboard();
             }
         });
+
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', handleSearch);
+        }
     });
+
+    // --- CUSTOM NATIVE IOS ALERT OVERLAYS ---
+    function showiOSAlert(title, message, buttons) {
+        const overlay = document.getElementById('ios-alert-overlay');
+        const alertBox = document.getElementById('ios-alert');
+        const titleEl = document.getElementById('ios-alert-title');
+        const msgEl = document.getElementById('ios-alert-msg');
+        const btnContainer = document.getElementById('ios-alert-buttons');
+
+        titleEl.innerText = title;
+        msgEl.innerText = message;
+        btnContainer.innerHTML = '';
+
+        buttons.forEach(btn => {
+            const b = document.createElement('button');
+            b.style.cssText = `
+                flex: 1;
+                padding: 14px;
+                background: transparent;
+                border: none;
+                border-left: 1px solid rgba(0,0,0,0.1);
+                font-size: 16px;
+                font-family: var(--font);
+                color: ${btn.color || '#007AFF'};
+                font-weight: ${btn.bold ? '600' : '400'};
+                cursor: pointer;
+                outline: none;
+            `;
+            b.innerText = btn.text;
+            b.onclick = () => {
+                hideiOSAlert();
+                if (btn.onClick) btn.onClick();
+            };
+            btnContainer.appendChild(b);
+        });
+
+        if (btnContainer.firstChild) {
+            btnContainer.firstChild.style.borderLeft = 'none';
+        }
+
+        overlay.style.display = 'flex';
+        overlay.style.visibility = 'visible';
+        setTimeout(() => {
+            overlay.style.opacity = '1';
+            alertBox.style.transform = 'scale(1)';
+        }, 10);
+    }
+
+    function hideiOSAlert() {
+        const overlay = document.getElementById('ios-alert-overlay');
+        const alertBox = document.getElementById('ios-alert');
+        overlay.style.opacity = '0';
+        alertBox.style.transform = 'scale(0.85)';
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            overlay.style.visibility = 'hidden';
+        }, 250);
+    }
 
     // --- SETUP STATE MANAGERS ---
     let lastSpotlightCloseTime = 0;
@@ -690,7 +795,7 @@
         ]);
     }
     function createBackup() {
-        let a = document.createElement('a'); a.href = "data:text/json;utf-8," + encodeURIComponent(JSON.stringify(state));
+        let a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
         a.download = "minios_backup.json"; a.click();
     }
     
@@ -768,8 +873,9 @@
 
     // --- SPOTLIGHT & NOTIFICATIONS LOGIC ---
     let homeStartY = 0; const spotlight = document.getElementById('spotlight');
-    home.addEventListener('touchstart', e => { if(!isEditing) homeStartY = e.touches[0].clientY; });
-    home.addEventListener('touchend', e => {
+    const homeEl = document.getElementById('home');
+    homeEl.addEventListener('touchstart', e => { if(!isEditing) homeStartY = e.touches[0].clientY; });
+    homeEl.addEventListener('touchend', e => {
         if(!isEditing && (e.changedTouches[0].clientY - homeStartY) > 60) {
             spotlight.classList.add('active'); 
             if (document.getElementById('sp-search-view').style.display !== 'none') {
@@ -919,6 +1025,7 @@
 
         document.getElementById('wallpaper').classList.add('app-open');
         document.getElementById('home').classList.add('app-open');
+        document.getElementById('dock').classList.add('app-open');
 
         let rect = iconElement ? iconElement.getBoundingClientRect() : { top: window.innerHeight/2, left: window.innerWidth/2, width: 0, height: 0 };
         
@@ -942,7 +1049,6 @@
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                // Slower spring curves for deep transitions
                 appContainer.style.transition = 'all 0.55s cubic-bezier(0.32, 0.72, 0, 1)';
                 appContainer.style.top = '0px'; appContainer.style.left = '0px';
                 appContainer.style.width = '100vw'; appContainer.style.height = '100dvh';
@@ -1013,6 +1119,7 @@
 
         document.getElementById('wallpaper').classList.remove('app-open');
         document.getElementById('home').classList.remove('app-open');
+        document.getElementById('dock').classList.remove('app-open');
 
         if (activeAppId) {
             let activeAppElement = document.querySelector(`.app[data-id="${activeAppId}"] .app-icon`);
@@ -1051,12 +1158,12 @@
         } else if (id === 'Reminders') {
             ui.style.background = '#fff';
             ui.innerHTML = `
-                <div style="padding: 60px 20px 20px;">
+                <div style="padding: calc(60px + env(safe-area-inset-top, 20px)) 20px 20px;">
                     <h1 class="ios-title" style="color: #007AFF;">Reminders</h1>
                     <div style="display:flex; margin-bottom:20px;">
                         <input type="text" id="remText" placeholder="Remind me to..." style="flex:1; padding:12px; font-size:16px; border:1px solid #eee; border-radius:10px 0 0 10px; font-family:var(--font); color:#000; outline:none;">
                         <input type="time" id="remTime" style="padding:12px; border:1px solid #eee; border-left:none; font-family:var(--font); color:#000; outline:none;">
-                        <button onclick="addReminder()" style="background:#007AFF; color:#fff; border:none; padding:12px 20px; border-radius:0 10px 10px 0; font-family:var(--font);">Add</button>
+                        <button onclick="addReminder()" style="background:#007AFF; color:#fff; border:none; padding:12px 20px; border-radius:0 10px 10px 0; font-family:var(--font); cursor:pointer;">Add</button>
                     </div>
                     <div id="remList" style="color: #000;"></div>
                 </div>`;
@@ -1078,14 +1185,14 @@
         } else if (id === 'Photos') {
             ui.style.background = '#fff';
             ui.innerHTML = `
-                <div style="padding: 60px 5px 0;">
+                <div style="padding: calc(60px + env(safe-area-inset-top, 20px)) 5px 0;">
                     <h1 class="ios-title" style="margin-left: 15px;">Photos</h1>
                     ${state.photos.length ? `<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:3px;">${state.photos.map(p => `<img src="${p}" onclick="fullscreenPhoto('${p}')" style="width:100%; aspect-ratio:1; object-fit:cover; cursor:pointer;">`).join('')}</div>` : `<p style="text-align:center; color:#888; margin-top:50px;">No Photos Yet</p>`}
                 </div>`;
         } else if (id === 'Weather') {
             ui.style.background = 'linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%)';
             ui.innerHTML = `
-                <div style="padding-top: 80px; color: #fff;">
+                <div style="padding-top: calc(80px + env(safe-area-inset-top, 20px)); color: #fff;">
                     <h1 style="text-align:center; font-weight:300; font-size: 38px; margin-bottom: 0; text-shadow: 0 1px 10px rgba(0,0,0,0.1);">Melbourne</h1>
                     <div id="weather-temp" style="font-size: 90px; font-weight: 100; text-align: center; margin-top: 10px; letter-spacing: -3px; text-shadow: 0 1px 10px rgba(0,0,0,0.1);">--°</div>
                     <p id="weather-desc" style="text-align:center; font-size: 20px; margin-top: 10px; font-weight: 300;">Loading...</p>
@@ -1110,8 +1217,8 @@
         } else if (id === 'YouTube') {
             ui.style.background = '#fff';
             ui.innerHTML = `
-                <div style="padding: 60px 0 20px; display: flex; flex-direction: column; height: 100%; background: #fff; color: #000;">
-                    <div style="display:flex; align-items:center; padding: 0 20px 10px; border-bottom: 1px solid #eee; background:#ff0000; color:#fff; margin-top:-60px; padding-top:60px;">
+                <div style="padding: calc(60px + env(safe-area-inset-top, 20px)) 0 20px; display: flex; flex-direction: column; height: 100%; background: #fff; color: #000;">
+                    <div style="display:flex; align-items:center; padding: calc(10px + env(safe-area-inset-top, 20px)) 20px 10px; border-bottom: 1px solid #eee; background:#ff0000; color:#fff; margin-top:calc(-60px - env(safe-area-inset-top, 20px));">
                         <span class="material-icons" style="font-size:28px; margin-right:8px;">play_circle_filled</span>
                         <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.5px;">YouTube</span>
                     </div>
@@ -1196,9 +1303,9 @@
             opacity:0; transition:opacity 0.3s ease;
         `;
         overlay.innerHTML = `
-            <div style="height: 60px; background: #000; display: flex; align-items: center; padding: 0 20px; z-index: 101;">
+            <div style="height: calc(75px + env(safe-area-inset-top, 20px)); background: #000; display: flex; align-items: flex-end; padding: 0 20px 15px; z-index: 101; box-sizing: border-box;">
                 <span class="material-icons" style="color: #fff; font-size: 30px; cursor: pointer;" onclick="closeYouTubeWatch()">arrow_back</span>
-                <span style="color:#fff; font-size:18px; margin-left:15px; font-weight:500;">Now Playing</span>
+                <span style="color:#fff; font-size:18px; margin-left:15px; font-weight:500; padding-bottom: 2px;">Now Playing</span>
             </div>
             <div style="flex:1; display:flex; justify-content:center; align-items:center;">
                 <iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" style="width:100%; height:56.25vw; max-height:80%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
@@ -1268,15 +1375,15 @@
         const track = musicState.tracks[musicState.currentTrackIndex];
         
         ui.innerHTML = `
-            <div style="padding: 60px 20px 20px; display: flex; flex-direction: column; height: 100%; background: #fff; color: #000; justify-content:space-between;">
+            <div style="padding: calc(65px + env(safe-area-inset-top, 20px)) 20px calc(20px + env(safe-area-inset-bottom, 15px)); display: flex; flex-direction: column; height: 100%; background: #fff; color: #000; justify-content:space-between; box-sizing: border-box;">
                 <div>
                     <h1 class="ios-title" style="margin-bottom:10px;">Music</h1>
-                    <div id="music-library-list" style="max-height: calc(100vh - 430px); overflow-y: auto; padding-right:5px;">
+                    <div id="music-library-list" style="max-height: calc(100vh - 450px); overflow-y: auto; padding-right:5px;">
                         ${musicState.tracks.map((t, idx) => `
                             <div class="music-item" onclick="playMusicTrack(${idx})" style="display:flex; align-items:center; padding:12px; border-radius:12px; margin-bottom:10px; cursor:pointer; background: ${idx === musicState.currentTrackIndex ? '#007AFF' : '#f2f2f6'}; color: ${idx === musicState.currentTrackIndex ? '#fff' : '#000'}; transition: all 0.2s;">
                                 <div style="width:40px; height:40px; border-radius:8px; background:${t.cover}; margin-right:12px; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff; font-size:12px;">M</div>
                                 <div style="flex:1; overflow:hidden;">
-                                    <div style="font-weight:600; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.title}</div>
+                                    <div style="font-weight:600; font-size:15px; line-height:1.3; color:${idx === musicState.currentTrackIndex ? '#fff' : '#111'}; margin-bottom:4px;">${t.title}</div>
                                     <div style="font-size:12px; opacity:0.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.artist}</div>
                                 </div>
                                 ${idx === musicState.currentTrackIndex && musicState.playing ? `<span class="material-icons" style="font-size:20px;">volume_up</span>` : ''}
@@ -1286,7 +1393,7 @@
                 </div>
 
                 <!-- NOW PLAYING COMPONENT -->
-                <div style="background: #f9f9f9; padding: 20px; border-radius: 20px; border: 1px solid #eee; display: flex; flex-direction: column; align-items: center;">
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 20px; border: 1px solid #eee; display: flex; flex-direction: column; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
                     <div id="music-track-cover" style="width: 100px; height: 100px; border-radius: 18px; background: ${track.cover}; margin-bottom: 15px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-weight:600; color:#fff; font-size:24px;">Cover</div>
                     <div style="text-align: center; width: 100%; margin-bottom: 12px;">
                         <div id="music-track-title" style="font-size: 18px; font-weight: 600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${track.title}</div>
@@ -1401,7 +1508,7 @@
         const ui = document.getElementById('app-ui');
         if (page === 'main') {
             ui.innerHTML = `
-                <div style="padding: 60px 20px 20px;">
+                <div style="padding: calc(60px + env(safe-area-inset-top, 20px)) 20px 20px;">
                     <h1 class="ios-title">Settings</h1>
                     <div class="ios-list">
                         <div class="ios-item" onclick="renderSettingsPage('wallpapers')"><span>Wallpapers</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:18px;">chevron_right</span></span></div>
@@ -1466,7 +1573,7 @@
         const ui = document.getElementById('app-ui');
         if (page === 'list') {
             ui.innerHTML = `
-                <div style="padding: 60px 20px 20px;">
+                <div style="padding: calc(60px + env(safe-area-inset-top, 20px)) 20px 20px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <h1 class="ios-title" style="margin:0;">Contacts</h1>
                         <span onclick="renderContactsPage('add')" style="cursor:pointer; display:flex; align-items:center;"><span class="material-icons" style="font-size:30px; color:#007AFF;">add</span></span>
@@ -1541,7 +1648,7 @@
     // --- APP LOGIC (CALENDAR) ---
     function renderCalendar() {
         let d = new Date(); let month = d.toLocaleString('default', { month: 'long' }); let year = d.getFullYear();
-        let html = `<div style="padding:60px 20px 20px; background:#fff; height:100%; color:#000;">`;
+        let html = `<div style="padding:calc(60px + env(safe-area-inset-top, 20px)) 20px 20px; background:#fff; height:100%; color:#000;">`;
         html += `<h1 class="ios-title" style="color:#ff3b30;">${month} ${year}</h1>`;
         html += `<div style="display:grid; grid-template-columns:repeat(7, 1fr); gap:15px 10px; text-align:center; font-size: 20px;">`;
         ['S','M','T','W','T','F','S'].forEach(day => html += `<div style="font-weight:400; color:#888;">${day}</div>`);
@@ -1566,6 +1673,8 @@
     }
 
     // --- APP LOGIC (PHOTO BOOTH) ---
+    let pbFilter = 'none';
+
     function renderPhotoBooth() {
         pbFilter = 'none'; const ui = document.getElementById('app-ui');
         ui.innerHTML = `
@@ -1591,14 +1700,62 @@
     
     function startCameraPB() {
         if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            // Locked front camera only with mirrored output
             navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } }).then(stream => { 
                 window.cameraStream = stream; 
                 const feed = document.getElementById('photobooth-feed');
-                feed.srcObject = stream; 
-                feed.classList.add('mirrored');
-            }).catch(err => document.getElementById('photobooth-feed').parentElement.innerHTML = '<p style="color:#fff; text-align:center; margin-top:50px;">Front Camera disabled.</p>');
+                if (feed) {
+                    feed.srcObject = stream; 
+                    feed.classList.add('mirrored');
+                }
+            }).catch(err => {
+                const feed = document.getElementById('photobooth-feed');
+                if (feed) feed.parentElement.innerHTML = '<p style="color:#fff; text-align:center; margin-top:50px;">Front Camera disabled.</p>';
+            });
         }
+    }
+
+    function setPBFilter(filter) {
+        pbFilter = filter;
+        const feed = document.getElementById('photobooth-feed');
+        if (feed) {
+            feed.style.filter = getCSSFilterString(filter);
+        }
+        const btns = document.querySelectorAll('.filter-row .filter-btn');
+        btns.forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.getElementById(`f-${filter}`);
+        if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    function getCSSFilterString(filter) {
+        if (filter === 'noir') return 'grayscale(1) contrast(1.4)';
+        if (filter === 'thermal') return 'hue-rotate(180deg) saturate(3) contrast(1.2)';
+        if (filter === 'acid') return 'hue-rotate(90deg) saturate(5) invert(0.1)';
+        if (filter === 'xray') return 'invert(1) grayscale(1) contrast(1.5)';
+        if (filter === 'vintage') return 'sepia(0.8) contrast(0.95) saturate(1.1) hue-rotate(-10deg)';
+        if (filter === 'ultra') return 'hue-rotate(280deg) saturate(4) contrast(1.1)';
+        return 'none';
+    }
+
+    function capturePBPhoto() {
+        const v = document.getElementById('photobooth-feed'); if(!v||!v.videoWidth) return;
+        const c = document.createElement('canvas'); 
+        c.width = 1080; c.height = Math.round(1080 * (v.videoHeight / v.videoWidth));
+        const ctx = c.getContext('2d');
+        
+        ctx.translate(c.width, 0); 
+        ctx.scale(-1, 1);
+        ctx.filter = getCSSFilterString(pbFilter);
+        
+        ctx.drawImage(v, 0, 0, c.width, c.height); 
+        state.photos.unshift(c.toDataURL('image/jpeg', 0.85)); 
+        saveState(); 
+        notify("Photo Booth", "Photo captured with style.");
+        
+        const flash = document.createElement('div'); 
+        flash.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:#fff;z-index:99;transition:opacity 0.4s; pointer-events:none;';
+        document.getElementById('app-ui').appendChild(flash); 
+        setTimeout(() => flash.style.opacity = '0', 50); 
+        setTimeout(() => flash.remove(), 450);
     }
 
     // --- APP LOGIC (NOTES) ---
@@ -1606,7 +1763,7 @@
         const ui = document.getElementById('app-ui');
         if (page === 'list') {
             ui.innerHTML = `
-                <div style="padding: 60px 20px 20px;">
+                <div style="padding: calc(60px + env(safe-area-inset-top, 20px)) 20px 20px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
                         <h1 class="ios-title" style="margin:0;">Notes</h1>
                         <span onclick="createNewNote()" style="color:#007AFF; cursor:pointer; display:flex; align-items:center;"><span class="material-icons">note_add</span></span>
@@ -1677,10 +1834,15 @@
             navigator.mediaDevices.getUserMedia({ video: { facingMode: cameraFacingMode } }).then(stream => { 
                 window.cameraStream = stream; 
                 const feed = document.getElementById('camera-feed');
-                feed.srcObject = stream; 
-                if (cameraFacingMode === 'user') feed.classList.add('mirrored');
-                else feed.classList.remove('mirrored');
-            }).catch(err => document.getElementById('camera-feed').parentElement.innerHTML = '<p style="color:#fff; text-align:center; margin-top:50px;">Camera disabled.</p>');
+                if (feed) {
+                    feed.srcObject = stream; 
+                    if (cameraFacingMode === 'user') feed.classList.add('mirrored');
+                    else feed.classList.remove('mirrored');
+                }
+            }).catch(err => {
+                const feed = document.getElementById('camera-feed');
+                if (feed) feed.parentElement.innerHTML = '<p style="color:#fff; text-align:center; margin-top:50px;">Camera disabled.</p>';
+            });
         }
     }
     function toggleCameraFacing() {
