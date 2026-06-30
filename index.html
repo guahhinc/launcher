@@ -1,2492 +1,813 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Betterblox</title>
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/guahhinc/launcher/main/betterblox.png">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
-
-    <!-- Chrome App / PWA Support -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Betterblox">
-    <meta name="apple-mobile-web-app-title" content="Betterblox">
-    <meta name="theme-color" content="#0074BD">
-    <meta name="msapplication-navbutton-color" content="#0074BD">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="msapplication-starturl" content="index.html">
-    <link rel="icon" type="image/png" sizes="512x512"
-        href="https://raw.githubusercontent.com/guahhinc/launcher/main/betterblox.png">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/guahhinc/launcher/main/betterblox.png">
-    <link rel="stylesheet" href="style.css">
-</head>
+    <meta name="apple-mobile-web-app-title" content="miniOS">
+    <link rel="apple-touch-icon" href="https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Settings.png">
+    <title>miniOS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@100;200;300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <style>
+        :root {
+            --font: 'Inter Tight', sans-serif;
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: var(--font); background: #000; color: #fff;
+            overflow: hidden; user-select: none; -webkit-user-select: none;
+            overscroll-behavior: none; font-weight: 200;
+        }
+
+        #screen { position: relative; width: 100vw; height: 100vh; overflow: hidden; background: #000;}
+
+        /* Background wallpaper defaults to zoomed in slightly (1.05) */
+        #wallpaper {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
+            background-size: cover; background-position: center;
+            transform: scale(1.05) translateZ(0); filter: blur(0px);
+            transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1), filter 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+            will-change: transform, filter;
+        }
+        /* Zooms out and blurs when app opens */
+        #wallpaper.app-open { transform: scale(1) translateZ(0); filter: blur(15px); }
+
+        .layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; }
+        .glass { background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
+
+        /* --- SETUP SCREEN --- */
+        #setup {
+            background: #fff; color: #000; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.5s;
+        }
+        #setup h1 { font-weight: 200; font-size: 50px; margin-bottom: 10px; }
+        .btn { background: #007AFF; color: white; padding: 15px 30px; border-radius: 25px; font-size: 18px; margin-top: 20px; text-align: center; width: 250px; font-weight: 300; cursor: pointer; }
+        input[type="file"] { display: none; }
+
+        /* --- LOCK SCREEN --- */
+        #lock {
+            z-index: 50; display: flex; flex-direction: column; align-items: center;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        #lock-texts { display: flex; flex-direction: column; align-items: center; width: 100%; transition: transform 0.1s linear; }
+        #lock-time { font-size: 85px; font-weight: 100; margin-top: 12vh; text-shadow: 0 1px 15px rgba(0,0,0,0.2); letter-spacing: -2px; }
+        #lock-date { font-size: 22px; font-weight: 300; text-shadow: 0 1px 15px rgba(0,0,0,0.2); }
+        #lock-notifications { flex-grow: 1; width: 90%; margin-top: 20px; overflow-y: auto; }
+        
+        .slider-container {
+            position: absolute; bottom: 60px; width: 100%; height: 50px;
+            display: flex; justify-content: center; align-items: center; text-align: center;
+            font-size: 26px; font-weight: 200; color: rgba(255,255,255,0.7);
+            background: linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0.4) 100%);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite; cursor: pointer;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        /* --- HOME SCREEN --- */
+        #home { 
+            z-index: 20; display: flex; flex-direction: column; justify-content: space-between; 
+            visibility: hidden; transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease; 
+        }
+        #home.unlocked { visibility: visible; }
+        #home.app-open { opacity: 0; pointer-events: none; }
+
+        #app-grid { display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center; gap: 15px 5px; padding: 45px 10px 0; align-content: start; height: calc(100% - 110px); }
+        #dock { height: 110px; width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center; padding: 15px 10px; border-top: 1px solid var(--glass-border); border-radius: 0; }
+        
+        .app { display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 0; }
+        .app-icon { width: 80px; height: 80px; border-radius: 18px; background-size: contain; background-repeat: no-repeat; background-position: center; transition: filter 0.1s ease; }
+        .app-icon:active { filter: brightness(0.4); }
+        .app-label { margin-top: 6px; font-size: 13px; font-weight: 300; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+
+        /* Fly-In Animation - Slower and smoother */
+        .app.fly-in { animation: flyIn 1.0s cubic-bezier(0.2, 0.8, 0.1, 1) forwards; }
+        @keyframes flyIn {
+            0% { transform: translate(var(--fly-x), var(--fly-y)) scale(1.5); opacity: 0; filter: blur(5px); }
+            100% { transform: translate(0, 0) scale(1); opacity: 1; filter: blur(0px); }
+        }
+
+        .editing .app-icon { animation: jiggle 0.3s infinite; }
+        .editing .app-icon:nth-child(even) { animation: jiggle2 0.3s infinite; }
+        @keyframes jiggle { 0% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } 100% { transform: rotate(-2deg); } }
+        @keyframes jiggle2 { 0% { transform: rotate(2deg); } 50% { transform: rotate(-2deg); } 100% { transform: rotate(2deg); } }
+
+        /* --- SPOTLIGHT SEARCH --- */
+        #spotlight { z-index: 40; transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s; transform: translateY(-100%); opacity: 0; padding-top: 50px; pointer-events: none; }
+        #spotlight.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        #search-bar { width: 90%; margin: 0 auto; background: rgba(255,255,255,0.4); padding: 12px 15px; border-radius: 12px; display: flex; }
+        #search-bar input { border: none; background: transparent; width: 100%; font-size: 18px; outline: none; color: #fff; font-family: var(--font); font-weight: 300; }
+        #search-bar input::placeholder { color: rgba(255,255,255,0.7); }
+        #spotlight-results { width: 90%; margin: 20px auto; max-height: 70vh; overflow-y: auto; }
+        .search-result { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); font-size: 18px; font-weight: 300; cursor: pointer; }
+        .search-result small { display: block; font-size: 13px; color: #eee; margin-top: 4px; }
+
+        /* --- APP CONTAINER (Hero Animation) --- */
+        #app-container {
+            z-index: 80; background: #fff; color: #000;
+            position: absolute; overflow: hidden; pointer-events: none; opacity: 0;
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            transform: translateX(0);
+        }
+        #app-container.open { pointer-events: auto; }
+        #app-ui { height: 100%; width: 100%; overflow-y: auto; overflow-x: hidden; position: relative; }
+
+        /* --- NOTIFICATIONS --- */
+        .toast { position: absolute; top: 15px; left: 5%; width: 90%; border-radius: 15px; padding: 15px; z-index: 1000; transform: translateY(-150%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); color: #fff; font-size: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); font-weight: 300; }
+        .toast.show { transform: translateY(0); }
+        .lock-notif { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; margin-bottom: 10px; backdrop-filter: blur(15px); }
+
+        /* --- SETTINGS/NATIVE UI CSS --- */
+        .ios-list { background: #fff; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;}
+        .ios-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; color: #000; font-size: 18px; cursor: pointer;}
+        .ios-item:last-child { border-bottom: none; }
+        .ios-item:active { background: #f0f0f0; }
+        .ios-title { color: #000; font-weight: 400; margin-bottom: 20px; font-size: 30px;}
+        .ios-nav { display: flex; align-items: center; padding: 50px 20px 10px; background: #f8f8f8; border-bottom: 1px solid #ddd; }
+        .ios-back { color: #007AFF; font-size: 18px; cursor: pointer; padding-right: 15px; }
+
+        /* --- CALCULATOR CSS --- */
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 85px; gap: 4px; padding: 4px; background: #000; align-content: end; padding-bottom: 30px;}
+        .calc-btn { display: flex; justify-content: center; align-items: center; font-size: 35px; font-weight: 300; border-radius: 0; color: #fff; background: #333; cursor: pointer; transition: filter 0.1s;}
+        .calc-btn:active { filter: brightness(1.5); }
+        .calc-btn.op { background: #FF9F0A; color: #fff; }
+        .calc-btn.op:active { filter: brightness(1.2); }
+        .calc-btn.top { background: #A5A5A5; color: #000; }
+        .calc-btn.top:active { filter: brightness(0.8); }
+        .calc-btn.zero { grid-column: span 2; justify-content: flex-start; padding-left: 30px; }
+        .calc-screen { display: flex; justify-content: flex-end; align-items: flex-end; padding: 10px 20px 30px; font-size: 85px; color: #fff; font-weight: 200; overflow: hidden; height: 180px; }
+
+        /* --- PHOTO BOOTH --- */
+        .filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px; background: #000; border-top: 1px solid #333; }
+        .filter-btn { padding: 8px 12px; background: #222; color: #fff; border: 1px solid #444; font-family: var(--font); cursor: pointer; border-radius: 6px; }
+        .filter-btn.active { background: #007AFF; border-color: #007AFF; }
+    </style>
+</head>
 <body>
 
-    <div class="navbar">
-        <div class="logo-container" onclick="showPage('home')">
-            <img class="logo"
-                src="https://see.fontimg.com/api/rf5/v6dO/ZjY2YTVmYmNjNTEwNDg2N2I1MzM2YjU4OThmYjQ1OTQudHRm/QkVUVEVSQkxPWA/roblox-2017.png?r=fs&h=104&w=1000&fg=000000&bg=FFFFFF&tb=1&s=104"
-                alt="BETTERBLOX">
+<div id="screen">
+    <!-- WALLPAPER LAYER -->
+    <div id="wallpaper"></div>
+
+    <!-- SETUP SCREEN -->
+    <div id="setup" class="layer">
+        <h1>miniOS</h1>
+        <p style="font-size: 18px; color: #555;">Welcome to your new experience.</p>
+        <div class="btn" onclick="startSetup()">Set Up as New</div>
+        <label class="btn" style="background:#fff; color:#007AFF; border: 1px solid #007AFF;">
+            Restore from Backup
+            <input type="file" accept=".json" onchange="restoreBackup(event)">
+        </label>
+    </div>
+
+    <!-- LOCK SCREEN -->
+    <div id="lock" class="layer">
+        <div id="lock-texts">
+            <div id="lock-time">10:41</div>
+            <div id="lock-date">Tuesday, June 30</div>
         </div>
-
-        <div class="nav-tabs">
-            <button class="nav-tab active" id="tab-home" onclick="showPage('home')">Home & Games</button>
-
-        </div>
-
-        <div class="search-container">
-            <input type="text" id="search-bar" class="search-bar" placeholder="Search games..." onkeyup="searchGames()">
-        </div>
-
-        <div class="nav-links">
-                <div id="friends-link-container" style="display:flex; align-items:center;">
-                    <span class="material-icons nav-icon" onclick="window.open('https://www.roblox.com/users/friends#!/friends', '_blank')" title="Friends">people</span>
-                </div>
-
-            <div class="dropdown-container">
-                <span class="material-icons nav-icon" onclick="toggleMenu('settings-menu')">settings</span>
-                <div id="settings-menu" class="dropdown-menu hidden">
-                    <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
-                    <button onclick="changeName()">Change Name</button>
-                    <button onclick="clearRecent()">Clear Recently Played</button>
-                    <button onclick="clearTasteProfile()">Clear Recommendation Knowledge</button>
-
-                    <button onclick="window.open('https://en.help.roblox.com/hc/en-us', '_blank')">Help &
-                        Safety</button>
-                </div>
+        <div id="lock-notifications"></div>
+        <div class="slider-container" id="slider">
+            <div style="display:flex; justify-content:center; align-items:center; width: 100%;">
+                <span style="opacity: 0.3; margin-right: 10px;">></span> slide to unlock
             </div>
         </div>
     </div>
 
-    <div id="home" class="container page-view">
-
-        <div class="greeting-title"><span id="greeting-time">Hello</span>, <span id="greeting-name">Robloxian</span>!
+    <!-- SPOTLIGHT -->
+    <div id="spotlight" class="layer glass">
+        <div id="search-bar">
+            <input type="text" id="search-input" placeholder="Search apps, notes, reminders..." oninput="handleSearch()">
         </div>
-
-        <div id="continue-playing-section" class="hidden">
-            <h2 class="section-title">Recently Played</h2>
-            <div class="games-grid" id="recent-game-container" style="margin-bottom: 40px;">
-            </div>
-        </div>
-
-        <div id="recommendations-section" class="hidden">
-            <h2 class="section-title">Recommended For You</h2>
-            <div class="games-grid" id="recommendations-container" style="margin-bottom: 40px;">
-            </div>
-        </div>
-
-        <div id="favorites-section" class="hidden">
-            <h2 class="section-title">Favourites</h2>
-            <div class="games-grid" id="favorites-container" style="margin-bottom: 40px;">
-            </div>
-        </div>
-
-
-
-        <h2 class="section-title">All Games</h2>
-
-        <div class="genre-filters" id="genre-filters">
-            <button class="genre-pill active" onclick="filterByGenre('All')">All</button>
-            <button class="genre-pill" onclick="filterByGenre('Horror')">Horror</button>
-            <button class="genre-pill" onclick="filterByGenre('Survival')">Survival</button>
-            <button class="genre-pill" onclick="filterByGenre('Action')">Action / Fighting</button>
-            <button class="genre-pill" onclick="filterByGenre('Party')">Party / Social</button>
-            <button class="genre-pill" onclick="filterByGenre('Simulation')">Simulation</button>
-            <button class="genre-pill" onclick="filterByGenre('Obby')">Obby</button>
-            <button class="genre-pill" onclick="filterByGenre('Shooter')">Shooter</button>
-            <button class="genre-pill" onclick="filterByGenre('RPG')">RPG</button>
-        </div>
-
-        <div class="games-grid" id="all-games-container">
-
-            <div class="game-card" onclick="showPage('game-detail-piggy')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-9a6167eabc17cccd69511f6213e94b03/768/432/Image/Webp/noFilter"
-                    alt="Piggy">
-                <div class="game-info">
-                    <h3 class="game-title">Piggy</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">MiniToon</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-3008')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-1393cf4ea0d2cb4e97bc0a05938822e6/768/432/Image/Webp/noFilter"
-                    alt="3008">
-                <div class="game-info">
-                    <h3 class="game-title">3008</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">uglyburger0</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-smile')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-792578a0730d4dcf6dbac9fd15de33e0/768/432/Image/Webp/noFilter"
-                    alt="Infectious Smile">
-                <div class="game-info">
-                    <h3 class="game-title">Infectious Smile</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">laughablehaha</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-epic')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-7ee35d19e13cefd730129cf99268792c/768/432/Image/Webp/noFilter"
-                    alt="Epic Minigames">
-                <div class="game-info">
-                    <h3 class="game-title">Epic Minigames ✨</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">TypicalType</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-shark')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-8af54bd04cab100361501d9c38211f4e/768/432/Image/Webp/noFilter"
-                    alt="SharkBite Classic">
-                <div class="game-info">
-                    <h3 class="game-title">SharkBite Classic 🦈</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Abracadabra</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-phantom')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-bf6f7058336de36c002dc58d33e9c101/768/432/Image/Webp/noFilter"
-                    alt="Phantom Forces">
-                <div class="game-info">
-                    <h3 class="game-title">Phantom Forces</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">StyLiS Studios</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-murdurr')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-bfdb4c4f5bad565d32ce203e375dc288/768/432/Image/Webp/noFilter"
-                    alt="MurDurr">
-                <div class="game-info">
-                    <h3 class="game-title">MurDurr</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Legobirdd</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-untitled')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-cd834c110aa147df9bc89a79fece32ea/768/432/Image/Webp/noFilter"
-                    alt="untitled tag game">
-                <div class="game-info">
-                    <h3 class="game-title">untitled tag game</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">_create</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-retro')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-9e4fae118735bc44c824d52e7c7799f0/768/432/Image/Webp/noFilter"
-                    alt="RetroStudio">
-                <div class="game-info">
-                    <h3 class="game-title">RetroStudio</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Retro Dev</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-combat')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-6c257588551cecd73f962d8165e6b9f1/768/432/Image/Webp/noFilter"
-                    alt="Combat Initiation">
-                <div class="game-info">
-                    <h3 class="game-title">Combat Initiation</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Windforce
-                            Interactive</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-knockout')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-f75a05b251c9fdb0c762a3bd997a2901/768/432/Image/Webp/noFilter"
-                    alt="Knockout! 🐧">
-                <div class="game-info">
-                    <h3 class="game-title">Knockout! 🐧</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">braxworks</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-adopt')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-dc544ac25d03f485d6a58f79efc51ed2/768/432/Image/Webp/noFilter"
-                    alt="Adopt Me!">
-                <div class="game-info">
-                    <h3 class="game-title">Adopt Me!</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Uplift Games</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-garden')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-edd534a57d371273de1f5d94c2b30583/768/432/Image/Webp/noFilter"
-                    alt="Grow a Garden 🌶️">
-                <div class="game-info">
-                    <h3 class="game-title">Grow a Garden 🌶️</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">The Garden
-                            Game</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-disaster')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-7ea7065a02f8cff80f8b0270a9ad2d3b/768/432/Image/Webp/noFilter"
-                    alt="Natural Disaster Survival">
-                <div class="game-info">
-                    <h3 class="game-title">Natural Disaster Survival</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span
-                            style="color: #00a2ff;">Stickmasterluke</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-golf')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-28f42fb6bbd4bc16216d6d95b0c9a468/768/432/Image/Webp/noFilter"
-                    alt="Super Golf!">
-                <div class="game-info">
-                    <h3 class="game-title">Super Golf!</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Nosniy Games</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-mm2')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-0a5d0d27fd60272237a869af29cbccb1/768/432/Image/Webp/noFilter"
-                    alt="Murder Mystery 2">
-                <div class="game-info">
-                    <h3 class="game-title">Murder Mystery 2</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Nikilis</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-pet99')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-59a871f1639e5a55e3c49273a0b34d6a/768/432/Image/Webp/noFilter"
-                    alt="Pet Simulator 99">
-                <div class="game-info">
-                    <h3 class="game-title">Pet Simulator 99</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">BIG Games Pets</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-jujutsu')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-decec85a41b80e4ac0beca8bc2952a7f/768/432/Image/Webp/noFilter"
-                    alt="Jujutsu Shenanigans">
-                <div class="game-info">
-                    <h3 class="game-title">Jujutsu Shenanigans</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Tze's
-                            Shenanigans</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-overtone')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-3523135b8468cb8c6663e021da5f78b5/768/432/Image/Webp/noFilter"
-                    alt="Overtone">
-                <div class="game-info">
-                    <h3 class="game-title">Overtone</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Overtone
-                            Projects</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-coolobby')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-44d4a95190453bbd14a4db3f84410433/768/432/Image/Webp/noFilter"
-                    alt="[250] Cool Obby 2">
-                <div class="game-info">
-                    <h3 class="game-title">[250] Cool Obby 2</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">deadalready</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-theme-park')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-19d37e8208a9d390075158433face2cd/768/432/Image/Webp/noFilter"
-                    alt="Theme Park Tycoon 2">
-                <div class="game-info">
-                    <h3 class="game-title">Theme Park Tycoon 2</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Den_S</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-bee-swarm')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-0458177ee998eb2ffd882ad46207e4c5/768/432/Image/Webp/noFilter"
-                    alt="Bee Swarm Simulator">
-                <div class="game-info">
-                    <h3 class="game-title">Bee Swarm Simulator</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Onett</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-homer')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-6f65dd5173f9f11b026acbb7aef20740/768/432/Image/Webp/noFilter"
-                    alt="You VS Homer">
-                <div class="game-info">
-                    <h3 class="game-title">You VS Homer</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">dgk
-                            enterprises</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-podcasts')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-dd6388f386387a2d1d6f942eca4856fb/768/432/Image/Webp/noFilter"
-                    alt="[VC] Podcasts 🔊">
-                <div class="game-info">
-                    <h3 class="game-title">[VC] Podcasts 🔊</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">NDO Studios</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-ballaxe')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-a9d6d065668af8b6e08e7813168f18fa/768/432/Image/Webp/noFilter"
-                    alt="ball and axe">
-                <div class="game-info">
-                    <h3 class="game-title">ball and axe</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">DoctorPurpl</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-robots2')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-8d80a4c1885d64b1d8903f6dfb6c485f/768/432/Image/Webp/noFilter"
-                    alt="Build to Survive the Robots 2">
-                <div class="game-info">
-                    <h3 class="game-title">Build to Survive the Robots 2</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">SheriffTaco</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-tower')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-20a372111085c33de1e64004e4dca1d8/768/432/Image/Webp/noFilter"
-                    alt="Tower of Hell">
-                <div class="game-info">
-                    <h3 class="game-title">Tower of Hell</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">YXceptional
-                            Studios</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-prison')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-7e4ac70bc3496ea7e4d039f3cd60b6a4/768/432/Image/Webp/noFilter"
-                    alt="Prison Life">
-                <div class="game-info">
-                    <h3 class="game-title">Prison Life</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Aesthetical</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-prospecting')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-e18515933a4c6208e2176d2f0351f12c/768/432/Image/Webp/noFilter"
-                    alt="Prospecting! 💎">
-                <div class="game-info">
-                    <h3 class="game-title">Prospecting! 💎</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Prospecting!</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-hide-seek')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-c17b13acb45f07ec1517623969b81ec0/768/432/Image/Webp/noFilter"
-                    alt="Hide and Seek Extreme">
-                <div class="game-info">
-                    <h3 class="game-title">Hide and Seek Extreme</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Tim7775</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-horrific-housing')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-a361113feebd101cd29510bfe3f610dd/768/432/Image/Webp/noFilter"
-                    alt="Horrific Housing">
-                <div class="game-info">
-                    <h3 class="game-title">Horrific Housing</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">CookieScript's
-                            games</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-brookhaven')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-a4fb7b266105fa038d92bf425d58ee53/768/432/Image/Webp/noFilter"
-                    alt="Brookhaven 🏡RP">
-                <div class="game-info">
-                    <h3 class="game-title">Brookhaven 🏡RP</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Brookhaven by
-                            Voldex</span></div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-rivals')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-eb783deba3b661ff753ab9be4089188d/768/432/Image/Webp/noFilter"
-                    alt="RIVALS">
-                <div class="game-info">
-                    <h3 class="game-title">RIVALS</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Nosniy Games</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-flee-facility')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-f3e6bca490d2d655cde4894e502e5989/768/432/Image/Webp/noFilter"
-                    alt="Flee the Facility">
-                <div class="game-info">
-                    <h3 class="game-title">Flee the Facility</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">A.W. Apps</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-flood-escape')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-0317908608680ca27ade363ac0feb6c0/768/432/Image/Webp/noFilter"
-                    alt="Flood Escape: Classic">
-                <div class="game-info">
-                    <h3 class="game-title">Flood Escape: Classic</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Crazyblox</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-cone')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-3286dd029217592b49d830707e0bfcfa/768/432/Image/Webp/noFilter"
-                    alt="CONE">
-                <div class="game-info">
-                    <h3 class="game-title">CONE</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Defaultio</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-fling')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-20254f91c5043de87f6cc8adb218c624/768/432/Image/Webp/noFilter"
-                    alt="Fling Things and People">
-                <div class="game-info">
-                    <h3 class="game-title">Fling Things and People</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Horomori</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-eg')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-96097b5752ff62cf014a214f427ba0c1/768/432/Image/Webp/noFilter"
-                    alt="🥚 Eg!">
-                <div class="game-info">
-                    <h3 class="game-title">🥚 Eg!</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Nimblz</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-robot64')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-f1e38127294c9673738306a5d002b372/768/432/Image/Webp/noFilter"
-                    alt="Robot 64">
-                <div class="game-info">
-                    <h3 class="game-title">Robot 64</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">zKevin</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-markers')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-666aa1bde55fa5557827dc36e10c6c8d/768/432/Image/Webp/noFilter"
-                    alt="Find the Markers">
-                <div class="game-info">
-                    <h3 class="game-title">Find the Markers</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">markers epic
-                            memers</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-deforestation')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-fedb2d4f532dbb6ccc21a9050a9dc750/768/432/Image/Webp/noFilter"
-                    alt="deforestation therapy || alpha">
-                <div class="game-info">
-                    <h3 class="game-title">deforestation therapy || alpha</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">The Fartering
-                            Few</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-sbb')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-ec5fc17541e2ab2233bbfe151926261c/768/432/Image/Webp/noFilter"
-                    alt="SBB Marathon">
-                <div class="game-info">
-                    <h3 class="game-title">SBB Marathon</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Maelstronomer</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-banana-eats')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-9c13ad9096e592d4afadec6f7913e46c/768/432/Image/Webp/noFilter"
-                    alt="Banana Eats">
-                <div class="game-info">
-                    <h3 class="game-title">Banana Eats</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">RyCitrus</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-arsenal')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-05dd752d8a8bced5c802236d64cf7809/768/432/Image/Webp/noFilter"
-                    alt="Arsenal">
-                <div class="game-info">
-                    <h3 class="game-title">Arsenal</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">ROLVe</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-demonology')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-73d277df7a233a3aaf2afb060b5f7452/768/432/Image/Webp/noFilter"
-                    alt="Demonology🕯️">
-                <div class="game-info">
-                    <h3 class="game-title">Demonology🕯️</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Blaqk Magic Blue</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="showPage('game-detail-pizza-place')">
-                <img class="game-thumbnail"
-                    src="https://tr.rbxcdn.com/180DAY-95a48d9b2051185ec0e8c98c21d48319/768/432/Image/Webp/noFilter"
-                    alt="🍕Work at a Pizza Place">
-                <div class="game-info">
-                    <h3 class="game-title">🍕Work at a Pizza Place</h3>
-                    <div style="font-size: 12px; color: #757575;">By <span style="color: #00a2ff;">Dued1</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+        <div id="spotlight-results"></div>
     </div>
 
-
-
-    <div id="game-detail-piggy" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-9a6167eabc17cccd69511f6213e94b03/768/432/Image/Webp/noFilter"
-                        alt="Piggy">
-                    <div class="description-box">Do you have what it takes to escape Piggy and uncover the mysteries
-                        surrounding the beast?
-
-                        Controls:
-                        Pick up items / Use items - Click, Tap or Right Trigger
-                        Crouch / Place trap - CTRL, Tap or B
-
-                        Credits:
-                        IK3As - Building
-                        Optikk & Epic_Tank - Build Mode
-                        TenuousFlea - Models
-                        For You to Stay © 2019 Mira K.</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Piggy</h2>
-                        <p>By <a href="https://www.roblox.com/users/21823494/profile/" target="_blank"
-                                class="creator-link">MiniToon</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>23 Jan 2020</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Horror</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-piggy">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('piggy', 'roblox://placeId=4623386862')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="piggy" onclick="toggleFavorite('piggy', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/4623386862/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- HOME SCREEN -->
+    <div id="home" class="layer">
+        <div id="app-grid"></div>
+        <div id="dock" class="glass"></div>
     </div>
 
-    <div id="game-detail-3008" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-1393cf4ea0d2cb4e97bc0a05938822e6/768/432/Image/Webp/noFilter"
-                        alt="3008">
-                    <div class="description-box">Thumbnail by: PlagueDoctor_Dash
-                        ---
-                        Welcome to 3008, the unusually large furniture store. Wander through the vast horror land of
-                        home hardware located within 3008-1. Build a base, survive from employees.</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>3008</h2>
-                        <p>By <a href="https://www.roblox.com/users/22718068/profile/" target="_blank"
-                                class="creator-link">uglyburger0</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>21 Jan 2019</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Horror / Survival</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-3008">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('3008', 'roblox://placeId=2768379856')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="3008" onclick="toggleFavorite('3008', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/2768379856/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- APP OPEN CONTAINER -->
+    <div id="app-container" class="layer">
+        <div id="app-ui"></div>
     </div>
-
-    <div id="game-detail-smile" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-792578a0730d4dcf6dbac9fd15de33e0/768/432/Image/Webp/noFilter"
-                        alt="Infectious Smile">
-                    <div class="description-box">As ordinary people we all strive to find true happiness in life. But
-                        no... not like this.... something is REALLY off about this...
-
-                        This game serves to remind us that life is much more complicated than finding true happiness.
-                        Sadness, struggle, and anger are a part of the human experience. If your only emotion is
-                        happiness... then.. are you really human?
-
-                        For Server Owners you can use :regen & :disaster & :choosemap
-
-                        laughablehaha - Scripter
-                        yurgzen & ItsByskyWrecker - Building
-                        sirener55 & Vinniie3D - Thumbnail & Scripting & Design</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Infectious Smile</h2>
-                        <p>By <a href="https://www.roblox.com/communities/5054016/laughablehaha#!/about" target="_blank"
-                                class="creator-link">laughablehaha</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>22 Nov 2020</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Survival / Infection</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-smile">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('smile', 'roblox://placeId=5985232436')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="smile" onclick="toggleFavorite('smile', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/5985232436/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-epic" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-7ee35d19e13cefd730129cf99268792c/768/432/Image/Webp/noFilter"
-                        alt="Epic Minigames">
-                    <div class="description-box">Welcome to Epic Minigames, the game where you can enjoy a collection of
-                        140 unique and exciting minigames! 🕹️
-
-                        Level up and earn coins by winning rounds, and spend your coins on gear, pets, effects, and
-                        other fun stuff for your character. 🌟
-
-                        As well as the main minigame mode, there's also Epic Party 🎲, a board game where you can
-                        compete against a group of friends or strangers to see who can gather the most crystals! 💎
-                    </div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Epic Minigames ✨</h2>
-                        <p>By <a href="https://www.roblox.com/users/7568292/profile/" target="_blank"
-                                class="creator-link">TypicalType</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>29 July 2015</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-epic">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('epic', 'roblox://placeId=277751860')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="epic" onclick="toggleFavorite('epic', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/277751860/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-shark" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-8af54bd04cab100361501d9c38211f4e/768/432/Image/Webp/noFilter"
-                        alt="SharkBite Classic">
-                    <div class="description-box">In SharkBite either become the shark or join your friends in a battle
-                        of survival against the boat eating shark. Use your weapon to fight off the shark or avoid it
-                        all cost! At the end of each round use your shark teeth to buy more exciting items! Developers:
-                        Simoon68 & Opplo</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>SharkBite Classic 🦈</h2>
-                        <p>By <a href="https://www.roblox.com/communities/997074/Abracadabra#!/about" target="_blank"
-                                class="creator-link">Abracadabra</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>11 Apr 2017</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-shark">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('shark', 'roblox://placeId=734159876')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="shark" onclick="toggleFavorite('shark', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/734159876/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-phantom" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-bf6f7058336de36c002dc58d33e9c101/768/432/Image/Webp/noFilter"
-                        alt="Phantom Forces">
-                    <div class="description-box">If you are on PS5 or XBOX, visit the StyLiS Group to find the Console
-                        version!
-
-                        [Update Notes]
-                        We're taking a different approach to dynamic scalable menu so the new menu may not scale
-                        perfectly to all screens
-                        Try playing around with /menuscale: and /menuaspectratio: commands to see what works best for
-                        you
-
-                        Thank you for continuing support for PF for over 10 years!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Phantom Forces</h2>
-                        <p>By <a href="https://www.roblox.com/communities/1103278/StyLiS-Studios" target="_blank"
-                                class="creator-link">StyLiS Studios</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>31 Aug 2015</span></div>
-                    <div class="stat-row"><span>Genre</span><span>FPS</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-phantom">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('phantom', 'roblox://placeId=292439477')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="phantom" onclick="toggleFavorite('phantom', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/292439477/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-murdurr" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-bfdb4c4f5bad565d32ce203e375dc288/768/432/Image/Webp/noFilter"
-                        alt="MurDurr">
-                    <div class="description-box">Durr has turned evil… and he is hungry.
-
-                        Warning: Flashing lights, blood, loud noises.
-
-                        RESTART = UPDATE
-                        JOIN OUR SOCIAL SERVERS!
-                        Inspired by Orange the killer: Deluxe, You VS Homer, etc
-                        (games new and has bugs)
-                        Tags: Horror, Asym, Scary, Escape, Survival, Durr, Emojis, Forsaken, Gubby, Retro, Durr,
-                        Earnest, Retro, Retro Studio, Classic, 2016 , 2017, Roblox, Retro Roblox, Fortnite, Durr, 2012
-                    </div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>MurDurr</h2>
-                        <p>By <a href="https://www.roblox.com/users/296867003/profile/" target="_blank"
-                                class="creator-link">Legobirdd</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>11 Jan 2026</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-murdurr">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('murdurr', 'roblox://placeId=79735281630764')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="murdurr" onclick="toggleFavorite('murdurr', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-untitled" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-cd834c110aa147df9bc89a79fece32ea/768/432/Image/Webp/noFilter"
-                        alt="untitled tag game">
-                    <div class="description-box">play variations of tag with advanced movement, such as climbing,
-                        sliding, rolling, vaulting, swinging, and more!
-
-                        untitled tag game is a nostalgic parkour tag game inspired by roblox brickbattle games & other
-                        classics.
-                        this game is a remake and continuation of it's legacy counterpart, all made from scratch.
-
-                        join the communications server for updates!
-                        make sure to like and favorite the game!
-
-                        [W] - run
-                        [LMB] - tag
-                        [B] - shop
-                        [I] - inventory
-                        [G] - emote
-                        [Q] - menu
-
-                        this game has no copyrighted tracks. almost all music was made by the untitled tag game
-                        community.
-                        thank you for playing! &lt;3</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>untitled tag game</h2>
-                        <p>By <a href="https://www.roblox.com/communities/6682631/create" target="_blank"
-                                class="creator-link">_create</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>13 July 2023</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Action</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-untitled">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('untitled', 'roblox://placeId=14044547200')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="untitled" onclick="toggleFavorite('untitled', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-retro" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-9e4fae118735bc44c824d52e7c7799f0/768/432/Image/Webp/noFilter"
-                        alt="RetroStudio">
-                    <div class="description-box">Nominated for Builderman Award of Excellence 2022
-
-                        Create and play your own classic Roblox games.
-
-                        Our engine can simulate any time period between early 2009 to mid 2015!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>RetroStudio</h2>
-                        <p>By <a href="https://www.roblox.com/communities/5264310/Retro-Dev#!/about" target="_blank"
-                                class="creator-link">Retro Dev</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>19 Oct 2020</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Simulation</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-retro">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('retro', 'roblox://placeId=5846386835')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="retro" onclick="toggleFavorite('retro', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/5846386835/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-combat" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-6c257588551cecd73f962d8165e6b9f1/768/432/Image/Webp/noFilter"
-                        alt="Combat Initiation">
-                    <div class="description-box">[Beta v2.2.2]
-
-                        Gather a team, choose your weapons, select your tools, and ascend the spire of certain death. Do
-                        you have what it takes?
-
-                        Combat Initiation is a fast-paced arena brickbattle game that puts you in a max group of 6
-                        against all varying threats standing in your way. With all your 7 granted branching weapons to
-                        choose from, blaze through every army as you seek to reach the top.
-
-                        Inspired by many games, most notably a hit game named ULTRAKILL.</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Combat Initiation</h2>
-                        <p>By <a href="https://www.roblox.com/communities/32454792/Windforce-Interactive#!/about"
-                                target="_blank" class="creator-link">Windforce Interactive</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>27 May 2023</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Action</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-combat">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('combat', 'roblox://placeId=13559635034')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="combat" onclick="toggleFavorite('combat', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-knockout" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-f75a05b251c9fdb0c762a3bd997a2901/768/432/Image/Webp/noFilter"
-                        alt="Knockout! 🐧">
-                    <div class="description-box">❌You can't see their aim
-                        ❌ You can't see their power
-                        ✅ Last one on the ice wins!
-
-                        👊 Predict and out-maneuver to be the last penguin standing! 🐧
-                        🏆 Unlock skins by winning ice! 🧊
-
-                        Owning a private server gives you admin commands within them!
-                        ⚠️ New game – updates coming often!
-                        👥 Join the group for updates & rewards</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Knockout! 🐧</h2>
-                        <p>By <a href="https://www.roblox.com/communities/5268948/braxworks" target="_blank"
-                                class="creator-link">braxworks</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>20 Dec 2025</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Casual</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-knockout">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('knockout', 'roblox://placeId=136764190843219')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="knockout" onclick="toggleFavorite('knockout', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-adopt" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-dc544ac25d03f485d6a58f79efc51ed2/768/432/Image/Webp/noFilter"
-                        alt="Adopt Me!">
-                    <div class="description-box">Adopt and raise 🐶🦄👶, trade and collect legendary pets, build your
-                        dream home, and roleplay with friends!
-
-                        🎁 SUGARFEST: CHOCCYBUNNY BOX! 🎁
-                        🍫 Open the decadent Choccybunny Box!
-                        🐰 Milk, White and Dark Choccybunnies!
-                        💟 New Subscriptions Sticker Pack!
-
-                        Be FIRST 🏆 To experience new updates by pressing 🔔NOTIFY.
-
-                        Meet the founders!
-                        NewFissy - Tech Director
-                        Bethink - Creative Director
-
-                        Find out more about Uplift Games, our policies and creative attributions:
-                        https://devforum.roblox.com/t/credits/71812</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Adopt Me!</h2>
-                        <p>By <a href="https://www.roblox.com/communities/295182/Uplift-Games#!/about" target="_blank"
-                                class="creator-link">Uplift Games</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>15 July 2017</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Roleplay</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-adopt">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('adopt', 'roblox://placeId=920587237')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="adopt" onclick="toggleFavorite('adopt', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/920587237/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-garden" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-edd534a57d371273de1f5d94c2b30583/768/432/Image/Webp/noFilter"
-                        alt="Grow a Garden 🌶️">
-                    <div class="description-box">🍅Welcome to Grow a Garden🍅
-
-                        Are you ready to grow your very own garden? Buy seeds from the shop when they restock, plant
-                        them, wait for them to grow, and collect the profits! Flex fruits and finds on friends, and have
-                        fun!
-
-                        [How To Plant]
-                        • Equip your seed you want to plant!
-                        • Click in your farm on the brown plots to plant!
-                        • Wait to see it start growing!
-                        • After its fully grown, it is time to harvest the goods!
-
-                        Remember, your garden literally grows while you are offline⭐</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Grow a Garden 🌶️</h2>
-                        <p>By <a href="https://www.roblox.com/communities/35789249/The-Garden-Game#!/about"
-                                target="_blank" class="creator-link">The Garden Game</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>26 Mar 2025</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Simulation</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-garden">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('garden', 'roblox://placeId=126884695634066')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="garden" onclick="toggleFavorite('garden', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-disaster" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-7ea7065a02f8cff80f8b0270a9ad2d3b/768/432/Image/Webp/noFilter"
-                        alt="Natural Disaster Survival">
-                    <div class="description-box">Quickly, run around in circles! Your life depends on it!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Natural Disaster Survival</h2>
-                        <p>By <a href="https://www.roblox.com/users/80254/profile/" target="_blank"
-                                class="creator-link">Stickmasterluke</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>29 Mar 2008</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-disaster">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('disaster', 'roblox://placeId=189707')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="disaster" onclick="toggleFavorite('disaster', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/189707/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-golf" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-28f42fb6bbd4bc16216d6d95b0c9a468/768/432/Image/Webp/noFilter"
-                        alt="Super Golf!">
-                    <div class="description-box">⛳ Welcome to Super Golf! Play against others on a variety of exciting
-                        courses, unlock cool rewards, customize your ball, and compete to be the best player!
-
-                        🔨 Use the Map Builder to create your very own golf courses and play them with your friends!
-
-                        ⭐️ How To Play:
-                        - Press the PLAY button!
-                        - Shoot the ball into the hole!
-                        - The player with the least amount of strokes wins!
-                        - Vote for your favorite Map and Gamemode after the game ends!
-
-                        🎮 Controls:
-                        - Desktop: Click and drag to charge up! Release to shoot!
-                        - Mobile: Adjust power with slider! Tap button to shoot!
-                        - XBOX: Press A and use the Joystick to charge up! Press A again to shoot!
-                        - Playstation: Press X and use the Joystick to charge up! Press X again to shoot!
-
-                        🏆 2020 Mobile Game of the Year!
-                        💜 Join Nosniy Games for an exclusive Skin & Chat Tag!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Super Golf!</h2>
-                        <p>By <a href="https://www.roblox.com/communities/3461453/Nosniy-Games" target="_blank"
-                                class="creator-link">Nosniy Games</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>29 Nov 2019</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Sports</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-golf">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('golf', 'roblox://placeId=4468711919')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="golf" onclick="toggleFavorite('golf', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/4468711919/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-mm2" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-0a5d0d27fd60272237a869af29cbccb1/768/432/Image/Webp/noFilter"
-                        alt="Murder Mystery 2">
-                    <div class="description-box">Can you solve the Mystery and survive each round?
-
-                        INNOCENTS: Run and hide from the Murderer. Use your detective skills to expose the Murderer.
-                        SHERIFF: Work with the Innocents; you are the only one with a weapon who can take down the
-                        Murderer.
-                        MURDERER: Eliminate EVERYONE. Don't get shot by the sheriff.
-
-                        Collect and trade hundreds of knives!
-
-                        Check out my profile for quick links to my pages!
-                        Like, follow, and subscribe for exclusive update news, free knife codes, and more!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Murder Mystery 2</h2>
-                        <p>By <a href="https://www.roblox.com/users/1848960/profile/" target="_blank"
-                                class="creator-link">Nikilis</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>18 jan 2014</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-mm2">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('mm2', 'roblox://placeId=142823291')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="mm2" onclick="toggleFavorite('mm2', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/142823291/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-pet99" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-59a871f1639e5a55e3c49273a0b34d6a/768/432/Image/Webp/noFilter"
-                        alt="Pet Simulator 99">
-                    <div class="description-box">Create an army of the coolest pets! They will help you get RICH!
-
-                        ✨ Currently 2,000+ pets to collect! 🐾
-
-                        🧡 Thanks for playing!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Pet Simulator 99</h2>
-                        <p>By <a href="https://www.roblox.com/communities/3959677/BIG-Games-Pets#!/about"
-                                target="_blank" class="creator-link">BIG Games Pets</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>4 Feb 2022</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Simulation</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-pet99">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('pet99', 'roblox://placeId=8737899170')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="pet99" onclick="toggleFavorite('pet99', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/8737899170/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-jujutsu" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-decec85a41b80e4ac0beca8bc2952a7f/768/432/Image/Webp/noFilter"
-                        alt="Jujutsu Shenanigans">
-                    <div class="description-box">"what are you doing"
-                        "im doing some jujutsu shenanigans" (tell that to your friends)
-
-                        M1 - melee combo
-                        1,2,3,4 - skills
-                        Q - dash (use in stun to escape)
-                        F - block
-                        R - special
-                        W+W - sprint (automatically avoids obstacles)
-                        G - awaken
-
-                        combat based off many battleground games
-                        destruction inspired by combat mayhem</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Jujutsu Shenanigans</h2>
-                        <p>By <a href="https://www.roblox.com/communities/16357742/Tzes-Shenanigans#!/about"
-                                target="_blank" class="creator-link">Tze's Shenanigans</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>17 Apr 2022</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Action / Fighting</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-jujutsu">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('jujutsu', 'roblox://placeId=9391468976')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="jujutsu" onclick="toggleFavorite('jujutsu', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-overtone" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-3523135b8468cb8c6663e021da5f78b5/768/432/Image/Webp/noFilter"
-                        alt="Overtone">
-                    <div class="description-box">Overtone is a multiplayer color card game where you mix translucent
-                        color cards to match a target color before your opponents.
-
-                        ❓How to Play
-                        Draw cards
-                        Return cards
-                        Combine colors
-                        Match the target color to win
-                        Beat other players solving the same color challenge
-
-                        📌 Optional PC Keybinds
-                        E - Pull / Return
-                        F - Hint
-                        Space - Combine
-
-                        Inspired by いろかるた (Color Karuta) by Riuko Maishi
-
-                        Tags: color mixing, color theory, card game, strategy, multiplayer, puzzle</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Overtone</h2>
-                        <p>By <a href="https://www.roblox.com/communities/143803956/Overtone-Projects#!/about"
-                                target="_blank" class="creator-link">Overtone Projects</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>1 Mar 2026</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Puzzle</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-overtone">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('overtone', 'roblox://placeId=102779234672656')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="overtone" onclick="toggleFavorite('overtone', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-coolobby" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-44d4a95190453bbd14a4db3f84410433/768/432/Image/Webp/noFilter"
-                        alt="[250] Cool Obby 2">
-                    <div class="description-box">A simplistic obby game with 5 themes to discover and explore over the
-                        span of 250 stages, plus some secrets to be found!
-
-                        If anything seems broken or if you feel lag after teleporting between areas, rejoining should
-                        fix it
-
-                        Links:
-                        Dogi Studios (Clothing): https://www.roblox.com/Groups/Group.aspx?gid=3052824
-                        Smol Bun Studios (Clothing): https://www.roblox.com/Groups/Group.aspx?gid=2783155
-                        Lavish (Clothing):
-
-                        『甘い』Lavish
-
-                        Music courtesy of APM Music and Monstercat</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>[250] Cool Obby 2</h2>
-                        <p>By <a href="https://www.roblox.com/users/1288579/profile/" target="_blank"
-                                class="creator-link">deadalready</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>18 Oct 2008</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Obby / Platformer</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-coolobby">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('coolobby', 'roblox://placeId=4927387')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="coolobby" onclick="toggleFavorite('coolobby', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/4927387/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-theme-park" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-19d37e8208a9d390075158433face2cd/768/432/Image/Webp/noFilter"
-                        alt="Theme Park Tycoon 2">
-                    <div class="description-box">In Theme Park Tycoon 2 you get your own plot of land to build your own
-                        theme park on, together with your friends! Construct a range of rides the way you want and
-                        design your own roller coasters to truly make your park your own! Select from hundreds of
-                        scenery pieces to decorate your park further!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Theme Park Tycoon 2</h2>
-                        <p>By <a href="https://www.roblox.com/users/1741242/profile/" target="_blank"
-                                class="creator-link">Den_S</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>2 Jan 2012</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Simulation / Tycoon</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-theme-park">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('theme-park', 'roblox://placeId=69184822')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="theme-park"
-                            onclick="toggleFavorite('theme-park', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-bee-swarm" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-0458177ee998eb2ffd882ad46207e4c5/768/432/Image/Webp/noFilter"
-                        alt="Bee Swarm Simulator">
-                    <div class="description-box">Grow your own swarm of bees, collect pollen, and make honey in Bee
-                        Swarm Simulator! Meet friendly bears, complete their quests and get rewards! As your hive grows
-                        larger and larger, you can explore further up the mountain. Use your bees to defeat dangerous
-                        bugs and monsters. Look for treasures hidden around the map. Discover new types of bees, all
-                        with their own traits and personalities!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Bee Swarm Simulator</h2>
-                        <p>By <a href="https://www.roblox.com/users/1912490/profile/" target="_blank"
-                                class="creator-link">Onett</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>21 Mar 2018</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Simulation</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-bee-swarm">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('bee-swarm', 'roblox://placeId=1537690962')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="bee-swarm" onclick="toggleFavorite('bee-swarm', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-homer" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-6f65dd5173f9f11b026acbb7aef20740/768/432/Image/Webp/noFilter"
-                        alt="You VS Homer">
-                    <div class="description-box">(BETA)
-                        SHUTDOWN = YOU REJOIN
-
-                        Survive and hide as a Bart with your fellow players...
-                        Or become a Homer and seek out every Bart till none are left standing!
-                        Can you survive Homer and not be eaten?
-
-                        This game originated from michae84525 and baconsarthebest19's "Survive Homer scary test" on
-                        Retro Studio. It was then adapted through many other Homer games! (Most notable being Agust3K's
-                        YOU vs HOMER Remasterd'nt, also on Retro Studio) If you haven't played them, go check them out!
-                        This game wouldn't exist without them.
-
-                        Tags: Horror, Asym, Scary, Escape, Survival, Simpsons, Bart, Homer, Forsaken, Hide From Homer,
-                        You VS Homer, Lisa, Maggie, Marge, Retro, Retro Studio, Classic, 2016 , 2017, Roblox, Retro
-                        Roblox, Fortnite, Simpsons Fortnite,</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>You VS Homer</h2>
-                        <p>By <a href="https://www.roblox.com/communities/33760527/dgk-enterprises#!/about"
-                                target="_blank" class="creator-link">dgk enterprises</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>21 Mar 2026</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-homer">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('homer', 'roblox://placeId=108124933582607')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="homer" onclick="toggleFavorite('homer', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-podcasts" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-dd6388f386387a2d1d6f942eca4856fb/768/432/Image/Webp/noFilter"
-                        alt="[VC] Podcasts 🔊">
-                    <div class="description-box">🎙️ Podcasts
-                        Grab a mic, gather your crew, and create stages! Use your voice to record hilarious debates,
-                        deep convos, or chaos in your own virtual podcast studio. Talk it out, vibe with friends, and go
-                        viral (maybe).
-
-                        Supports:
-                        - PC
-                        - Mobile
-
-                        ⚠️ DISCLAIMER ⚠️
-                        By creating servers within our game, you agree we reserve the right to close your server for
-                        violations against Roblox's TOS and take necessary actions to protect the platform and our
-                        community.
-                        Server boost or not you are not immune to moderation, no refund policy.
-                        Serious + repeat offenses will be dealt with unappealable permanent + strict temporary bans.
-                    </div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>[VC] Podcasts 🔊</h2>
-                        <p>By <a href="https://www.roblox.com/communities/4699129/NDO-Studios#!/about" target="_blank"
-                                class="creator-link">NDO Studios</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>30 May 2025</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Social</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-podcasts">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('podcasts', 'roblox://placeId=110584310129887')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="podcasts" onclick="toggleFavorite('podcasts', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-ballaxe" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-a9d6d065668af8b6e08e7813168f18fa/768/432/Image/Webp/noFilter"
-                        alt="ball and axe">
-                    <div class="description-box">videogame</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>ball and axe</h2>
-                        <p>By <a href="https://www.roblox.com/users/59695013/profile/" target="_blank"
-                                class="creator-link">DoctorPurpl</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>14 Dec 2017</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Obby / Platformer</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-ballaxe">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('ballaxe', 'roblox://placeId=1242235469')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="ballaxe" onclick="toggleFavorite('ballaxe', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-robots2" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-8d80a4c1885d64b1d8903f6dfb6c485f/768/432/Image/Webp/noFilter"
-                        alt="Build to Survive the Robots 2">
-                    <div class="description-box">Robots have taken over the world! Survive as a human, or join forces
-                        and hunt them down as a robot!
-
-                        ⚔️ How To Play ⚔️
-                        1. Build a base before nightfall
-                        2. Fight and survive the robots until the morning
-                        3. Don’t die, or you will become a robot!
-
-                        🎮 Controls 🎮
-                        - Shift (LT on console): sprint/activate ability
-                        - RMB (L3 on console): aim down sights
-                        - G (D-Pad down on console): open shop
-                        - Long click: auto-build/delete
-
-                        💡 Tips 💡
-                        • Purchase better items and upgrade their stats in the shop
-                        • Build high, use strong materials, and layer blocks together for maximum protection
-                        • Destroy all connected foundations of a base to knock it down as a robot
-                        • Test different designs on sandbox servers, which features build saving & infinite blocks
-
-                        Private servers include free admin commands! 🙂</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Build to Survive the Robots 2</h2>
-                        <p>By <a href="https://www.roblox.com/users/24773541/profile/" target="_blank"
-                                class="creator-link">SheriffTaco</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>9 Jan 2025</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-robots2">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('robots2', 'roblox://placeId=103980862080286')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="robots2" onclick="toggleFavorite('robots2', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-tower" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-20a372111085c33de1e64004e4dca1d8/768/432/Image/Webp/noFilter"
-                        alt="Tower of Hell">
-                    <div class="description-box">Can you be the first to the top in this randomly generated obby with
-                        absolutely no checkpoints at all?
-
-                        Owners of VIP-Servers can use the settings menu to skip rounds, set the tower size and lock the
-                        shop.</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Tower of Hell</h2>
-                        <p>By <a href="https://www.roblox.com/communities/4217910/YXceptional-Studios#!/about"
-                                target="_blank" class="creator-link">YXceptional Studios</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>18 Jun 2018</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Obby / Platformer</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-tower">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('tower', 'roblox://placeId=1962086868')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="tower" onclick="toggleFavorite('tower', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/1962086868/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-prison" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-7e4ac70bc3496ea7e4d039f3cd60b6a4/768/432/Image/Webp/noFilter"
-                        alt="Prison Life">
-                    <div class="description-box">Live life as a prisoner and escape, or become a guard and defend the
-                        prison!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Prison Life</h2>
-                        <p>By <a href="https://www.roblox.com/users/53537032/profile/" target="_blank"
-                                class="creator-link">Aesthetical</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>1 May 2014</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Action / Open World</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-prison">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('prison', 'roblox://placeId=155615604')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="prison" onclick="toggleFavorite('prison', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/155615604/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-prospecting" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-e18515933a4c6208e2176d2f0351f12c/768/432/Image/Webp/noFilter"
-                        alt="Prospecting! 💎">
-                    <div class="description-box">Grab your pan and head to the river in Prospecting! — a relaxing
-                        gold-panning adventure! Search for gold, gems, and hidden treasures as you explore rivers,
-                        caves, and old mining sites. Upgrade your gear, discover secrets, and see if you can strike it
-                        rich!
-
-                        ⛏️ Pan for gold
-                        💎 Discover rare gems
-                        🤑 Use sluices to grind offline
-                        🗺️ Explore new areas
-                        🏆 Become the ultimate prospector!
-
-                        Enjoy the game? Remember to like (👍) and favourite (🌟)!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Prospecting! 💎</h2>
-                        <p>By <a href="https://www.roblox.com/communities/35888785/Prospecting#!/about" target="_blank"
-                                class="creator-link">Prospecting!</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>1 May 2025</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Simulation</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-prospecting">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('prospecting', 'roblox://placeId=129827112113663')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="prospecting"
-                            onclick="toggleFavorite('prospecting', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-hide-seek" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-c17b13acb45f07ec1517623969b81ec0/768/432/Image/Webp/noFilter"
-                        alt="Hide and Seek Extreme">
-                    <div class="description-box">Welcome to Hide and Seek Extreme.
-                        At the start of the game, one player gets chosen to be 'It'. 'It' has to try and find the other
-                        players. 'It' will not spawn with their default character, instead they will spawn with their
-                        equipped 'It' character. Every 'It' character has a special ability that can be used to help
-                        catch the hiders. 'It' characters can be purchased in the shop.
-
-                        Press 1 to use your 'It' ability
-                        Press T to taunt</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Hide and Seek Extreme</h2>
-                        <p>By <a href="https://www.roblox.com/users/4563899/profile/" target="_blank"
-                                class="creator-link">Tim7775</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>18 Jan 2015</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Party / Casual</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-hide-seek">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('hide-seek', 'roblox://placeId=205224386')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="hide-seek" onclick="toggleFavorite('hide-seek', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-horrific-housing" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-a361113feebd101cd29510bfe3f610dd/768/432/Image/Webp/noFilter"
-                        alt="Horrific Housing">
-                    <div class="description-box">Just for a bit of fun.
-
-                        Can you survive a laundry list of exciting randomly chosen disasters? All you have is a small
-                        floating plot of land with a house - are you able to out live your opponents?
-
-                        pls thumb up 👍 and favourite ⭐</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Horrific Housing</h2>
-                        <p>By <a href="https://www.roblox.com/communities/17171528/CookieScripts-games#!/about"
-                                target="_blank" class="creator-link">CookieScript's games</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>2 May 2015</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-horrific-housing">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('horrific-housing', 'roblox://placeId=263761432')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="horrific-housing"
-                            onclick="toggleFavorite('horrific-housing', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-brookhaven" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-a4fb7b266105fa038d92bf425d58ee53/768/432/Image/Webp/noFilter"
-                        alt="Brookhaven 🏡RP">
-                    <div class="description-box">A place to play with with like minded people and roleplay. Own and live
-                        in amazing houses, drive cool vehicles and explore the city. Be whoever you want to be in
-                        Brookhaven RP.
-
-                        Thanks for playing!
-
-                        Private Server Benefits:
-                        · Prop Saving
-                        · Server-Wide Music
-                        · Server-Wide Announcements
-                        · Remove or Lock Props
-                        · Check Prop Owners
-                        · Set Players as Admins
-                        · Kick / Temp Ban Players
-                        · Set Day of the Week
-                        · Set Time by the Hour
-                        · Change Weather and Lighting
-                        · Speed up Time
-                        · Server Theme Controls
-                        · No Wait Time for Changing House
-                        · Spawn Up to Three Vehicles
-                        · Prop Limit Increased
-                        · Freecam for PC users (Shift+P)</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Brookhaven 🏡RP</h2>
-                        <p>By <a href="https://www.roblox.com/communities/3104358/Brookhaven-by-Voldex#!/about"
-                                target="_blank" class="creator-link">Brookhaven by Voldex</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>20 Apr 2020</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Roleplay</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-brookhaven">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('brookhaven', 'roblox://placeId=4924922222')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="brookhaven"
-                            onclick="toggleFavorite('brookhaven', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-rivals" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-eb783deba3b661ff753ab9be4089188d/768/432/Image/Webp/noFilter"
-                        alt="RIVALS">
-                    <div class="description-box">Welcome to RIVALS, the most intense first person shooter game on
-                        Roblox! Challenge other players in 1v1 to 5v5 FPS duels where the first to 5 wins!
-
-                        🔫 Challenge someone by stepping on a duel pad!
-                        🔑 Earn keys to unlock new weapons & skins!
-                        📜 Complete contracts to unlock exclusive rewards!
-                        🏆 Show off your win streak and climb the leaderboards!
-
-                        🎮 Available on Desktop, Phones, Tablets, XBOX, & PlayStation 5!
-                        💜 Like and join the group for exclusive rewards!
-
-                        ⚠️ WARNING: Cheaters will be permanently banned with no second chances, our anticheat &
-                        moderators will catch you. Abusing glitches & using sketchy farming methods are also not
-                        allowed!
-
-                        🏆 RIA25 Best Shooter Experience!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>RIVALS</h2>
-                        <p>By <a href="https://www.roblox.com/communities/3461453/Nosniy-Games#!/about" target="_blank"
-                                class="creator-link">Nosniy Games</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>26 May 2024</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Shooter</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-rivals">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('rivals', 'roblox://placeId=17625359962')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="rivals" onclick="toggleFavorite('rivals', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-flee-facility" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-f3e6bca490d2d655cde4894e502e5989/768/432/Image/Webp/noFilter"
-                        alt="Flee the Facility">
-                    <div class="description-box">RUN, HIDE, ESCAPE! Run from the beast, unlock the exits, and flee the
-                        facility!
-                        This game runs well on phones, tablets, PC, Xbox, and PlayStation.
-
-                        📋GAME RULES📋
-                        https://devforum.roblox.com/t/flee-the-facility-game-rules/3941301
-
-                        ⭐CREDITS⭐
-                        https://devforum.roblox.com/t/flee-the-facility-credits/2026108</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Flee the Facility</h2>
-                        <p>By <a href="https://www.roblox.com/communities/3182154/A-W-Apps#!/about" target="_blank"
-                                class="creator-link">A.W. Apps</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>30 Jun 2017</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Survival / Action</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-flee-facility">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('flee-facility', 'roblox://placeId=893973440')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="flee-facility"
-                            onclick="toggleFavorite('flee-facility', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-flood-escape" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-0317908608680ca27ade363ac0feb6c0/768/432/Image/Webp/noFilter"
-                        alt="Flood Escape: Classic">
-                    <div class="description-box">Locked in a flooding facility, you and your team must work together to
-                        push buttons, find the way out, crack the code and escape before the flood takes you!
-
-                        Flood Escape Classic started development in September 2011, and is what kickstarted the Flood
-                        Escape series.
-
-                        FEC persisted through many of Roblox's fundamental changes; Mobile Support, Dynamic Lighting,
-                        Filtering Enabled and many more.
-
-                        While the game doesn't get updated often now due to focus on FE2, FEC's continued community and
-                        player count shows that the game continues to offer a solid experience for obby enthusiasts.
-
-                        Flood Escape © Crazyblox Games 2011 - 2024</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Flood Escape: Classic</h2>
-                        <p>By <a href="https://www.roblox.com/users/247535/profile/" target="_blank"
-                                class="creator-link">Crazyblox</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>15 Aug 2010</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-flood-escape">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('flood-escape', 'roblox://placeId=32990482')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="flood-escape"
-                            onclick="toggleFavorite('flood-escape', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-cone" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-3286dd029217592b49d830707e0bfcfa/768/432/Image/Webp/noFilter"
-                        alt="CONE">
-                    <div class="description-box">CONE</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>CONE</h2>
-                        <p>By <a href="https://www.roblox.com/users/1320922/profile/" target="_blank"
-                                class="creator-link">Defaultio</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>6 Mar 2016</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Adventure / Puzzle</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-cone">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('cone', 'roblox://placeId=378223328')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="cone" onclick="toggleFavorite('cone', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/378223328/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-fling" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-20254f91c5043de87f6cc8adb218c624/768/432/Image/Webp/noFilter"
-                        alt="Fling Things and People">
-                    <div class="description-box">A place where you can play with or fling various objects and players.
-                    </div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Fling Things and People</h2>
-                        <p>By <a href="https://www.roblox.com/users/212140315/profile/" target="_blank"
-                                class="creator-link">Horomori</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>16 Jun 2021</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Physics Sim</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-fling">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('fling', 'roblox://placeId=6961824067')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="fling" onclick="toggleFavorite('fling', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/6961824067/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-eg" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-96097b5752ff62cf014a214f427ba0c1/768/432/Image/Webp/noFilter"
-                        alt="🥚 Eg!">
-                    <div class="description-box">🥚 eg! is a silly social game about being an egg with legs! 🥚
-                        🌎 Explore a vast world with your friends! 🌏
-                        💰 Collect coins to buy hats, pets, materials, and more! 💰
-                        🎩 Customize your egg with 100+ unique hats. 🎩</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>🥚 Eg!</h2>
-                        <p>By <a href="https://www.roblox.com/users/2246184/profile/" target="_blank"
-                                class="creator-link">Nimblz</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>13 Jan 2019</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Exploration / Comedy</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-eg">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('eg', 'roblox://placeId=2747834912')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="eg" onclick="toggleFavorite('eg', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/2747834912/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-robot64" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-f1e38127294c9673738306a5d002b372/768/432/Image/Webp/noFilter"
-                        alt="Robot 64">
-                    <div class="description-box">Robot 64 is a modern 3D Platformer with a large array of movements.
-                        Play as
-                        Beebo, explore wacky worlds, collect ice cream, and destroy the sun!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Robot 64</h2>
-                        <p>By <a href="https://www.roblox.com/communities/2822856/zKevin#!/about" target="_blank"
-                                class="creator-link">zKevin</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>16 Oct 2017</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Obby / Platformer</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-robot64">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('robot64', 'roblox://placeId=1111083356')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="robot64" onclick="toggleFavorite('robot64', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-markers" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-666aa1bde55fa5557827dc36e10c6c8d/768/432/Image/Webp/noFilter"
-                        alt="Find the Markers">
-                    <div class="description-box">this game was highly inspired by a lot of "find the" games,
-                        specifically "find the domos". Marker originated from the web series known as 'battle for dream
-                        island'.</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Find the Markers</h2>
-                        <p>By <a href="https://www.roblox.com/communities/5218018/markers-epic-memers#!/about"
-                                target="_blank" class="creator-link">markers epic memers</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>3 Nov 2021</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Adventure / Scavenger Hunt</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-markers">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('markers', 'roblox://placeId=7896264844')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="markers" onclick="toggleFavorite('markers', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-deforestation" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-fedb2d4f532dbb6ccc21a9050a9dc750/768/432/Image/Webp/noFilter"
-                        alt="deforestation therapy || alpha">
-                    <div class="description-box">a calm game where you (and your friends) deforest a forest full of
-                        trees! The game doesn't try to stress or rush you, just keep you in peace of mind. Uses classic
-                        Roblox and 90s aesthetics.</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>deforestation therapy || alpha</h2>
-                        <p>By <a href="https://www.roblox.com/communities/8532621/The-Fartering-Few#!/about"
-                                target="_blank" class="creator-link">The Fartering Few</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>26 June 2024</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Simulation</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-deforestation">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('deforestation', 'roblox://placeId=18216750738')"
-                            class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="deforestation"
-                            onclick="toggleFavorite('deforestation', this)"><span
-                                class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- New Games -->
-    <div id="game-detail-banana-eats" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-9c13ad9096e592d4afadec6f7913e46c/768/432/Image/Webp/noFilter" alt="Banana Eats">
-                    <div class="description-box">Hide from Banana, complete hidden puzzles, and escape when exits open! Survive, earn coins, and unlock over 500 playable skins! Can you survive the killer banana? 
-
-RIPE BONUS: 
-• Get bonus coins every round with Premium! 
-• Join our Roblox Community for a FREE Skin!
-• Get Double XP Every Weekend!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Banana Eats</h2>
-                        <p>By <a href="https://www.roblox.com/users/21746001/profile/" target="_blank" class="creator-link">RyCitrus</a></p>
-                    </div>
-                    <div class="stat-row"><span>Created</span><span>23 Nov 2019</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Survival</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span id="times-played-banana-eats">0</span></div>
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('banana-eats', 'roblox://placeId=4448566543')" class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="banana-eats" onclick="toggleFavorite('banana-eats', this)"><span class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-arsenal" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-05dd752d8a8bced5c802236d64cf7809/768/432/Image/Webp/noFilter" alt="Arsenal">
-                    <div class="description-box">Race to the top through a massive Arsenal of weapons! 
-Conquer the day in fast paced arcade gameplay, from bazookas to spell books, each weapon will keep you guessing on what's next! 
-Earn BattleBucks and trick out your game with a huge cast of characters, melees, kill effects, skins and more!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Arsenal</h2>
-                        <p>By <a href="https://www.roblox.com/communities/2613928/ROLVe#!/about" target="_blank" class="creator-link">ROLVe</a></p>
-                    </div>
-                    <div class="stat-row"><span>Created</span><span>18 Aug 2015</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Shooter</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span id="times-played-arsenal">0</span></div>
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('arsenal', 'roblox://placeId=286090429')" class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="arsenal" onclick="toggleFavorite('arsenal', this)"><span class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-demonology" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-73d277df7a233a3aaf2afb060b5f7452/768/432/Image/Webp/noFilter" alt="Demonology🕯️">
-                    <div class="description-box">🕯️Use the tools at your disposal to hunt down and identify the evil spirits haunting your jobsite!
-👁️ For the best experience, play with max graphic settings!
-🎙️ Sadly, voice chat can't be used to ask questions to the Spirit Box or Umbra Board.
-Demonology's music is custom & copyright free, feel free to use it in videos!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>Demonology🕯️</h2>
-                        <p>By <a href="https://www.roblox.com/communities/32847485/Blaqk Magic Blue#!/about" target="_blank" class="creator-link">Blaqk Magic Blue</a></p>
-                    </div>
-                    <div class="stat-row"><span>Created</span><span>24 Jun 2024</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Horror</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span id="times-played-demonology">0</span></div>
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('demonology', 'roblox://placeId=18199615050')" class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="demonology" onclick="toggleFavorite('demonology', this)"><span class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-pizza-place" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail" src="https://tr.rbxcdn.com/180DAY-95a48d9b2051185ec0e8c98c21d48319/768/432/Image/Webp/noFilter" alt="🍕Work at a Pizza Place">
-                    <div class="description-box">🤝Work as a team to fulfill food orders.
-🏠Use your work earnings to upgrade your house and buy furniture.
-Don't forget to 👍 and ⭐! It really helps!</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>🍕Work at a Pizza Place</h2>
-                        <p>By <a href="https://www.roblox.com/users/82471/profile/" target="_blank" class="creator-link">Dued1</a></p>
-                    </div>
-                    <div class="stat-row"><span>Created</span><span>28 Mar 2008</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Roleplay & Avatar Sim</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span id="times-played-pizza-place">0</span></div>
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('pizza-place', 'roblox://placeId=192800')" class="play-btn"><span class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="pizza-place" onclick="toggleFavorite('pizza-place', this)"><span class="material-icons">star_border</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-detail-sbb" class="container page-view hidden">
-        <div class="box">
-            <div class="game-layout">
-                <div class="main-column">
-                    <img class="big-thumbnail"
-                        src="https://tr.rbxcdn.com/180DAY-ec5fc17541e2ab2233bbfe151926261c/768/432/Image/Webp/noFilter"
-                        alt="SBB Marathon">
-                    <div class="description-box">From the creator of Super Blocky Ball,
-
-                        All 15 maps put together!
-
-                        Now with backwards racing!!
-
-                        April 9 2021 update:
-                        - faster controls
-                        - centered shift lock camera
-                        - shorter jump delay
-                        - added dev times</div>
-                </div>
-                <div class="side-column">
-                    <div class="game-header-side">
-                        <h2>SBB Marathon</h2>
-                        <p>By <a href="https://www.roblox.com/users/487805/profile/" target="_blank"
-                                class="creator-link">Maelstronomer</a></p>
-                    </div>
-
-                    <div class="stat-row"><span>Created</span><span>8 May 2020</span></div>
-                    <div class="stat-row"><span>Genre</span><span>Sports / Racing</span></div>
-                    <div class="stat-row" style="margin-bottom: 15px;"><span>Times Played</span><span
-                            id="times-played-sbb">0</span></div>
-
-                    <div class="action-row">
-                        <a href="#" onclick="launchGame('sbb', 'roblox://placeId=4999134338')" class="play-btn"><span
-                                class="material-icons">play_arrow</span></a>
-                        <button class="fav-btn" data-game="sbb" onclick="toggleFavorite('sbb', this)"><span
-                                class="material-icons">star_border</span></button>
-                        <button class="server-btn" onclick="window.open('https://www.roblox.com/games/4999134338/#!/game-instances', '_blank')"><span
-                                class="material-icons">dns</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-    <div id="launch-modal" class="modal hidden" onclick="closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Roblox_Corporation_2025_logo.svg/960px-Roblox_Corporation_2025_logo.svg.png"
-                class="roblox-modal-logo" alt="Roblox">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <h2 style="margin-top: 0;">Launched in Roblox!</h2>
-            <p>Your game is now launching in the Roblox client. If you don't have Roblox installed, you can download it
-                below.</p>
-            <div class="modal-actions">
-                <a href="https://roblox.com/download/" target="_blank" class="download-btn" style="width: 100%; text-align: center;">Download Roblox</a>
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
-
+</div>
+
+<script>
+    // --- APP DATA & ASSETS ---
+    const APP_DEFS = {
+        'Weather': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Weather.png',
+        'Settings': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Settings.png',
+        'Reminders': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Reminders.png',
+        'Photos': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Photos.png',
+        'Mail': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Mail.png',
+        'Notes': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Notes.png',
+        'Messages': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Messages.png',
+        'Music': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Music.png',
+        'Clock': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/clock.png',
+        'Calendar': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Calendar.png',
+        'Calculator': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Calculator.png',
+        'Contacts': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Contacts.png',
+        'Camera': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Camera.png',
+        'Photo Booth': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Photo%20Booth.png',
+        'Maps': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Maps.png'
+    };
+
+    const WALLPAPERS = [
+        'https://raw.githubusercontent.com/SniperGER/iOS-Wallpapers/refs/heads/master/iPhone/5.8%22/iOS%2011.1/Stills/330.Mars_HERO-375w-812h%403x%7Eiphone.jpg',
+        'https://raw.githubusercontent.com/SniperGER/iOS-Wallpapers/refs/heads/master/iPhone/5.8%22/iOS%2011.1/Stills/325.Waves_Hero-375w-812h%403x%7Eiphone.jpg',
+        'https://raw.githubusercontent.com/SniperGER/iOS-Wallpapers/refs/heads/master/iPhone/5.8%22/iOS%2011.1/Stills/335.EF_Flower_AECHMEA-375w-812h%403x%7Eiphone.jpg',
+        'https://raw.githubusercontent.com/SniperGER/iOS-Wallpapers/refs/heads/master/iPhone/5.8%22/iOS%2011.1/Stills/345.EF_Flower_AQUILEGIA-375w-812h%403x%7Eiphone.jpg',
+        'https://raw.githubusercontent.com/SniperGER/iOS-Wallpapers/refs/heads/master/iPhone/5.8%22/iOS%2012/Stills/500.WWDC2018-375w-812h%403x%7Eiphone.jpg'
+    ];
+
+    let state = {
+        version: 5, setupDone: false,
+        wallpaper: WALLPAPERS[0],
+        gridApps: ['Weather', 'Reminders', 'Mail', 'Clock', 'Calendar', 'Maps', 'Calculator', 'Contacts', 'Photo Booth', 'Music', 'Settings'],
+        dockApps: ['Messages', 'Camera', 'Photos', 'Notes'],
+        photos: [], reminders: [], contacts: [],
+        noteText: "Welcome to miniOS!\n\nThis app automatically saves what you type."
+    };
+
+    function loadState() {
+        let saved = localStorage.getItem('minios_state');
+        if (saved) {
+            let parsed = JSON.parse(saved);
+            if (parsed.version !== 5) { 
+                parsed.version = 5; 
+                parsed.gridApps = state.gridApps; 
+                parsed.dockApps = state.dockApps; 
+                if(!parsed.contacts) parsed.contacts=[]; 
+            }
+            state = parsed;
+        }
+        applyState();
+    }
+    function saveState() { localStorage.setItem('minios_state', JSON.stringify(state)); }
+
+    function applyState() {
+        document.getElementById('wallpaper').style.backgroundImage = `url('${state.wallpaper}')`;
+        const setupEl = document.getElementById('setup');
+        if (state.setupDone) { 
+            setupEl.style.display = 'none'; 
+            if (document.getElementById('app-grid').children.length === 0) renderHome();
+        } else { 
+            setupEl.style.display = 'flex'; 
+        }
+    }
+
+    function startSetup() { state.setupDone = true; saveState(); applyState(); unlockScreen(); }
+    function createBackup() {
+        let a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+        a.download = "minios_backup.json"; a.click();
+    }
+    function restoreBackup(e) {
+        let reader = new FileReader();
+        reader.onload = function(evt) {
+            try { let parsed = JSON.parse(evt.target.result); parsed.version = 5; state = parsed; saveState(); window.location.reload(); } 
+            catch(err) { alert("Invalid backup file."); }
+        }; reader.readAsText(e.target.files[0]);
+    }
+
+    // --- RENDER HOME SCREEN ---
+    let gridSortable, dockSortable, isEditing = false;
+    function renderHome() {
+        const grid = document.getElementById('app-grid'); const dock = document.getElementById('dock');
+        grid.innerHTML = ''; dock.innerHTML = '';
+        state.gridApps.forEach(app => grid.appendChild(createAppIcon(app)));
+        state.dockApps.forEach(app => dock.appendChild(createAppIcon(app, true)));
+
+        let options = { animation: 150, delay: 200, delayOnTouchOnly: true, disabled: !isEditing, group: 'shared', onEnd: saveOrder };
+        if(gridSortable) gridSortable.destroy(); if(dockSortable) dockSortable.destroy();
+        gridSortable = new Sortable(grid, options); dockSortable = new Sortable(dock, options);
+    }
+
+    function createAppIcon(appName, isDock = false) {
+        let div = document.createElement('div'); div.className = 'app'; div.dataset.id = appName;
+        div.innerHTML = `<div class="app-icon" style="background-image: url('${APP_DEFS[appName]}')"></div>${isDock ? '' : `<div class="app-label">${appName}</div>`}`;
+        let pressTimer, isDragging = false;
+        div.addEventListener('pointerdown', (e) => {
+            if(isEditing) return; isDragging = false; pressTimer = setTimeout(() => enableEditMode(), 600);
+        });
+        div.addEventListener('pointermove', () => { isDragging = true; clearTimeout(pressTimer); });
+        div.addEventListener('pointerup', () => clearTimeout(pressTimer));
+        div.addEventListener('click', (e) => {
+            clearTimeout(pressTimer); if(!isEditing && !isDragging) openApp(appName, div.querySelector('.app-icon'));
+        });
+        return div;
+    }
+
+    function enableEditMode() { isEditing = true; document.body.classList.add('editing'); gridSortable.option("disabled", false); dockSortable.option("disabled", false); }
+    function disableEditMode() { if(!isEditing) return; isEditing = false; document.body.classList.remove('editing'); gridSortable.option("disabled", true); dockSortable.option("disabled", true); saveOrder(); }
+    document.getElementById('home').addEventListener('click', (e) => { if(isEditing && !e.target.closest('.app')) disableEditMode(); });
+    function saveOrder() { state.gridApps = Array.from(document.getElementById('app-grid').children).map(c => c.dataset.id); state.dockApps = Array.from(document.getElementById('dock').children).map(c => c.dataset.id); saveState(); }
+
+    // --- LOCK SCREEN & FLY-IN ANIMATIONS ---
+    const lockScreen = document.getElementById('lock'), lockTexts = document.getElementById('lock-texts'), home = document.getElementById('home'), slider = document.getElementById('slider');
+    let sliderStartX = 0;
+
+    function unlockScreen() {
+        lockScreen.style.opacity = '0'; lockScreen.style.pointerEvents = 'none';
+        home.classList.add('unlocked');
+        
+        const cx = window.innerWidth / 2; const cy = window.innerHeight / 2;
+        document.querySelectorAll('.app').forEach((app, index) => {
+            const rect = app.getBoundingClientRect();
+            const dx = (rect.left + rect.width/2) - cx;
+            const dy = (rect.top + rect.height/2) - cy;
+            app.style.setProperty('--fly-x', (dx * 3) + 'px'); app.style.setProperty('--fly-y', (dy * 3) + 'px');
+            
+            app.classList.remove('fly-in');
+            void app.offsetWidth; 
+            app.style.animationDelay = (index * 0.03) + 's'; 
+            app.classList.add('fly-in');
+        });
+        setTimeout(() => { lockScreen.style.display = 'none'; }, 400); 
+    }
+
+    slider.addEventListener('touchstart', e => sliderStartX = e.touches[0].clientX);
+    slider.addEventListener('touchmove', e => {
+        let delta = Math.max(0, e.touches[0].clientX - sliderStartX);
+        slider.style.transform = `translateX(${delta}px)`; slider.style.opacity = 1 - (delta / 250);
+        lockTexts.style.transform = `translateX(${delta * 1.5}px)`;
+    });
+    slider.addEventListener('touchend', e => {
+        let delta = e.changedTouches[0].clientX - sliderStartX;
+        if(delta > 130) { unlockScreen(); } 
+        else { slider.style.transform = 'translateX(0)'; slider.style.opacity = '1'; lockTexts.style.transform = 'translateX(0)'; }
+    });
+
+    document.addEventListener('keydown', e => {
+        if (e.code === 'Space' && state.setupDone) {
+            e.preventDefault();
+            if (lockScreen.style.display !== 'none') unlockScreen();
+            else if (appContainer.classList.contains('open')) closeApp();
+        }
+    });
+
+    // --- SPOTLIGHT ---
+    let homeStartY = 0; const spotlight = document.getElementById('spotlight');
+    home.addEventListener('touchstart', e => { if(!isEditing) homeStartY = e.touches[0].clientY; });
+    home.addEventListener('touchend', e => {
+        if(!isEditing && (e.changedTouches[0].clientY - homeStartY) > 60) {
+            spotlight.classList.add('active'); document.getElementById('search-input').focus();
+        }
+    });
+    spotlight.addEventListener('touchstart', e => {
+        if(e.touches[0].clientY > 150 && !e.target.closest('#search-bar') && !e.target.closest('#spotlight-results')) closeSpotlight();
+    });
+    function closeSpotlight() { spotlight.classList.remove('active'); document.getElementById('search-input').value = ''; document.getElementById('spotlight-results').innerHTML = ''; }
+    function handleSearch() {
+        let q = document.getElementById('search-input').value.toLowerCase(); let resDiv = document.getElementById('spotlight-results');
+        if(!q) { resDiv.innerHTML = ''; return; }
+        let results = [];
+        Object.keys(APP_DEFS).forEach(a => { if(a.toLowerCase().includes(q)) results.push({type: 'App', text: a}); });
+        if(state.noteText.toLowerCase().includes(q)) results.push({type: 'Note', text: state.noteText.substring(0, 30) + "..."});
+        state.reminders.forEach(r => { if(r.text.toLowerCase().includes(q)) results.push({type: 'Reminder', text: r.text}); });
+        resDiv.innerHTML = results.map(r => `<div class="search-result glass" onclick="closeSpotlight(); ${r.type==='App'?`openApp('${r.text}')`:'openApp(\''+r.type+'s\')'}"><strong>${r.text}</strong><small>${r.type}</small></div>`).join('');
+    }
+
+    // --- APP CONTAINER & HERO ANIMATION (0.6s snappier morph) ---
+    const appContainer = document.getElementById('app-container');
+    let activeAppId = null;
+
+    function openApp(id, iconElement) {
+        activeAppId = id;
+        const ui = document.getElementById('app-ui');
+        ui.innerHTML = '';
+
+        document.getElementById('wallpaper').classList.add('app-open');
+        document.getElementById('home').classList.add('app-open');
+
+        let rect = iconElement ? iconElement.getBoundingClientRect() : { top: window.innerHeight/2, left: window.innerWidth/2, width: 0, height: 0 };
+        
+        // Starts 10% smaller than icon size for a tighter expand feel
+        const pad = rect.width * 0.1;
+        const targetTop = rect.top + pad / 2;
+        const targetLeft = rect.left + pad / 2;
+        const targetWidth = rect.width - pad;
+        const targetHeight = rect.height - pad;
+
+        appContainer.style.transition = 'none';
+        appContainer.style.top = targetTop + 'px';
+        appContainer.style.left = targetLeft + 'px';
+        appContainer.style.width = targetWidth + 'px';
+        appContainer.style.height = targetHeight + 'px';
+        appContainer.style.borderRadius = '18px';
+        appContainer.style.opacity = '1';
+        appContainer.style.transform = 'translateX(0)';
+
+        buildAppUI(id, ui);
+
+        // Animate to full screen over 0.6s
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                appContainer.style.transition = 'all 0.6s cubic-bezier(0.32, 0.72, 0, 1)';
+                appContainer.style.top = '0px'; appContainer.style.left = '0px';
+                appContainer.style.width = '100vw'; appContainer.style.height = '100vh';
+                appContainer.style.borderRadius = '0px';
+                appContainer.classList.add('open');
+            });
+        });
+    }
+
+    // --- LEFT EDGE SWIPE BACK ---
+    let appSwipeStartX = 0, appSwipeStartY = 0, isSwipingApp = false;
+    appContainer.addEventListener('touchstart', e => {
+        if(e.touches[0].clientX < 35 && appContainer.classList.contains('open')) {
+            appSwipeStartX = e.touches[0].clientX; appSwipeStartY = e.touches[0].clientY;
+            isSwipingApp = true; appContainer.style.transition = 'none';
+        }
+    });
+    appContainer.addEventListener('touchmove', e => {
+        if(isSwipingApp) {
+            let dx = e.touches[0].clientX - appSwipeStartX; let dy = Math.abs(e.touches[0].clientY - appSwipeStartY);
+            if (dy > dx && dx < 20) { isSwipingApp = false; return; }
+            if (dx > 0) { e.preventDefault(); appContainer.style.transform = `translateX(${dx}px)`; }
+        }
+    });
+    appContainer.addEventListener('touchend', e => {
+        if(isSwipingApp) {
+            isSwipingApp = false;
+            let dx = e.changedTouches[0].clientX - appSwipeStartX;
+            if(dx > 80) { 
+                appContainer.style.transform = 'translateX(0)'; 
+                closeApp(); 
+            } else { 
+                appContainer.style.transition = 'all 0.4s cubic-bezier(0.32, 0.72, 0, 1)'; 
+                appContainer.style.transform = 'translateX(0)'; 
+            }
+        }
+    });
+
+    function closeApp() {
+        if(window.cameraStream) { window.cameraStream.getTracks().forEach(t => t.stop()); window.cameraStream = null; }
+
+        // Reliably toggle classes on existing wallpaper. No deletion and prepending!
+        document.getElementById('wallpaper').classList.remove('app-open');
+        document.getElementById('home').classList.remove('app-open');
+
+        // Dynamically re-acquire the exact icon position for perfect closing animation
+        if (activeAppId) {
+            let activeAppElement = document.querySelector(`.app[data-id="${activeAppId}"] .app-icon`);
+            if (activeAppElement) {
+                const rect = activeAppElement.getBoundingClientRect();
+                const pad = rect.width * 0.1; // Morph target finishes slightly tighter (10% smaller)
+                const targetTop = rect.top + pad / 2;
+                const targetLeft = rect.left + pad / 2;
+                const targetWidth = rect.width - pad;
+                const targetHeight = rect.height - pad;
+
+                // Fades out late (over 0.15s, after a 0.45s delay) so it shrinks completely on target before disappearing
+                appContainer.style.transition = 'top 0.6s cubic-bezier(0.32, 0.72, 0, 1), left 0.6s cubic-bezier(0.32, 0.72, 0, 1), width 0.6s cubic-bezier(0.32, 0.72, 0, 1), height 0.6s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.6s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.15s cubic-bezier(0.32, 0.72, 0, 1) 0.45s';
+                appContainer.style.top = targetTop + 'px'; appContainer.style.left = targetLeft + 'px';
+                appContainer.style.width = targetWidth + 'px'; appContainer.style.height = targetHeight + 'px';
+                appContainer.style.borderRadius = '18px';
+                appContainer.style.opacity = '0';
+            }
+        }
+        
+        setTimeout(() => { appContainer.classList.remove('open'); document.getElementById('app-ui').innerHTML = ''; activeAppId = null; }, 600);
+    }
+
+    // --- APP UI BUILDERS ---
+    function buildAppUI(id, ui) {
+        if (id === 'Settings') {
+            ui.style.background = '#f2f2f6';
+            renderSettingsPage('main');
+        } else if (id === 'Notes') {
+            ui.style.background = '#fffcf0';
+            ui.innerHTML = `
+                <div style="padding: 50px 20px 20px; height: 100%;">
+                    <h1 class="ios-title" style="color: #d4a017;">Notes</h1>
+                    <textarea id="notesArea" placeholder="Start typing..." oninput="saveNotes()" style="width:100%; height:calc(100% - 60px); border:none; outline:none; font-size:20px; font-family:var(--font); font-weight:300; resize:none; background:transparent; color:#333; line-height:1.5;">${state.noteText}</textarea>
+                </div>`;
+        } else if (id === 'Reminders') {
+            ui.style.background = '#fff';
+            ui.innerHTML = `
+                <div style="padding: 60px 20px 20px;">
+                    <h1 class="ios-title" style="color: #007AFF;">Reminders</h1>
+                    <div style="display:flex; margin-bottom:20px;">
+                        <input type="text" id="remText" placeholder="Remind me to..." style="flex:1; padding:12px; font-size:16px; border:1px solid #eee; border-radius:10px 0 0 10px; font-family:var(--font); color:#000; outline:none;">
+                        <input type="time" id="remTime" style="padding:12px; border:1px solid #eee; border-left:none; font-family:var(--font); color:#000; outline:none;">
+                        <button onclick="addReminder()" style="background:#007AFF; color:#fff; border:none; padding:12px 20px; border-radius:0 10px 10px 0; font-family:var(--font);">Add</button>
+                    </div>
+                    <div id="remList" style="color: #000;"></div>
+                </div>`;
+            renderReminders();
+        } else if (id === 'Camera') {
+            ui.style.background = '#000';
+            ui.innerHTML = `
+                <div style="display:flex; height:100%; flex-direction:column;">
+                    <div style="flex-grow:1; background:#111; position:relative;">
+                        <video id="camera-feed" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+                    </div>
+                    <div style="height:140px; background:#000; display:flex; justify-content:center; align-items:center; padding-bottom:20px;">
+                        <div onclick="capturePhoto()" style="width:75px; height:75px; border-radius:50%; background:#fff; border:5px solid #ccc; cursor:pointer; transition:transform 0.1s;"></div>
+                    </div>
+                </div>`;
+            startCamera();
+        } else if (id === 'Photos') {
+            ui.style.background = '#fff';
+            ui.innerHTML = `
+                <div style="padding: 60px 5px 0;">
+                    <h1 class="ios-title" style="margin-left: 15px;">Photos</h1>
+                    ${state.photos.length ? `<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:3px;">${state.photos.map(p => `<img src="${p}" style="width:100%; aspect-ratio:1; object-fit:cover;">`).join('')}</div>` : `<p style="text-align:center; color:#888; margin-top:50px;">No Photos Yet</p>`}
+                </div>`;
+        } else if (id === 'Weather') {
+            ui.style.background = 'linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%)';
+            ui.innerHTML = `
+                <div style="padding-top: 80px; color: #fff;">
+                    <h1 style="text-align:center; font-weight:300; font-size: 38px; margin-bottom: 0; text-shadow: 0 1px 10px rgba(0,0,0,0.1);">Melbourne</h1>
+                    <div id="weather-temp" style="font-size: 90px; font-weight: 100; text-align: center; margin-top: 10px; letter-spacing: -3px; text-shadow: 0 1px 10px rgba(0,0,0,0.1);">--°</div>
+                    <p id="weather-desc" style="text-align:center; font-size: 20px; margin-top: 10px; font-weight: 300;">Loading...</p>
+                </div>`;
+            fetch('https://api.open-meteo.com/v1/forecast?latitude=-37.81&longitude=144.96&current_weather=true')
+                .then(r => r.json()).then(d => {
+                    document.getElementById('weather-temp').innerText = `${Math.round(d.current_weather.temperature)}°`;
+                    document.getElementById('weather-desc').innerText = `Wind: ${d.current_weather.windspeed} km/h`;
+                }).catch(() => document.getElementById('weather-desc').innerText = "Offline");
+        } else if (id === 'Contacts') {
+            ui.style.background = '#fff';
+            renderContactsPage('list');
+        } else if (id === 'Calculator') {
+            ui.style.background = '#000';
+            renderCalculator();
+        } else if (id === 'Calendar') {
+            ui.style.background = '#fff';
+            ui.innerHTML = renderCalendar();
+        } else if (id === 'Clock') {
+            ui.style.background = '#000';
+            ui.innerHTML = renderClockApp();
+        } else if (id === 'Photo Booth') {
+            ui.style.background = '#000';
+            renderPhotoBooth();
+        } else if (id === 'Maps') {
+            ui.style.background = '#fff';
+            ui.innerHTML = `
+                <div style="height:100%; width:100%; display:flex; flex-direction:column;">
+                    <iframe src="https://maps.google.com/maps?q=Melbourne&t=&z=13&ie=UTF8&iwloc=&output=embed" style="flex-grow:1; border:none; width:100%; height:100%;"></iframe>
+                </div>`;
+        } else {
+            ui.style.background = '#fff';
+            ui.innerHTML = `<div style="text-align:center; padding-top:100px; font-size:26px; color:#000; font-weight:300;">${id}<br><span style="font-size:18px; color:#888;">Coming Soon</span></div>`;
+        }
+    }
+
+    // --- APP LOGIC (SETTINGS) ---
+    function renderSettingsPage(page) {
+        const ui = document.getElementById('app-ui');
+        if (page === 'main') {
+            ui.innerHTML = `
+                <div style="padding: 60px 20px 20px;">
+                    <h1 class="ios-title">Settings</h1>
+                    <div class="ios-list">
+                        <div class="ios-item" onclick="renderSettingsPage('wallpapers')"><span>Wallpapers</span> <span style="color:#aaa;">></span></div>
+                        <div class="ios-item" onclick="renderSettingsPage('reset')"><span>Reset</span> <span style="color:#aaa;">></span></div>
+                        <div class="ios-item" onclick="createBackup()"><span>Backup Data</span> <span style="color:#aaa;">></span></div>
+                        <div class="ios-item" onclick="renderSettingsPage('about')"><span>About</span> <span style="color:#aaa;">></span></div>
+                    </div>
+                </div>`;
+        } else if (page === 'wallpapers') {
+            ui.innerHTML = `
+                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')">< Back</span><span style="font-size:18px; font-weight:400; color:#000;">Wallpapers</span></div>
+                <div style="padding: 20px; display:flex; flex-wrap:wrap; gap:10px;">
+                    ${WALLPAPERS.map(w => `<div onclick="setWallpaper('${w}')" style="width:calc(50% - 5px); height:250px; background:url('${w}') center/cover; border-radius:0; cursor:pointer; ${state.wallpaper===w?'border:4px solid #007AFF':''}"></div>`).join('')}
+                </div>`;
+        } else if (page === 'reset') {
+            ui.innerHTML = `
+                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')">< Back</span><span style="font-size:18px; font-weight:400; color:#000;">Reset Option</span></div>
+                <div style="padding: 20px;">
+                    <div class="ios-list">
+                        <div class="ios-item" onclick="resetHomeLayout()" style="color:#007AFF; font-weight:400;">Reset Home Screen Layout</div>
+                        <div class="ios-item" onclick="factoryReset()" style="color:#ff3b30; font-weight:400;">Erase All Content (Factory Reset)</div>
+                    </div>
+                </div>`;
+        } else if (page === 'about') {
+            ui.innerHTML = `
+                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')">< Back</span><span style="font-size:18px; font-weight:400; color:#000;">About</span></div>
+                <div style="padding: 30px 20px; text-align:center; color:#000;">
+                    <div style="width:100px; height:100px; background:url('https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Settings.png') center/cover; margin:0 auto 20px; border-radius:22px;"></div>
+                    <h2 style="font-weight:300;">miniOS</h2><p style="color:#666;">Version 4.1</p>
+                </div>`;
+        }
+    }
+    function setWallpaper(url) { state.wallpaper = url; saveState(); applyState(); renderSettingsPage('wallpapers'); }
+    function resetHomeLayout() {
+        if(confirm("Are you sure you want to restore the default home screen icon arrangement?")) {
+            state.gridApps = ['Weather', 'Reminders', 'Mail', 'Clock', 'Calendar', 'Maps', 'Calculator', 'Contacts', 'Photo Booth', 'Music', 'Settings'];
+            state.dockApps = ['Messages', 'Camera', 'Photos', 'Notes'];
+            saveState(); window.location.reload();
+        }
+    }
+    function factoryReset() {
+        if(confirm("Factory Resetting will permanently delete all photos, contacts, notes, reminders, and custom arrangements. Continue?")) {
+            localStorage.removeItem('minios_state'); window.location.reload();
+        }
+    }
+
+    // --- APP LOGIC (CONTACTS) ---
+    function renderContactsPage(page) {
+        const ui = document.getElementById('app-ui');
+        if (page === 'list') {
+            ui.innerHTML = `
+                <div style="padding: 60px 20px 20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h1 class="ios-title" style="margin:0;">Contacts</h1>
+                        <span onclick="renderContactsPage('add')" style="color:#007AFF; font-size:35px; font-weight:200; cursor:pointer; line-height:1;">+</span>
+                    </div>
+                    <div class="ios-list" style="margin-top:20px;">
+                        ${state.contacts.length ? state.contacts.map((c, i) => `<div class="ios-item" onclick="alert('Phone: ${c.phone}')">${c.first} ${c.last}</div>`).join('') : `<div style="padding:30px; text-align:center; color:#888;">No Contacts</div>`}
+                    </div>
+                </div>`;
+        } else if (page === 'add') {
+            ui.innerHTML = `
+                <div class="ios-nav">
+                    <span class="ios-back" onclick="renderContactsPage('list')">Cancel</span>
+                    <span style="font-size:18px; font-weight:400; color:#000; flex-grow:1; text-align:center;">New Contact</span>
+                    <span class="ios-back" onclick="saveContact()" style="padding:0;">Done</span>
+                </div>
+                <div style="padding: 20px;">
+                    <div class="ios-list">
+                        <input id="c-first" type="text" placeholder="First Name" style="width:100%; border:none; border-bottom:1px solid #eee; padding:15px; font-size:18px; font-family:var(--font); outline:none;">
+                        <input id="c-last" type="text" placeholder="Last Name" style="width:100%; border:none; border-bottom:1px solid #eee; padding:15px; font-size:18px; font-family:var(--font); outline:none;">
+                        <input id="c-phone" type="tel" placeholder="Phone" style="width:100%; border:none; padding:15px; font-size:18px; font-family:var(--font); outline:none;">
+                    </div>
+                </div>`;
+        }
+    }
+    function saveContact() {
+        let first = document.getElementById('c-first').value; let last = document.getElementById('c-last').value; let phone = document.getElementById('c-phone').value;
+        if(first || last) { state.contacts.push({first, last, phone}); state.contacts.sort((a,b) => a.first.localeCompare(b.first)); saveState(); renderContactsPage('list'); }
+    }
+
+    // --- APP LOGIC (CALCULATOR) ---
+    let calcState = { prev: '', curr: '0', op: null, reset: false };
+    function renderCalculator() {
+        calcState = { prev: '', curr: '0', op: null, reset: false };
+        document.getElementById('app-ui').innerHTML = `
+            <div style="display:flex; flex-direction:column; height:100%;">
+                <div style="flex-grow:1;"></div>
+                <div id="calc-screen" class="calc-screen">0</div>
+                <div class="calc-grid">
+                    <div class="calc-btn top" onclick="cBtn('C')">C</div><div class="calc-btn top" onclick="cBtn('±')">±</div><div class="calc-btn top" onclick="cBtn('%')">%</div><div class="calc-btn op" onclick="cBtn('÷')">÷</div>
+                    <div class="calc-btn" onclick="cBtn('7')">7</div><div class="calc-btn" onclick="cBtn('8')">8</div><div class="calc-btn" onclick="cBtn('9')">9</div><div class="calc-btn op" onclick="cBtn('×')">×</div>
+                    <div class="calc-btn" onclick="cBtn('4')">4</div><div class="calc-btn" onclick="cBtn('5')">5</div><div class="calc-btn" onclick="cBtn('6')">6</div><div class="calc-btn op" onclick="cBtn('-')">-</div>
+                    <div class="calc-btn" onclick="cBtn('1')">1</div><div class="calc-btn" onclick="cBtn('2')">2</div><div class="calc-btn" onclick="cBtn('3')">3</div><div class="calc-btn op" onclick="cBtn('+')">+</div>
+                    <div class="calc-btn zero" onclick="cBtn('0')">0</div><div class="calc-btn" onclick="cBtn('.')">.</div><div class="calc-btn op" onclick="cBtn('=')">=</div>
+                </div>
+            </div>`;
+    }
+    function cBtn(val) {
+        if (['+','-','×','÷'].includes(val)) { calcState.op = val; calcState.prev = calcState.curr; calcState.reset = true; }
+        else if (val === '=') { 
+            if(calcState.op && calcState.prev) { 
+                let p = parseFloat(calcState.prev), c = parseFloat(calcState.curr), r = 0;
+                if(calcState.op==='+') r = p+c; if(calcState.op==='-') r = p-c; if(calcState.op==='×') r = p*c; if(calcState.op==='÷') r = p/c;
+                calcState.curr = String(r).substring(0,10); calcState.op = null; calcState.reset = true;
+            }
+        }
+        else if (val === 'C') { calcState.curr = '0'; calcState.prev = ''; calcState.op = null; }
+        else if (val === '±') { calcState.curr = calcState.curr.startsWith('-') ? calcState.curr.substring(1) : '-' + calcState.curr; }
+        else if (val === '%') { calcState.curr = String(parseFloat(calcState.curr) / 100); }
+        else {
+            if(calcState.reset) { calcState.curr = val; calcState.reset = false; }
+            else { calcState.curr = calcState.curr === '0' && val !== '.' ? val : calcState.curr + val; }
+        }
+        document.getElementById('calc-screen').innerText = calcState.curr;
+    }
+
+    // --- APP LOGIC (CALENDAR) ---
+    function renderCalendar() {
+        let d = new Date(); let month = d.toLocaleString('default', { month: 'long' }); let year = d.getFullYear();
+        let html = `<div style="padding:60px 20px 20px; background:#fff; height:100%; color:#000;">`;
+        html += `<h1 class="ios-title" style="color:#ff3b30;">${month} ${year}</h1>`;
+        html += `<div style="display:grid; grid-template-columns:repeat(7, 1fr); gap:15px 10px; text-align:center; font-size: 20px;">`;
+        ['S','M','T','W','T','F','S'].forEach(day => html += `<div style="font-weight:400; color:#888;">${day}</div>`);
+        let firstDay = new Date(year, d.getMonth(), 1).getDay(); let numDays = new Date(year, d.getMonth()+1, 0).getDate(); let today = d.getDate();
+        for(let i=0; i<firstDay; i++) html += `<div></div>`;
+        for(let i=1; i<=numDays; i++) {
+            let isToday = (i === today); let bg = isToday ? '#ff3b30' : 'transparent'; let col = isToday ? '#fff' : '#000';
+            html += `<div style="display:flex; justify-content:center; align-items:center;"><span style="display:flex; justify-content:center; align-items:center; width:38px; height:38px; border-radius:50%; background:${bg}; color:${col};">${i}</span></div>`;
+        }
+        html += `</div></div>`; return html;
+    }
+
+    // --- APP LOGIC (CLOCK) ---
+    function renderClockApp() {
+        return `
+            <div style="display:flex; flex-direction:column; height:100%; background:#000; color:#fff;">
+                <div style="flex-grow:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                    <div id="clock-live-display" data-active="true" style="font-size:75px; font-weight:100; letter-spacing: 2px;">${new Date().toLocaleTimeString('en-US', {hour12: false})}</div>
+                    <div style="color:#aaa; font-size:20px; margin-top:10px; font-weight: 300;">${new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'})}</div>
+                </div>
+            </div>`;
+    }
+
+    // --- APP LOGIC (PHOTO BOOTH) ---
+    let pbFilter = 'none';
+    const PB_FILTERS = {
+        'none': 'none',
+        'noir': 'grayscale(100%) contrast(120%)',
+        'chrome': 'contrast(110%) saturate(140%)',
+        'sepia': 'sepia(90%)',
+        'invert': 'invert(100%)',
+        'hue': 'hue-rotate(90deg)'
+    };
+    function renderPhotoBooth() {
+        pbFilter = 'none';
+        const ui = document.getElementById('app-ui');
+        ui.innerHTML = `
+            <div style="display:flex; height:100%; flex-direction:column; background:#000;">
+                <div style="flex-grow:1; background:#111; position:relative; overflow:hidden;">
+                    <video id="photobooth-feed" autoplay playsinline style="width:100%; height:100%; object-fit:cover; transition: filter 0.1s;"></video>
+                </div>
+                <div class="filter-row">
+                    <button class="filter-btn active" id="f-none" onclick="setPBFilter('none')">Normal</button>
+                    <button class="filter-btn" id="f-noir" onclick="setPBFilter('noir')">Noir</button>
+                    <button class="filter-btn" id="f-chrome" onclick="setPBFilter('chrome')">Chrome</button>
+                    <button class="filter-btn" id="f-sepia" onclick="setPBFilter('sepia')">Sepia</button>
+                    <button class="filter-btn" id="f-invert" onclick="setPBFilter('invert')">Invert</button>
+                    <button class="filter-btn" id="f-hue" onclick="setPBFilter('hue')">Hue Shift</button>
+                </div>
+                <div style="height:100px; background:#000; display:flex; justify-content:center; align-items:center; padding-bottom:10px;">
+                    <div onclick="capturePBPhoto()" style="width:65px; height:65px; border-radius:50%; background:#fff; border:4px solid #ccc; cursor:pointer;"></div>
+                </div>
+            </div>`;
+        startCameraPB();
+    }
+    function startCameraPB() {
+        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } }).then(stream => { window.cameraStream = stream; document.getElementById('photobooth-feed').srcObject = stream; }).catch(err => document.getElementById('photobooth-feed').parentElement.innerHTML = '<p style="color:#fff; text-align:center; margin-top:50px;">Front Camera disabled.</p>');
+        }
+    }
+    function setPBFilter(type) {
+        pbFilter = type;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`f-${type}`).classList.add('active');
+        document.getElementById('photobooth-feed').style.filter = PB_FILTERS[type];
+    }
+    function capturePBPhoto() {
+        const v = document.getElementById('photobooth-feed'); if(!v||!v.videoWidth) return;
+        const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
+        const ctx = c.getContext('2d');
+        ctx.filter = PB_FILTERS[pbFilter]; // Applies CSS filter directly onto canvas contexts
+        ctx.drawImage(v, 0, 0);
+        state.photos.unshift(c.toDataURL('image/jpeg', 0.8)); saveState(); notify("Photo Booth", "Photo saved with effect!");
+        
+        const flash = document.createElement('div'); flash.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:#fff;z-index:99;transition:opacity 0.4s; pointer-events:none;';
+        document.getElementById('app-ui').appendChild(flash); setTimeout(() => flash.style.opacity = '0', 50); setTimeout(() => flash.remove(), 450);
+    }
+
+    // --- APP LOGIC (MISC) ---
+    function saveNotes() { state.noteText = document.getElementById('notesArea').value; saveState(); }
+    function addReminder() { let t = document.getElementById('remText').value, tm = document.getElementById('remTime').value; if(t&&tm){state.reminders.push({text:t, time:tm, notified:false}); saveState(); renderReminders();} }
+    function renderReminders() {
+        document.getElementById('remList').innerHTML = state.reminders.map((r,i) => `
+            <div style="padding:15px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:18px;">${r.text}</span> <span style="color:#888; margin-left:auto; margin-right:15px;">${r.time}</span>
+                <button onclick="state.reminders.splice(${i},1); saveState(); renderReminders();" style="background:#ff3b30; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">X</button>
+            </div>`).join('');
+    }
+
+    function startCamera() {
+        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(stream => { window.cameraStream = stream; document.getElementById('camera-feed').srcObject = stream; }).catch(err => document.getElementById('camera-feed').parentElement.innerHTML = '<p style="color:#fff; text-align:center; margin-top:50px;">Camera disabled.</p>');
+        }
+    }
+    function capturePhoto() {
+        const v = document.getElementById('camera-feed'); if(!v||!v.videoWidth) return;
+        const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
+        c.getContext('2d').drawImage(v, 0, 0); state.photos.unshift(c.toDataURL('image/jpeg', 0.8)); saveState(); notify("Camera", "Saved to Photos.");
+        const flash = document.createElement('div'); flash.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:#fff;z-index:99;transition:opacity 0.4s; pointer-events:none;';
+        document.getElementById('app-ui').appendChild(flash); setTimeout(() => flash.style.opacity = '0', 50); setTimeout(() => flash.remove(), 450);
+    }
+
+    // Global Clock & Notifications Trigger
+    function notify(title, body) {
+        let ln = document.createElement('div'); ln.className = 'lock-notif glass'; ln.innerHTML = `<strong>${title}</strong>${body}`; document.getElementById('lock-notifications').prepend(ln);
+        let toast = document.createElement('div'); toast.className = 'toast glass'; toast.innerHTML = `<strong>${title}</strong>${body}`; document.body.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 100); setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 4000);
+    }
+    setInterval(() => {
+        let d = new Date(), hrs = d.getHours().toString().padStart(2, '0'), mins = d.getMinutes().toString().padStart(2, '0'), t = `${hrs}:${mins}`;
+        let lt = document.getElementById('lock-time'); if(lt.innerText !== t) lt.innerText = t;
+        let liveClock = document.getElementById('clock-live-display'); if(liveClock) liveClock.innerText = d.toLocaleTimeString('en-US', {hour12: false});
+        state.reminders.forEach(r => { if(r.time === t && !r.notified) { notify("Reminder", r.text); r.notified = true; saveState(); } });
+    }, 1000);
+    document.getElementById('lock-date').innerText = new Date().toLocaleDateString('en-US', {weekday:'long',month:'long',day:'numeric'});
+
+    loadState();
+</script>
 </body>
-
 </html>
