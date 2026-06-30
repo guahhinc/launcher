@@ -8,7 +8,6 @@
     <meta name="apple-mobile-web-app-title" content="miniOS">
     <link rel="apple-touch-icon" href="https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Settings.png">
     <title>miniOS</title>
-    <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
@@ -21,27 +20,25 @@
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        /* Webkit filling viewport rules completely cure the bottom black gap */
         html, body {
-            margin: 0; padding: 0; width: 100%; height: 100vh;
-            height: -webkit-fill-available;
+            margin: 0; padding: 0; width: 100vw; height: 100vh;
             font-family: var(--font); background: #000; color: #fff;
             overflow: hidden; user-select: none; -webkit-user-select: none;
             overscroll-behavior: none; font-weight: 200;
         }
 
         #screen { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; 
-            height: -webkit-fill-available; overflow: hidden; background: #000;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            overflow: hidden; background: #000;
         }
 
-        /* Default wallpaper zoom factor raised to 1.4 for deep transition depths */
         #wallpaper {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
             background-size: cover; background-position: center;
             transform: scale(1.4) translateZ(0); filter: blur(0px);
             transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1), filter 0.6s cubic-bezier(0.32, 0.72, 0, 1);
             will-change: transform, filter;
+            backface-visibility: hidden;
         }
         #wallpaper.app-open { transform: scale(0.9) translateZ(0); filter: blur(15px); }
 
@@ -62,11 +59,12 @@
         #lock {
             z-index: 50; display: flex; flex-direction: column; align-items: center;
             transition: opacity 0.4s ease, transform 0.4s ease;
+            will-change: opacity, transform;
         }
-        #lock-texts { display: flex; flex-direction: column; align-items: center; width: 100%; transition: transform 0.1s linear; }
+        #lock-texts { display: flex; flex-direction: column; align-items: center; width: 100%; transition: transform 0.1s linear; will-change: transform; }
         #lock-time { font-size: 85px; font-weight: 100; margin-top: calc(10vh + env(safe-area-inset-top, 20px)); text-shadow: 0 1px 15px rgba(0,0,0,0.2); letter-spacing: -2px; }
         #lock-date { font-size: 22px; font-weight: 300; text-shadow: 0 1px 15px rgba(0,0,0,0.2); }
-        #lock-notifications { flex-grow: 1; width: 90%; margin-top: 20px; overflow-y: auto; padding-bottom: 20px; }
+        #lock-notifications { flex-grow: 1; width: 90%; margin-top: 20px; overflow-y: auto; padding-bottom: 20px; overflow-x: hidden; }
         
         .slider-container {
             position: absolute; bottom: calc(60px + env(safe-area-inset-bottom, 15px)); width: 100%; height: 50px;
@@ -74,7 +72,7 @@
             font-size: 26px; font-weight: 200; color: rgba(255,255,255,0.7);
             background: linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0.4) 100%);
             background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: shine 3s linear infinite; cursor: pointer;
+            animation: shine 3s linear infinite; pointer-events: none;
         }
         @keyframes shine { to { background-position: 200% center; } }
 
@@ -82,35 +80,31 @@
         #home { 
             z-index: 20; display: flex; flex-direction: column; justify-content: space-between; 
             visibility: hidden; transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease; 
+            will-change: transform, opacity;
         }
         #home.unlocked { visibility: visible; }
         #home.app-open { opacity: 0; pointer-events: none; }
 
-        /* Page layout constraints */
-        #app-grid-container { position: relative; flex-grow: 1; width: 100%; overflow: hidden; }
-        #app-grid-scroller { display: flex; width: 100%; height: 100%; }
-        
-        .grid-page { 
-            min-width: 100vw; width: 100vw; height: 100%; display: grid; 
-            grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 15px 5px; 
-            padding: calc(15px + env(safe-area-inset-top, 20px)) 10px 0; align-content: start; 
+        #app-grid { 
+            display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center; gap: 15px 5px; 
+            padding: calc(20px + env(safe-area-inset-top, 20px)) 10px 0; align-content: start; 
+            height: calc(100% - (110px + env(safe-area-inset-bottom, 15px))); 
         }
-
         #dock { 
             height: calc(110px + env(safe-area-inset-bottom, 15px)); width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center; 
             padding: 15px 10px calc(15px + env(safe-area-inset-bottom, 15px)); border-top: 1px solid var(--glass-border); border-radius: 0; 
         }
         
-        .app { display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 0; text-align: center;}
-        .app-icon { width: 80px; height: 80px; border-radius: 18px; background-size: contain; background-repeat: no-repeat; background-position: center; transition: filter 0.1s ease; }
+        .app { display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 0; width: 100%; will-change: transform; }
+        .app-icon { width: 80px; height: 80px; margin: 0 auto; border-radius: 18px; background-size: contain; background-repeat: no-repeat; background-position: center; transition: filter 0.1s ease; will-change: transform; }
         .app-icon:active { filter: brightness(0.4); }
-        .app-label { margin-top: 6px; font-size: 13px; font-weight: 300; text-shadow: 0 1px 3px rgba(0,0,0,0.6); width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+        .app-label { margin-top: 6px; font-size: 13px; font-weight: 300; text-shadow: 0 1px 3px rgba(0,0,0,0.6); text-align: center; width: 100%; display: block; }
 
-        /* Fly-In Entrance */
-        .app.fly-in { animation: flyIn 1.0s cubic-bezier(0.2, 0.8, 0.1, 1) forwards; }
+        /* Fly-In Entrance (Blur removed for smooth performance) */
+        .app.fly-in { animation: flyIn 0.8s cubic-bezier(0.2, 0.8, 0.1, 1) forwards; }
         @keyframes flyIn {
-            0% { transform: translate(var(--fly-x), var(--fly-y)) scale(1.5); opacity: 0; filter: blur(5px); }
-            100% { transform: translate(0, 0) scale(1); opacity: 1; filter: blur(0px); }
+            0% { transform: translate3d(var(--fly-x), var(--fly-y), 0) scale(1.5); opacity: 0; }
+            100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
         }
 
         .editing .app-icon { animation: jiggle 0.3s infinite; }
@@ -118,13 +112,11 @@
         @keyframes jiggle { 0% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } 100% { transform: rotate(-2deg); } }
         @keyframes jiggle2 { 0% { transform: rotate(2deg); } 50% { transform: rotate(-2deg); } 100% { transform: rotate(2deg); } }
 
-        /* Absolute size lock when sorting eliminates resizing janks */
-        .sortable-drag, .sortable-ghost, .sortable-chosen { transform: none !important; }
+        /* No scaling when moving an app */
         .sortable-drag .app-icon, .sortable-ghost .app-icon, .sortable-chosen .app-icon {
             animation: none !important;
-            transform: none !important;
             filter: brightness(0.8);
-            box-shadow: none !important;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
         }
 
         /* --- SPOTLIGHT SEARCH --- */
@@ -137,35 +129,34 @@
         .search-result { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); font-size: 18px; font-weight: 300; cursor: pointer; }
         .search-result small { display: block; font-size: 13px; color: #eee; margin-top: 4px; }
 
-        /* --- APP CONTAINER (Fully GPU-Accelerated morphing) --- */
+        /* --- APP CONTAINER (Hero Animation) --- */
         #app-container {
             z-index: 80; background: #fff; color: #000;
             position: absolute; overflow: hidden; pointer-events: none; opacity: 0; visibility: hidden;
-            box-shadow: 0 0 30px rgba(0,0,0,0.3);
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            box-shadow: 0 0 30px rgba(0,0,0,0.3); transform: translate3d(0,0,0);
+            will-change: transform, opacity, width, height, top, left;
         }
         #app-container.open { pointer-events: auto; visibility: visible; }
         #app-ui { height: 100%; width: 100%; overflow-y: auto; overflow-x: hidden; position: relative; }
 
-        /* Left Edge swipe back handle */
         #app-edge-handle {
             position: absolute; top: 0; left: 0; width: 45px; height: 100%; z-index: 9999;
             background: transparent; pointer-events: auto;
         }
 
-        /* --- NOTIFICATIONS (Dark glass iOS 7 style) --- */
+        /* --- NOTIFICATIONS --- */
         .toast { 
             position: absolute; top: calc(15px + env(safe-area-inset-top, 20px)); left: 5%; width: 90%; border-radius: 14px; padding: 12px; z-index: 1000; 
             transform: translateY(-150%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
             background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); color: #fff;
             font-size: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-weight: 300; display:flex; align-items:center;
-            cursor: pointer; will-change: transform;
         }
         .toast.show { transform: translateY(0); }
         
         .lock-notif { 
             background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); color: #fff;
-            padding: 12px; border-radius: 14px; margin-bottom: 10px; display:flex; align-items:center;
+            padding: 12px; border-radius: 14px; margin-bottom: 10px; display:flex; align-items:center; cursor: pointer;
+            will-change: transform, opacity;
         }
 
         /* --- SETTINGS/NATIVE UI CSS --- */
@@ -174,7 +165,7 @@
         .ios-item:last-child { border-bottom: none; }
         .ios-item:active { background: #f0f0f0; }
         .ios-title { color: #000; font-weight: 400; margin-bottom: 20px; font-size: 30px;}
-        .ios-nav { display: flex; align-items: center; padding: calc(30px + env(safe-area-inset-top, 20px)) 20px 10px; background: #f8f8f8; border-bottom: 1px solid #ddd; }
+        .ios-nav { display: flex; align-items: center; padding: calc(45px + env(safe-area-inset-top, 20px)) 20px 10px; background: #f8f8f8; border-bottom: 1px solid #ddd; }
         .ios-back { color: #007AFF; font-size: 18px; cursor: pointer; display:flex; align-items:center; }
 
         /* --- CALCULATOR CSS --- */
@@ -188,27 +179,17 @@
         .calc-btn.zero { grid-column: span 2; justify-content: flex-start; padding-left: 30px; }
         .calc-screen { display: flex; justify-content: flex-end; align-items: flex-end; padding: 10px 20px 30px; font-size: 85px; color: #fff; font-weight: 200; overflow: hidden; height: calc(180px + env(safe-area-inset-top, 20px)); }
 
-        /* --- PHOTO BOOTH --- */
         .filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px; background: #000; border-top: 1px solid #333; }
         .filter-btn { padding: 8px 12px; background: #222; color: #fff; border: 1px solid #444; font-family: var(--font); cursor: pointer; border-radius: 6px; }
         .filter-btn.active { background: #007AFF; border-color: #007AFF; }
-
-        /* --- CHAT BUBBLES --- */
-        .msg-bubble { padding: 10px 14px; border-radius: 18px; margin-bottom: 8px; max-width: 70%; font-size: 16px; word-wrap: break-word; font-weight:300; }
-        .msg-me { background: #007AFF; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .msg-them { background: #E5E5EA; color: #000; align-self: flex-start; border-bottom-left-radius: 4px; }
-
-        /* Mirror front facing cameras */
         .mirrored { transform: scaleX(-1) !important; }
     </style>
 </head>
 <body>
 
 <div id="screen">
-    <!-- WALLPAPER LAYER -->
     <div id="wallpaper"></div>
 
-    <!-- SETUP SCREEN -->
     <div id="setup" class="layer">
         <h1>miniOS</h1>
         <p style="font-size: 18px; color: #555;">Welcome to your new experience.</p>
@@ -243,10 +224,7 @@
 
     <!-- HOME SCREEN -->
     <div id="home" class="layer">
-        <div id="app-grid-container">
-            <div id="app-grid-scroller"></div>
-            <div id="page-dots" style="position:absolute; bottom:5px; left:0; width:100%; display:flex; justify-content:center; gap:8px; z-index:30;"></div>
-        </div>
+        <div id="app-grid"></div>
         <div id="dock" class="glass"></div>
     </div>
 
@@ -256,7 +234,7 @@
         <div id="app-ui"></div>
     </div>
 
-    <!-- CUSTOM NATIVE IOS 7 POPUP OVERLAY -->
+    <!-- CUSTOM NATIVE IOS POPUP OVERLAY -->
     <div id="ios-alert-overlay" class="layer" style="display:none; justify-content:center; align-items:center; background:rgba(0,0,0,0.45); z-index:10000; opacity:0; transition:opacity 0.25s ease; visibility: hidden;">
         <div id="ios-alert" class="glass" style="width:270px; border-radius:14px; color:#000; display:flex; flex-direction:column; overflow:hidden; background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); transform:scale(1.2); transition:transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1.2);">
             <div style="padding:20px; text-align:center;">
@@ -275,9 +253,7 @@
         'Settings': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Settings.png',
         'Reminders': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Reminders.png',
         'Photos': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Photos.png',
-        'Mail': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Mail.png',
         'Notes': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Notes.png',
-        'Messages': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Messages.png',
         'Music': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Music.png',
         'Clock': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/clock.png',
         'Calendar': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Calendar.png',
@@ -297,17 +273,16 @@
     ];
 
     let state = {
-        version: 7, setupDone: false,
+        version: 8, setupDone: false,
         wallpaper: WALLPAPERS[0],
-        gridApps: ['Weather', 'Reminders', 'Mail', 'Clock', 'Calendar', 'Maps', 'Calculator', 'Contacts', 'Photo Booth', 'Music', 'Settings'],
-        dockApps: ['Messages', 'Camera', 'Photos', 'Notes'],
-        photos: [], reminders: [], contacts: [], emails: [], chats: {}, notifications: [],
+        gridApps: ['Weather', 'Reminders', 'Clock', 'Calendar', 'Maps', 'Calculator', 'Photo Booth', 'Music', 'Settings'],
+        dockApps: ['Contacts', 'Camera', 'Photos', 'Notes'],
+        photos: [], reminders: [], contacts: [], notifications: [],
         notes: [
             { id: 1, title: "Welcome to miniOS", text: "Welcome to miniOS!\n\nThis app automatically saves what you type.", date: "6/30/26" }
         ]
     };
 
-    // --- CUSTOM ALERTS REPLACING CHROME POPUPS ---
     function showiOSAlert(title, message, buttons = []) {
         const overlay = document.getElementById('ios-alert-overlay');
         const alertBox = document.getElementById('ios-alert');
@@ -333,6 +308,7 @@
         overlay.style.display = 'flex'; void overlay.offsetWidth;
         overlay.style.opacity = '1'; alertBox.style.transform = 'scale(1)';
     }
+    
     function closeiOSAlert() {
         const overlay = document.getElementById('ios-alert-overlay');
         const alertBox = document.getElementById('ios-alert');
@@ -343,44 +319,28 @@
     function loadState() {
         let saved = localStorage.getItem('minios_state');
         if (saved) {
-            try {
-                let parsed = JSON.parse(saved);
-                // System validator prevents loading broken layout states completely
-                if (!parsed.gridApps || !Array.isArray(parsed.gridApps) || parsed.gridApps.length === 0 || parsed.gridApps.includes(null) || parsed.gridApps.includes(undefined)) {
-                    throw new Error("Corrupted state");
-                }
-                if (parsed.version !== 7) { 
-                    parsed.version = 7; 
-                    parsed.gridApps = state.gridApps; 
-                    parsed.dockApps = state.dockApps; 
-                    parsed.contacts = parsed.contacts || [
-                        {first: "Craig", last: "Federighi", phone: "555-456-7890"},
-                        {first: "Steve", last: "Jobs", phone: "555-197-6200"}
-                    ];
-                    parsed.emails = parsed.emails || [
-                        {id: 1, from: "Apple", subject: "Welcome to miniOS", body: "We hope you enjoy your HTML/CSS/JS experience!", date: "Today", folder: "inbox"},
-                        {id: 2, from: "Steve", subject: "Design Thoughts", body: "Flat design is the future. Helvetica Neue is nice, but Inter Tight is cleaner.", date: "Yesterday", folder: "inbox"}
-                    ];
-                    parsed.chats = parsed.chats || {
-                        "Craig Federighi": [
-                            {sender: "them", text: "Hey! Have you tested the Photo Booth app yet?"},
-                            {sender: "me", text: "Yes! The real-time filters are awesome."}
-                        ]
-                    };
-                    parsed.notes = parsed.notes || [
-                        { id: 1, title: "Welcome to miniOS", text: "Welcome to miniOS!\n\nThis app automatically saves what you type.", date: "6/30/26" }
-                    ];
-                    parsed.notifications = parsed.notifications || [];
-                }
-                state = parsed;
-            } catch (err) {
-                // Auto self-repair
-                localStorage.removeItem('minios_state');
+            let parsed = JSON.parse(saved);
+            if (parsed.version !== 8) { 
+                parsed.version = 8; 
+                parsed.gridApps = state.gridApps; 
+                parsed.dockApps = state.dockApps; 
+                delete parsed.emails; // Removing Mail legacy traces
+                delete parsed.chats;  // Removing Messages legacy traces
+                parsed.contacts = parsed.contacts || [
+                    {first: "Craig", last: "Federighi", phone: "555-456-7890"},
+                    {first: "Steve", last: "Jobs", phone: "555-197-6200"}
+                ];
+                parsed.notes = parsed.notes || [
+                    { id: 1, title: "Welcome to miniOS", text: "Welcome to miniOS!\n\nThis app automatically saves what you type.", date: "6/30/26" }
+                ];
+                parsed.notifications = parsed.notifications || [];
             }
+            state = parsed;
         }
         applyState();
         renderLockNotifications();
     }
+    
     function saveState() { localStorage.setItem('minios_state', JSON.stringify(state)); }
 
     function applyState() {
@@ -388,7 +348,7 @@
         const setupEl = document.getElementById('setup');
         if (state.setupDone) { 
             setupEl.style.display = 'none'; 
-            if (document.getElementById('app-grid-scroller').children.length === 0) renderHome();
+            if (document.getElementById('app-grid').children.length === 0) renderHome();
         } else { 
             setupEl.style.display = 'flex'; 
         }
@@ -399,58 +359,37 @@
         let a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
         a.download = "minios_backup.json"; a.click();
     }
+    
     function restoreBackup(e) {
         let reader = new FileReader();
         reader.onload = function(evt) {
-            try { let parsed = JSON.parse(evt.target.result); parsed.version = 7; state = parsed; saveState(); window.location.reload(); } 
+            try { let parsed = JSON.parse(evt.target.result); parsed.version = 8; state = parsed; saveState(); window.location.reload(); } 
             catch(err) { showiOSAlert("Restore Error", "Invalid backup JSON file."); }
         }; reader.readAsText(e.target.files[0]);
     }
 
-    // --- RENDER MULTI-PAGE HOME SCREEN ---
+    // --- RENDER HOME SCREEN & NATIVE REARRANGE ---
     let gridSortable, dockSortable, isEditing = false;
-    let currentPage = 0;
+    let isDragging = false, lastDragEndTime = 0;
 
     function renderHome() {
-        const scroller = document.getElementById('app-grid-scroller'); 
-        const dock = document.getElementById('dock');
-        scroller.innerHTML = ''; dock.innerHTML = '';
-
-        const appsPerPage = 8;
-        const numPages = Math.ceil(state.gridApps.length / appsPerPage);
-
-        for (let p = 0; p < numPages; p++) {
-            const pageDiv = document.createElement('div');
-            pageDiv.className = 'grid-page';
-            
-            const pageApps = state.gridApps.slice(p * appsPerPage, (p + 1) * appsPerPage);
-            pageApps.forEach(app => pageDiv.appendChild(createAppIcon(app)));
-            scroller.appendChild(pageDiv);
-        }
-
+        const grid = document.getElementById('app-grid'); const dock = document.getElementById('dock');
+        grid.innerHTML = ''; dock.innerHTML = '';
+        state.gridApps.forEach(app => grid.appendChild(createAppIcon(app)));
         state.dockApps.forEach(app => dock.appendChild(createAppIcon(app, true)));
-
-        // Page Indicator Dots
-        const dotsContainer = document.getElementById('page-dots');
-        dotsContainer.innerHTML = Array.from({length: numPages}).map((_, i) => `
-            <div class="page-dot" style="width:8px; height:8px; border-radius:50%; background:${i === currentPage ? '#fff' : 'rgba(255,255,255,0.4)'}; transition: background 0.3s;"></div>
-        `).join('');
 
         let options = { 
             animation: 150, 
             delay: 500, 
             delayOnTouchOnly: true, 
-            forceFallback: true, // Native fallbacks fix glitchy movements
+            forceFallback: true, 
             fallbackTolerance: 3, 
             group: 'shared', 
-            onStart: function() { enableEditMode(); },
-            onEnd: saveOrder 
+            onStart: function() { isDragging = true; enableEditMode(); },
+            onEnd: function() { setTimeout(() => isDragging = false, 50); lastDragEndTime = Date.now(); saveOrder(); }
         };
-        
-        document.querySelectorAll('.grid-page').forEach(el => {
-            new Sortable(el, options);
-        });
-        dockSortable = new Sortable(dock, options);
+        if(gridSortable) gridSortable.destroy(); if(dockSortable) dockSortable.destroy();
+        gridSortable = new Sortable(grid, options); dockSortable = new Sortable(dock, options);
     }
 
     function createAppIcon(appName, isDock = false) {
@@ -458,7 +397,8 @@
         div.innerHTML = `<div class="app-icon" style="background-image: url('${APP_DEFS[appName]}')"></div>${isDock ? '' : `<div class="app-label">${appName}</div>`}`;
         
         div.addEventListener('click', (e) => {
-            if(!isEditing) openApp(appName, div.querySelector('.app-icon'));
+            if (isEditing || isDragging || (Date.now() - lastDragEndTime < 300)) { e.preventDefault(); return; }
+            openApp(appName, div.querySelector('.app-icon'));
         });
         return div;
     }
@@ -468,144 +408,88 @@
         isEditing = true; 
         document.body.classList.add('editing'); 
     }
+    
     function disableEditMode() { 
         if(!isEditing) return;
         isEditing = false; 
         document.body.classList.remove('editing'); 
         saveOrder(); 
     }
-    document.getElementById('home').addEventListener('click', (e) => { if(isEditing && !e.target.closest('.app')) disableEditMode(); });
     
-    // Strict serialization sanitizes ghost drag clones during Sortable operations
-    function saveOrder() {
-        const pages = Array.from(document.querySelectorAll('.grid-page'));
-        let newGridApps = [];
-        pages.forEach(p => {
-            const pageApps = Array.from(p.children)
-                .map(c => c.dataset.id)
-                .filter(id => id && APP_DEFS[id]); // Filters ghost clones out cleanly
-            newGridApps = newGridApps.concat(pageApps);
-        });
-        
-        const dockApps = Array.from(document.getElementById('dock').children)
-            .map(c => c.dataset.id)
-            .filter(id => id && APP_DEFS[id]);
+    document.getElementById('home').addEventListener('click', (e) => { if(isEditing && !e.target.closest('.app')) disableEditMode(); });
+    function saveOrder() { state.gridApps = Array.from(document.getElementById('app-grid').children).map(c => c.dataset.id); state.dockApps = Array.from(document.getElementById('dock').children).map(c => c.dataset.id); saveState(); }
 
-        state.gridApps = [...new Set(newGridApps)];
-        state.dockApps = [...new Set(dockApps)];
-        saveState();
-    }
-
-    // --- HOME HORIZONTAL SWIPE PAGES ---
-    let pageStartX = 0, isSwipingPage = false;
-    const scroller = document.getElementById('app-grid-scroller');
-    const pageContainer = document.getElementById('app-grid-container');
-
-    pageContainer.addEventListener('touchstart', e => {
-        if (isEditing) return; // Disable horizontal paging during jiggle edit mode
-        pageStartX = e.touches[0].clientX;
-        isSwipingPage = true;
-        scroller.style.transition = 'none';
-    });
-    pageContainer.addEventListener('touchmove', e => {
-        if (isSwipingPage) {
-            let dx = e.touches[0].clientX - pageStartX;
-            let offset = -currentPage * window.innerWidth + dx;
-            scroller.style.transform = `translateX(${offset}px)`;
-        }
-    });
-    pageContainer.addEventListener('touchend', e => {
-        if (isSwipingPage) {
-            isSwipingPage = false;
-            let dx = e.changedTouches[0].clientX - pageStartX;
-            scroller.style.transition = 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
-            const numPages = Math.ceil(state.gridApps.length / 8);
-            if (dx < -80 && currentPage < numPages - 1) {
-                currentPage++;
-            } else if (dx > 80 && currentPage > 0) {
-                currentPage--;
-            }
-            updatePagePosition();
-        }
-    });
-    function updatePagePosition() {
-        scroller.style.transform = `translateX(${-currentPage * window.innerWidth}px)`;
-        const dots = document.querySelectorAll('.page-dot');
-        dots.forEach((dot, idx) => {
-            dot.style.background = idx === currentPage ? '#fff' : 'rgba(255,255,255,0.4)';
-        });
-    }
-
-    // --- LOCK SCREEN & FLY-IN ANIMATIONS ---
+    // --- LOCK SCREEN LOGIC & FULL SWIPE TO UNLOCK ---
     const lockScreen = document.getElementById('lock'), lockTexts = document.getElementById('lock-texts'), home = document.getElementById('home'), slider = document.getElementById('slider');
-    let sliderStartX = 0;
+    let lockStartX = 0, isUnlocking = false;
 
     function unlockScreen() {
         lockScreen.style.opacity = '0'; lockScreen.style.pointerEvents = 'none';
         home.classList.add('unlocked');
-        const cx = window.innerWidth / 2; const cy = window.innerHeight / 2;
+        
+        // Remove heavy blur from unlocking loop for fluid performance
         document.querySelectorAll('.app').forEach((app, index) => {
-            const rect = app.getBoundingClientRect();
-            const dx = (rect.left + rect.width/2) - cx;
-            const dy = (rect.top + rect.height/2) - cy;
-            app.style.setProperty('--fly-x', (dx * 3) + 'px'); app.style.setProperty('--fly-y', (dy * 3) + 'px');
             app.classList.remove('fly-in'); void app.offsetWidth; 
             app.style.animationDelay = (index * 0.03) + 's'; app.classList.add('fly-in');
         });
-        
-        // Remove animation properties after flyIn completes to avoid re-triggering during app rearranging!
-        setTimeout(() => {
-            document.querySelectorAll('.app').forEach(app => {
-                app.classList.remove('fly-in');
-                app.style.animationDelay = '';
-                app.style.opacity = '1'; 
-            });
-        }, 1200);
-
         setTimeout(() => { lockScreen.style.display = 'none'; }, 400); 
     }
 
-    // Swipe lockscreen left-to-right to unlock
+    // Attach unlock logic to whole lockscreen wrapper
     lockScreen.addEventListener('touchstart', e => {
-        sliderStartX = e.touches[0].clientX;
-        isSwipingPage = true;
-        lockScreen.style.transition = 'none';
+        // Prevent unlock initiation if touching notification swipe area
+        if (e.target.closest('.lock-notif')) return;
+        lockStartX = e.touches[0].clientX;
+        isUnlocking = true;
     });
+    
     lockScreen.addEventListener('touchmove', e => {
-        if(isSwipingPage) {
-            let delta = Math.max(0, e.touches[0].clientX - sliderStartX);
-            lockScreen.style.transform = `translateX(${delta}px)`;
-            lockScreen.style.opacity = 1 - (delta / window.innerWidth);
+        if (isUnlocking) {
+            let delta = Math.max(0, e.touches[0].clientX - lockStartX);
+            slider.style.transform = `translateX(${delta}px)`;
+            slider.style.opacity = 1 - (delta / 250);
+            lockTexts.style.transform = `translateX(${delta * 1.5}px)`;
         }
     });
+    
     lockScreen.addEventListener('touchend', e => {
-        if(isSwipingPage) {
-            isSwipingPage = false;
-            let delta = e.changedTouches[0].clientX - sliderStartX;
-            if(delta > window.innerWidth / 3) { unlockScreen(); } 
+        if (isUnlocking) {
+            isUnlocking = false;
+            let delta = e.changedTouches[0].clientX - lockStartX;
+            if(delta > 130) { unlockScreen(); } 
             else { 
-                lockScreen.style.transition = 'all 0.4s cubic-bezier(0.32, 0.72, 0, 1)'; 
-                lockScreen.style.transform = 'translateX(0)'; 
-                lockScreen.style.opacity = '1';
+                slider.style.transition = 'all 0.3s ease';
+                lockTexts.style.transition = 'all 0.3s ease';
+                slider.style.transform = 'translateX(0)'; slider.style.opacity = '1'; lockTexts.style.transform = 'translateX(0)';
+                setTimeout(() => { slider.style.transition = ''; lockTexts.style.transition = 'transform 0.1s linear'; }, 300);
             }
         }
     });
 
-    // --- GESTURE TO SLIDE HOME SCREEN BACK TO LOCK SCREEN ---
+    document.addEventListener('keydown', e => {
+        if (e.code === 'Space' && state.setupDone) {
+            e.preventDefault();
+            if (lockScreen.style.display !== 'none') unlockScreen();
+            else if (appContainer.classList.contains('open')) closeApp();
+        }
+    });
+
     let homeSwipeStartX = 0, isSwipingHome = false;
     home.addEventListener('touchstart', e => {
-        if (isEditing) return; // Disable lock swipe during app rearranging jiggle
+        if (isEditing) return;
         if (e.touches[0].clientX < 40) {
             homeSwipeStartX = e.touches[0].clientX;
             isSwipingHome = true;
         }
     });
+    
     home.addEventListener('touchmove', e => {
         if (isSwipingHome) {
             let dx = e.touches[0].clientX - homeSwipeStartX;
             if (dx > 0) { e.preventDefault(); home.style.transform = `translateX(${dx}px)`; }
         }
     });
+    
     home.addEventListener('touchend', e => {
         if (isSwipingHome) {
             isSwipingHome = false;
@@ -618,10 +502,10 @@
             }
         }
     });
-    // Fully reset lock screen state upon re-locking
+
     function lockDevice() {
-        slider.style.transform = 'translateX(0)';
-        slider.style.opacity = '1';
+        slider.style.transition = ''; lockTexts.style.transition = '';
+        slider.style.transform = 'translateX(0)'; slider.style.opacity = '1';
         lockTexts.style.transform = 'translateX(0)';
 
         lockScreen.style.display = 'flex'; void lockScreen.offsetWidth;
@@ -638,37 +522,39 @@
             spotlight.classList.add('active'); document.getElementById('search-input').focus();
         }
     });
+    
     spotlight.addEventListener('touchstart', e => {
         if(e.touches[0].clientY > 150 && !e.target.closest('#search-bar') && !e.target.closest('#spotlight-results')) closeSpotlight();
     });
+    
     function closeSpotlight() { spotlight.classList.remove('active'); document.getElementById('search-input').value = ''; document.getElementById('spotlight-results').innerHTML = ''; }
+    
     function handleSearch() {
         let q = document.getElementById('search-input').value.toLowerCase(); let resDiv = document.getElementById('spotlight-results');
         if(!q) { resDiv.innerHTML = ''; return; }
         let results = [];
-        Object.keys(APP_DEFS).forEach(a => { if(a.toLowerCase().includes(q)) results.push({type: 'App', text: a}); });
+        Object.keys(APP_DEFS).forEach(a => { if(a.toLowerCase().includes(q)) results.push({type: 'App', text: a, icon: APP_DEFS[a]}); });
         state.notes.forEach(n => { if(n.text.toLowerCase().includes(q)) results.push({type: 'Note', text: n.title}); });
         state.reminders.forEach(r => { if(r.text.toLowerCase().includes(q)) results.push({type: 'Reminder', text: r.text}); });
         
-        // Spotlights matching results now natively feature visual application icon renders
-        resDiv.innerHTML = results.map(r => {
-            let iconUrl = APP_DEFS[r.text] || APP_DEFS['Notes'];
-            let openAction = r.type === 'App' ? `openApp('${r.text}')` : `openApp('${r.type}s')`;
-            return `
-                <div class="search-result glass" onclick="closeSpotlight(); ${openAction}" style="display:flex; align-items:center;">
-                    <img src="${iconUrl}" style="width:32px; height:32px; border-radius:6px; margin-right:12px;">
+        resDiv.innerHTML = results.map(r => `
+            <div class="search-result glass" onclick="closeSpotlight(); ${r.type==='App'?`openApp('${r.text}')`:'openApp(\''+r.type+'s\')'}">
+                <div style="display:flex; align-items:center;">
+                    ${r.type === 'App' ? `<img src="${r.icon}" style="width:28px; height:28px; margin-right:12px; border-radius:6px;">` : `<span class="material-icons" style="margin-right:12px; opacity:0.7;">${r.type==='Note'?'description':'check_circle'}</span>`}
                     <div>
-                        <strong>${r.text}</strong><small style="display:block; font-size:11px; opacity:0.6;">${r.type}</small>
+                        <strong style="display:block;">${r.text}</strong>
+                        <small style="margin-top:2px;">${r.type}</small>
                     </div>
-                </div>`;
-        }).join('');
+                </div>
+            </div>`).join('');
     }
 
-    // --- APP CONTAINER & HERO ANIMATION (0.6s morph with 0.1s transition delay) ---
+    // --- APP CONTAINER & HERO ANIMATION ---
     const appContainer = document.getElementById('app-container');
     let activeAppId = null;
 
     function openApp(id, iconElement) {
+        if (!APP_DEFS[id] && id !== 'Notes' && id !== 'Reminders') return; // Validations
         activeAppId = id;
         const ui = document.getElementById('app-ui');
         ui.innerHTML = '';
@@ -678,7 +564,6 @@
 
         let rect = iconElement ? iconElement.getBoundingClientRect() : { top: window.innerHeight/2, left: window.innerWidth/2, width: 0, height: 0 };
         
-        // Starts 10% smaller than icon size for a tighter expand feel
         const pad = rect.width * 0.1;
         const targetTop = rect.top + pad / 2;
         const targetLeft = rect.left + pad / 2;
@@ -693,14 +578,13 @@
         appContainer.style.height = targetHeight + 'px';
         appContainer.style.borderRadius = '18px';
         appContainer.style.opacity = '1';
-        appContainer.style.transform = 'translateX(0)';
+        appContainer.style.transform = 'translate3d(0,0,0)';
 
         buildAppUI(id, ui);
 
-        // App window waits 0.1 seconds before executing the morph scaling
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                appContainer.style.transition = 'all 0.6s cubic-bezier(0.32, 0.72, 0, 1) 0.1s';
+                appContainer.style.transition = 'all 0.6s cubic-bezier(0.32, 0.72, 0, 1)';
                 appContainer.style.top = '0px'; appContainer.style.left = '0px';
                 appContainer.style.width = '100vw'; appContainer.style.height = '100vh';
                 appContainer.style.borderRadius = '0px';
@@ -709,7 +593,6 @@
         });
     }
 
-    // --- LEFT EDGE SWIPE BACK (INTERCEPTED OVER IFRAMES NATIVELY VIA #app-edge-handle) ---
     let appSwipeStartX = 0, appSwipeStartY = 0, isSwipingApp = false;
     const edgeHandle = document.getElementById('app-edge-handle');
 
@@ -720,15 +603,15 @@
     edgeHandle.addEventListener('touchmove', e => {
         if(isSwipingApp) {
             let dx = e.touches[0].clientX - appSwipeStartX;
-            if (dx > 0) { e.preventDefault(); appContainer.style.transform = `translateX(${dx}px)`; }
+            if (dx > 0) { e.preventDefault(); appContainer.style.transform = `translate3d(${dx}px,0,0)`; }
         }
     });
     edgeHandle.addEventListener('touchend', e => {
         if(isSwipingApp) {
             isSwipingApp = false;
             let dx = e.changedTouches[0].clientX - appSwipeStartX;
-            if(dx > 80) { appContainer.style.transform = 'translateX(0)'; closeApp(); } 
-            else { appContainer.style.transition = 'all 0.4s cubic-bezier(0.32, 0.72, 0, 1)'; appContainer.style.transform = 'translateX(0)'; }
+            if(dx > 80) { appContainer.style.transform = 'translate3d(0,0,0)'; closeApp(); } 
+            else { appContainer.style.transition = 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)'; appContainer.style.transform = 'translate3d(0,0,0)'; }
         }
     });
 
@@ -748,7 +631,6 @@
                 const targetWidth = rect.width - pad;
                 const targetHeight = rect.height - pad;
 
-                // Fades out late (opacity duration 0.15s, after a 0.45s delay)
                 appContainer.style.transition = 'top 0.6s cubic-bezier(0.32, 0.72, 0, 1), left 0.6s cubic-bezier(0.32, 0.72, 0, 1), width 0.6s cubic-bezier(0.32, 0.72, 0, 1), height 0.6s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.6s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.15s cubic-bezier(0.32, 0.72, 0, 1) 0.45s';
                 appContainer.style.top = targetTop + 'px'; appContainer.style.left = targetLeft + 'px';
                 appContainer.style.width = targetWidth + 'px'; appContainer.style.height = targetHeight + 'px';
@@ -760,7 +642,8 @@
         setTimeout(() => { 
             appContainer.classList.remove('open'); 
             appContainer.style.visibility = 'hidden';
-            document.getElementById('app-ui').innerHTML = ''; activeAppId = null; 
+            document.getElementById('app-ui').innerHTML = ''; 
+            activeAppId = null; 
         }, 600);
     }
 
@@ -833,17 +716,13 @@
                 <div style="height:100%; width:100%; display:flex; flex-direction:column;">
                     <iframe src="https://maps.google.com/maps?q=Melbourne&t=&z=13&ie=UTF8&iwloc=&output=embed" style="flex-grow:1; border:none; width:100%; height:100%;"></iframe>
                 </div>`;
-        } else if (id === 'Mail') {
-            ui.style.background = '#f2f2f6'; renderMailPage('inbox');
-        } else if (id === 'Messages') {
-            ui.style.background = '#fff'; renderMessagesPage('threads');
         } else {
             ui.style.background = '#fff';
             ui.innerHTML = `<div style="text-align:center; padding-top:100px; font-size:26px; color:#000; font-weight:300;">${id}<br><span style="font-size:18px; color:#888;">Coming Soon</span></div>`;
         }
     }
 
-    // --- APP LOGIC (SETTINGS - simplified with standard chevron_right arrows) ---
+    // --- APP LOGIC (SETTINGS) ---
     function renderSettingsPage(page) {
         const ui = document.getElementById('app-ui');
         if (page === 'main') {
@@ -865,7 +744,7 @@
                 </div>`;
         } else if (page === 'reset') {
             ui.innerHTML = `
-                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')"><span class="material-icons">chevron_left</span>Settings</span><span style="font-size:18px; font-weight:400; color:#000; margin-left:20px;">Reset Option</span></div>
+                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')"><span class="material-icons">chevron_left</span>Settings</span><span style="font-size:18px; font-weight:400; color:#000; margin-left:20px;">Reset Options</span></div>
                 <div style="padding: 20px;">
                     <div class="ios-list">
                         <div class="ios-item" onclick="resetHomeLayout()" style="color:#007AFF; font-weight:400;">Reset Home Screen Layout</div>
@@ -877,26 +756,26 @@
                 <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')"><span class="material-icons">chevron_left</span>Settings</span><span style="font-size:18px; font-weight:400; color:#000; margin-left:20px;">About</span></div>
                 <div style="padding: 30px 20px; text-align:center; color:#000;">
                     <div style="width:100px; height:100px; background:url('https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Settings.png') center/cover; margin:0 auto 20px; border-radius:22px;"></div>
-                    <h2 style="font-weight:300;">miniOS</h2><p style="color:#666;">Version 5.1</p>
-                    <div class="ios-list" style="margin-top:40px;">
-                        <div class="ios-item" onclick="window.location.reload();" style="color:#007AFF; justify-content:center; font-weight:400;">Update Software</div>
-                    </div>
+                    <h2 style="font-weight:300;">miniOS</h2><p style="color:#666;">Version 8.0</p>
                 </div>`;
         }
     }
+    
     function setWallpaper(url) { state.wallpaper = url; saveState(); applyState(); renderSettingsPage('wallpapers'); }
+    
     function resetHomeLayout() {
         showiOSAlert("Reset Layout", "Are you sure you want to restore the default home screen layout?", [
             { text: "Cancel", color: "#888" },
             { text: "Reset", color: "#007AFF", bold: true, onClick: () => {
-                state.gridApps = ['Weather', 'Reminders', 'Mail', 'Clock', 'Calendar', 'Maps', 'Calculator', 'Contacts', 'Photo Booth', 'Music', 'Settings'];
-                state.dockApps = ['Messages', 'Camera', 'Photos', 'Notes'];
+                state.gridApps = ['Weather', 'Reminders', 'Clock', 'Calendar', 'Maps', 'Calculator', 'Photo Booth', 'Music', 'Settings'];
+                state.dockApps = ['Contacts', 'Camera', 'Photos', 'Notes'];
                 saveState(); window.location.reload();
             }}
         ]);
     }
+    
     function factoryReset() {
-        showiOSAlert("Factory Reset", "Factory Resetting will permanently delete all photos, contacts, notes, reminders, emails, messages, and settings. Continue?", [
+        showiOSAlert("Factory Reset", "Factory Resetting will permanently delete all photos, contacts, notes, reminders, and settings. Continue?", [
             { text: "Cancel", color: "#888" },
             { text: "Erase Everything", color: "#ff3b30", bold: true, onClick: () => {
                 localStorage.removeItem('minios_state'); window.location.reload();
@@ -937,7 +816,6 @@
     function showContactDetails(idx) {
         const c = state.contacts[idx];
         showiOSAlert(`${c.first} ${c.last}`, `Phone: ${c.phone}`, [
-            { text: "Message", onClick: () => { closeApp(); openApp('Messages', document.querySelector('.app[data-id="Messages"] .app-icon')); renderMessagesPage('chat', `${c.first} ${c.last}`); }},
             { text: "OK" }
         ]);
     }
@@ -1075,75 +953,25 @@
         document.getElementById('app-ui').appendChild(flash); setTimeout(() => flash.style.opacity = '0', 50); setTimeout(() => flash.remove(), 450);
     }
 
-    // --- APP LOGIC (PHOTOS FULLSCREEN & CROP / DELETE ACTIONS) ---
+    // --- APP LOGIC (PHOTOS FULLSCREEN) ---
     function fullscreenPhoto(src) {
         const overlay = document.createElement('div');
         overlay.id = 'photo-fullscreen-overlay';
         overlay.style.cssText = `
             position: absolute; top:0; left:0; width:100%; height:100%; 
-            background:#000; z-index:100; display:flex; flex-direction:column; 
-            justify-content:space-between; opacity:0; transition:opacity 0.3s ease;
+            background:#000; z-index:100; display:flex; justify-content:center; 
+            align-items:center; opacity:0; transition:opacity 0.3s ease;
         `;
-        overlay.innerHTML = `
-            <div style="padding: calc(15px + env(safe-area-inset-top, 20px)) 20px 15px; display:flex; justify-content:space-between; align-items:center;">
-                <span onclick="document.getElementById('photo-fullscreen-overlay').remove()" style="color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center;"><span class="material-icons">chevron_left</span>Back</span>
-                <span onclick="deletePhoto('${src}')" style="color:#ff3b30; cursor:pointer; display:flex; align-items:center;"><span class="material-icons">delete</span></span>
-            </div>
-            <div style="flex-grow:1; display:flex; justify-content:center; align-items:center; overflow:hidden; position:relative;">
-                <img id="fullscreen-img-el" src="${src}" style="max-width:100%; max-height:100%; object-fit:contain;">
-                <div id="pb-crop-grid" style="display:none; position:absolute; border:2px dashed #fff; box-shadow:0 0 0 9999px rgba(0,0,0,0.5); width:250px; height:250px; pointer-events:none;"></div>
-            </div>
-            <div id="fullscreen-actions-bar" style="height:calc(80px + env(safe-area-inset-bottom, 15px)); display:flex; justify-content:space-around; align-items:center; padding-bottom:env(safe-area-inset-bottom, 15px); background:rgba(20,20,20,0.85); backdrop-filter:blur(20px);">
-                <button onclick="startCropMode('${src}')" id="crop-start-btn" style="background:transparent; border:none; color:#fff; display:flex; flex-direction:column; align-items:center; font-family:var(--font); font-size:12px; cursor:pointer;"><span class="material-icons" style="font-size:28px; margin-bottom:4px;">crop</span>Crop</button>
-                <button onclick="applyCropAction('${src}')" id="crop-apply-btn" style="display:none; background:#007AFF; border:none; color:#fff; padding:10px 20px; border-radius:20px; font-family:var(--font); font-size:14px; font-weight:500; cursor:pointer;">Apply Crop</button>
-            </div>
-        `;
+        overlay.innerHTML = `<img src="${src}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+        overlay.onclick = () => {
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.remove(), 300);
+        };
         document.getElementById('app-ui').appendChild(overlay);
         requestAnimationFrame(() => overlay.style.opacity = '1');
     }
 
-    function deletePhoto(src) {
-        showiOSAlert("Delete Photo", "Are you sure you want to delete this photo?", [
-            { text: "Cancel", color: "#888" },
-            { text: "Delete", color: "#ff3b30", bold: true, onClick: () => {
-                state.photos = state.photos.filter(x => x !== src);
-                saveState();
-                openApp('Photos', document.querySelector('.app[data-id="Photos"] .app-icon'));
-                document.getElementById('photo-fullscreen-overlay').remove();
-            }}
-        ]);
-    }
-
-    function startCropMode(src) {
-        document.getElementById('pb-crop-grid').style.display = 'block';
-        document.getElementById('crop-start-btn').style.display = 'none';
-        document.getElementById('crop-apply-btn').style.display = 'block';
-    }
-
-    function applyCropAction(src) {
-        const img = new Image();
-        img.src = src;
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const size = Math.min(img.width, img.height) * 0.7; // Standard center 70% box cropping
-            canvas.width = size; canvas.height = size;
-            const ctx = canvas.getContext('2d');
-            const startX = (img.width - size) / 2;
-            const startY = (img.height - size) / 2;
-            ctx.drawImage(img, startX, startY, size, size, 0, 0, size, size);
-            
-            const croppedSrc = canvas.toDataURL('image/jpeg', 0.85);
-            const idx = state.photos.indexOf(src);
-            if (idx !== -1) {
-                state.photos[idx] = croppedSrc;
-                saveState();
-                openApp('Photos', document.querySelector('.app[data-id="Photos"] .app-icon'));
-                document.getElementById('photo-fullscreen-overlay').remove();
-            }
-        };
-    }
-
-    // --- APP LOGIC (NOTES - Multi Note management) ---
+    // --- APP LOGIC (NOTES) ---
     function renderNotesPage(page = 'list', noteId = null) {
         const ui = document.getElementById('app-ui');
         if (page === 'list') {
@@ -1203,168 +1031,6 @@
         ]);
     }
 
-    // --- APP LOGIC (MAIL) ---
-    function renderMailPage(page, mailId = null) {
-        const ui = document.getElementById('app-ui');
-        if (page === 'inbox' || page === 'sent') {
-            const list = state.emails.filter(e => e.folder === page);
-            ui.innerHTML = `
-                <div style="padding: 60px 20px 20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                        <h1 class="ios-title" style="margin:0; text-transform:capitalize;">${page}</h1>
-                        <span onclick="renderMailPage('compose')" style="color:#007AFF; cursor:pointer; display:flex; align-items:center;"><span class="material-icons">edit</span></span>
-                    </div>
-                    <div style="display:flex; gap:10px; margin-bottom:20px;">
-                        <button onclick="renderMailPage('inbox')" style="flex:1; padding:8px; border:none; background:${page==='inbox'?'#007AFF':'#ddd'}; color:${page==='inbox'?'#fff':'#000'}; border-radius:6px; font-family:var(--font);">Inbox</button>
-                        <button onclick="renderMailPage('sent')" style="flex:1; padding:8px; border:none; background:${page==='sent'?'#007AFF':'#ddd'}; color:${page==='sent'?'#fff':'#000'}; border-radius:6px; font-family:var(--font);">Sent</button>
-                    </div>
-                    <div class="ios-list">
-                        ${list.length ? list.map((m) => `
-                            <div class="ios-item" onclick="renderMailPage('read', ${m.id})" style="flex-direction:column; align-items:flex-start;">
-                                <div style="display:flex; justify-content:space-between; width:100%; font-weight:500;">
-                                    <span>${m.from || m.to}</span><span style="font-size:12px; color:#999; font-weight:300;">${m.date}</span>
-                                </div>
-                                <div style="font-size:14px; font-weight:400; color:#333; margin-top:2px;">${m.subject}</div>
-                                <div style="font-size:12px; color:#666; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">${m.body}</div>
-                            </div>
-                        `).join('') : `<div style="padding:40px; text-align:center; color:#999;">No Mail</div>`}
-                    </div>
-                </div>`;
-        } else if (page === 'read') {
-            const m = state.emails.find(e => e.id === mailId);
-            ui.innerHTML = `
-                <div class="ios-nav">
-                    <span class="ios-back" onclick="renderMailPage('${m.folder}')"><span class="material-icons">chevron_left</span>Back</span>
-                    <span style="font-size:18px; font-weight:400; color:#000; flex-grow:1; text-align:center;">Details</span>
-                </div>
-                <div style="padding: 20px; color:#000;">
-                    <div style="border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:15px;">
-                        <h2 style="margin:0 0 5px; font-weight:400;">${m.subject}</h2>
-                        <div style="font-size:14px; color:#555;">From: <strong>${m.from || 'Me'}</strong></div>
-                        ${m.to ? `<div style="font-size:14px; color:#555;">To: <strong>${m.to}</strong></div>` : ''}
-                        <div style="font-size:12px; color:#999; margin-top:5px;">${m.date}</div>
-                    </div>
-                    <p style="font-size:16px; line-height:1.6; font-weight:300; white-space:pre-wrap;">${m.body}</p>
-                </div>`;
-        } else if (page === 'compose') {
-            ui.innerHTML = `
-                <div class="ios-nav">
-                    <span class="ios-back" onclick="renderMailPage('inbox')">Cancel</span>
-                    <span style="font-size:18px; font-weight:400; color:#000; flex-grow:1; text-align:center;">New Mail</span>
-                    <span class="ios-back" onclick="sendMail()" style="padding:0; font-weight:500;">Send</span>
-                </div>
-                <div style="padding: 20px;">
-                    <div class="ios-list">
-                        <input id="m-to" type="email" placeholder="To:" style="width:100%; border:none; border-bottom:1px solid #eee; padding:15px; font-size:18px; font-family:var(--font); outline:none;">
-                        <input id="m-subject" type="text" placeholder="Subject:" style="width:100%; border:none; border-bottom:1px solid #eee; padding:15px; font-size:18px; font-family:var(--font); outline:none;">
-                        <textarea id="m-body" placeholder="Message" style="width:100%; height:200px; border:none; padding:15px; font-size:18px; font-family:var(--font); outline:none; resize:none;"></textarea>
-                    </div>
-                </div>`;
-        }
-    }
-    function sendMail() {
-        let to = document.getElementById('m-to').value;
-        let subject = document.getElementById('m-subject').value;
-        let body = document.getElementById('m-body').value;
-        if(to && subject) {
-            state.emails.push({ id: Date.now(), to, subject, body, date: "Just Now", folder: "sent" });
-            saveState(); renderMailPage('sent');
-            notify("Mail", "Email sent successfully.");
-        }
-    }
-
-    // --- APP LOGIC (MESSAGES) ---
-    function renderMessagesPage(page, threadName = null) {
-        const ui = document.getElementById('app-ui');
-        if (page === 'threads') {
-            const threads = Object.keys(state.chats);
-            ui.innerHTML = `
-                <div style="padding: 60px 20px 20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                        <h1 class="ios-title" style="margin:0;">Messages</h1>
-                        <span onclick="createNewChat()" style="color:#007AFF; cursor:pointer; display:flex; align-items:center;"><span class="material-icons">chat</span></span>
-                    </div>
-                    <div class="ios-list">
-                        ${threads.length ? threads.map(t => {
-                            const lastMsg = state.chats[t][state.chats[t].length - 1];
-                            return `
-                                <div class="ios-item" onclick="renderMessagesPage('chat', '${t}')" style="flex-direction:column; align-items:flex-start;">
-                                    <div style="display:flex; justify-content:space-between; width:100%; font-weight:500;">
-                                        <span>${t}</span>
-                                    </div>
-                                    <div style="font-size:13px; color:#666; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">${lastMsg ? lastMsg.text : ''}</div>
-                                </div>`;
-                        }).join('') : `<div style="padding:40px; text-align:center; color:#999;">No Messages</div>`}
-                    </div>
-                </div>`;
-        } else if (page === 'chat') {
-            const msgs = state.chats[threadName] || [];
-            ui.innerHTML = `
-                <div class="ios-nav">
-                    <span class="ios-back" onclick="renderMessagesPage('threads')"><span class="material-icons">chevron_left</span>Back</span>
-                    <span style="font-size:18px; font-weight:400; color:#000; flex-grow:1; text-align:center;">${threadName}</span>
-                </div>
-                <div style="display:flex; flex-direction:column; height:calc(100% - 100px); background:#fff; padding:15px;">
-                    <div id="chat-scroller" style="flex-grow:1; overflow-y:auto; display:flex; flex-direction:column; padding-bottom:15px;">
-                        ${msgs.map(m => `<div class="msg-bubble ${m.sender === 'me' ? 'msg-me' : 'msg-them'}">${m.text}</div>`).join('')}
-                    </div>
-                    <div style="display:flex; border-top:1px solid #eee; padding-top:10px;">
-                        <input id="chat-input" type="text" placeholder="iMessage" style="flex:1; border:1px solid #ccc; border-radius:20px; padding:10px 15px; outline:none; font-family:var(--font); font-size:16px;">
-                        <button onclick="sendChatMessage('${threadName}')" style="background:#007AFF; color:#fff; border:none; border-radius:50%; width:38px; height:38px; margin-left:8px; display:flex; justify-content:center; align-items:center; font-size:16px; cursor:pointer;"><span class="material-icons" style="font-size:20px;">arrow_upward</span></button>
-                    </div>
-                </div>`;
-            setTimeout(() => { const sc = document.getElementById('chat-scroller'); if(sc) sc.scrollTop = sc.scrollHeight; }, 50);
-        }
-    }
-    function createNewChat() {
-        if (state.contacts.length === 0) {
-            showiOSAlert("Messages", "You have no contacts to message. Create a contact in Contacts app first.");
-            return;
-        }
-        const buttons = state.contacts.map(c => ({
-            text: `${c.first} ${c.last}`,
-            onClick: () => {
-                const name = `${c.first} ${c.last}`;
-                if(!state.chats[name]) state.chats[name] = [];
-                renderMessagesPage('chat', name);
-            }
-        }));
-        buttons.push({ text: "Cancel", color: "#ff3b30" });
-        showiOSAlert("New Message", "Select a contact to message:", buttons);
-    }
-    // Fixed keydrop bugs, handles DOM appending elegantly
-    function sendChatMessage(threadName) {
-        const inp = document.getElementById('chat-input');
-        const text = inp.value.trim();
-        if(!text) return;
-        if(!state.chats[threadName]) state.chats[threadName] = [];
-        state.chats[threadName].push({ sender: 'me', text });
-        saveState();
-
-        const scroller = document.getElementById('chat-scroller');
-        const bubble = document.createElement('div');
-        bubble.className = 'msg-bubble msg-me';
-        bubble.innerText = text;
-        scroller.appendChild(bubble);
-        scroller.scrollTop = scroller.scrollHeight;
-        inp.value = '';
-
-        setTimeout(() => {
-            const replies = ["Nice!", "That sounds cool.", "Talk to you soon!", "Awesome, check you later.", "Haha, perfect."];
-            const rand = replies[Math.floor(Math.random() * replies.length)];
-            state.chats[threadName].push({ sender: 'them', text: rand });
-            saveState();
-            
-            const replyBubble = document.createElement('div');
-            replyBubble.className = 'msg-bubble msg-them';
-            replyBubble.innerText = rand;
-            scroller.appendChild(replyBubble);
-            scroller.scrollTop = scroller.scrollHeight;
-            
-            notify(threadName, rand);
-        }, 1200);
-    }
-
     // --- APP LOGIC (MISC) ---
     function addReminder() { let t = document.getElementById('remText').value, tm = document.getElementById('remTime').value; if(t&&tm){state.reminders.push({text:t, time:tm, notified:false}); saveState(); renderReminders();} }
     function renderReminders() {
@@ -1404,12 +1070,11 @@
         document.getElementById('app-ui').appendChild(flash); setTimeout(() => flash.style.opacity = '0', 50); setTimeout(() => flash.remove(), 450);
     }
 
-    // Notification handling featuring persistent save states
     function notify(title, body) {
-        let iconUrl = APP_DEFS[title] || APP_DEFS['Messages']; 
+        let iconUrl = APP_DEFS[title] || APP_DEFS['Settings']; 
         
         state.notifications.unshift({ title, body, date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-        if (state.notifications.length > 10) state.notifications.pop(); 
+        if (state.notifications.length > 10) state.notifications.pop();
         saveState();
 
         renderLockNotifications();
@@ -1421,47 +1086,21 @@
                 <strong style="display:block; font-size:14px; font-weight:500; color:#fff;">${title}</strong>
                 <span style="font-size:13px; font-weight:300; color:#eee;">${body}</span>
             </div>`;
-        
-        let toastStartX = 0;
-        toast.addEventListener('touchstart', e => { toastStartX = e.touches[0].clientX; });
-        toast.addEventListener('touchmove', e => {
-            let dx = e.touches[0].clientX - toastStartX;
-            if (dx < 0) { toast.style.transform = `translateY(0) translateX(${dx}px)`; }
-        });
-        toast.addEventListener('touchend', e => {
-            let dx = e.changedTouches[0].clientX - toastStartX;
-            if (dx < -80) {
-                toast.style.transform = 'translateY(0) translateX(-150%)';
-                setTimeout(() => toast.remove(), 400);
-            } else {
-                toast.style.transform = 'translateY(0) translateX(0)';
-            }
-        });
-
-        toast.addEventListener('click', e => {
-            if (Math.abs(e.clientX - toastStartX) > 10) return;
-            let appToOpen = title;
-            if (!APP_DEFS[title]) appToOpen = 'Messages';
-            closeApp();
-            setTimeout(() => {
-                const icon = document.querySelector(`.app[data-id="${appToOpen}"] .app-icon`);
-                openApp(appToOpen, icon);
-                toast.remove();
-            }, 400);
-        });
-
         document.body.appendChild(toast);
         setTimeout(() => toast.classList.add('show'), 100); 
-        setTimeout(() => { if (toast.parentNode) { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); } }, 4000);
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 4000);
     }
 
+    // Interactive Notifications on Lock Screen (Swipe right-to-left to dismiss, Tap to open)
+    let notifStartX = 0;
+    let swipedNotif = null;
+    const notifContainer = document.getElementById('lock-notifications');
+
     function renderLockNotifications() {
-        const container = document.getElementById('lock-notifications');
-        if(!container) return;
-        container.innerHTML = state.notifications.map(n => {
-            let iconUrl = APP_DEFS[n.title] || APP_DEFS['Messages'];
+        notifContainer.innerHTML = state.notifications.map((n, idx) => {
+            let iconUrl = APP_DEFS[n.title] || APP_DEFS['Settings'];
             return `
-                <div class="lock-notif">
+                <div class="lock-notif" data-id="${idx}" data-app="${n.title}">
                     <img src="${iconUrl}" style="width:38px; height:38px; border-radius:8px; margin-right:12px;">
                     <div style="flex:1;">
                         <div style="display:flex; justify-content:space-between; width:100%;">
@@ -1474,9 +1113,58 @@
         }).join('');
     }
 
+    notifContainer.addEventListener('touchstart', e => {
+        const notif = e.target.closest('.lock-notif');
+        if (notif) {
+            swipedNotif = notif;
+            notifStartX = e.touches[0].clientX;
+            notif.style.transition = 'none';
+        }
+    });
+
+    notifContainer.addEventListener('touchmove', e => {
+        if (swipedNotif) {
+            let dx = e.touches[0].clientX - notifStartX;
+            if (dx < 0) { 
+                e.stopPropagation(); 
+                swipedNotif.style.transform = `translateX(${dx}px)`;
+                swipedNotif.style.opacity = 1 - Math.abs(dx)/200;
+            }
+        }
+    });
+
+    notifContainer.addEventListener('touchend', e => {
+        if (swipedNotif) {
+            let dx = e.changedTouches[0].clientX - notifStartX;
+            if (dx < -70) {
+                e.stopPropagation();
+                swipedNotif.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                swipedNotif.style.transform = `translateX(-120%)`;
+                swipedNotif.style.opacity = '0';
+                const idx = parseInt(swipedNotif.dataset.id);
+                setTimeout(() => {
+                    state.notifications.splice(idx, 1);
+                    saveState();
+                    renderLockNotifications();
+                }, 300);
+            } else if (Math.abs(dx) < 10) {
+                const appName = swipedNotif.dataset.app;
+                if (APP_DEFS[appName] || appName === 'Notes' || appName === 'Reminders') {
+                    unlockScreen();
+                    setTimeout(() => openApp(appName), 400);
+                }
+            } else {
+                swipedNotif.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                swipedNotif.style.transform = 'translateX(0)';
+                swipedNotif.style.opacity = '1';
+            }
+            swipedNotif = null;
+        }
+    });
+
     setInterval(() => {
         let d = new Date(), hrs = d.getHours().toString().padStart(2, '0'), mins = d.getMinutes().toString().padStart(2, '0'), t = `${hrs}:${mins}`;
-        let lt = document.getElementById('lock-time'); if(lt && lt.innerText !== t) lt.innerText = t;
+        let lt = document.getElementById('lock-time'); if(lt.innerText !== t) lt.innerText = t;
         let liveClock = document.getElementById('clock-live-display'); if(liveClock) liveClock.innerText = d.toLocaleTimeString('en-US', {hour12: false});
         state.reminders.forEach(r => { if(r.time === t && !r.notified) { notify("Reminder", r.text); r.notified = true; saveState(); } });
     }, 1000);
