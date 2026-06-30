@@ -103,7 +103,7 @@
         #dock.app-open { opacity: 0; pointer-events: none; } /* Kept in the exact same spot physically with transform removed */
         
         .app { display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 1; width: 100%; will-change: transform; }
-        #dock .app { width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; } /* Perfect docking centering alignment */
+        #dock .app { width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; } /* Perfect docking centering alignment */
         
         .app-icon { 
             width: 80px; height: 80px; margin: 0 auto; border-radius: 18px; 
@@ -189,14 +189,14 @@
             opacity: 0;
         }
 
-        /* --- LIGHT IOS KEYBOARD STYLE --- */
+        /* --- LIGHT IOS KEYBOARD STYLE WITH ADDITIONAL SPACING GAP --- */
         #custom-keyboard {
             display: none; position: fixed; bottom: 0; left: 0; width: 100vw; 
             background: rgba(240, 243, 248, 0.96);
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             z-index: 10000; 
-            padding: 8px 5px calc(10px + env(safe-area-inset-bottom, 15px)); 
+            padding: 8px 5px calc(25px + env(safe-area-inset-bottom, 15px)); /* Added a gorgeous spacing gap at the bottom */
             border-top: 1px solid rgba(0, 0, 0, 0.12); 
             transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); 
             transform: translateY(100%);
@@ -339,7 +339,7 @@
 </div>
 
 <script>
-    // --- APP DATA & ASSETS (ALL 256 RES UPGRADED FOR RETINA CRISPNESS) ---
+    // --- APP DATA & ASSETS ---
     const APP_DEFS = {
         'Safari': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Safari.png',
         'Weather': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Weather.png',
@@ -470,9 +470,16 @@
         }
         
         const rows = KEYBOARD_LAYOUTS[activeKey];
-        rows.forEach(row => {
+        rows.forEach((row, rowIndex) => {
             const rowDiv = document.createElement('div');
             rowDiv.className = 'kb-row';
+            
+            // To make middle row keys the exact same size as the top row keys, prepend a transparent flex spacer
+            if ((activeKey === 'abc' || activeKey === 'abc_shift') && rowIndex === 1) {
+                const leftSpacer = document.createElement('div');
+                leftSpacer.style.flex = '0.5';
+                rowDiv.appendChild(leftSpacer);
+            }
             
             row.forEach(key => {
                 const btn = document.createElement('button');
@@ -502,6 +509,14 @@
                 
                 rowDiv.appendChild(btn);
             });
+
+            // Append matching right spacer to middle row
+            if ((activeKey === 'abc' || activeKey === 'abc_shift') && rowIndex === 1) {
+                const rightSpacer = document.createElement('div');
+                rightSpacer.style.flex = '0.5';
+                rowDiv.appendChild(rightSpacer);
+            }
+
             container.appendChild(rowDiv);
         });
     }
@@ -1033,8 +1048,8 @@
 
         let rect = iconElement ? iconElement.getBoundingClientRect() : { top: window.innerHeight/2, left: window.innerWidth/2, width: 0, height: 0 };
         
-        // Symmetrical scale reduction padding (rect.width * 0.35 results in a beautifully tighter animation shrink)
-        const pad = rect.width * 0.35;
+        // Symmetrical target square animations (pad reduces scaling factors by 0.15 for an ideal balanced size)
+        const pad = rect.width * 0.15;
         const targetTop = rect.top + pad / 2;
         const targetLeft = rect.left + pad / 2;
         const targetWidth = rect.width - pad;
@@ -1132,8 +1147,8 @@
             if (activeAppElement) {
                 const rect = activeAppElement.getBoundingClientRect();
                 
-                // Perfect high-resolution centered coordinate animations, finishing a bit smaller (0.35 scaling shrink factor)
-                const pad = rect.width * 0.35;
+                // Perfect centered coordinates starting/ending slightly larger (pad reduces scale reduction factor by 0.15)
+                const pad = rect.width * 0.15;
                 const targetTop = rect.top + pad / 2;
                 const targetLeft = rect.left + pad / 2;
                 const targetWidth = rect.width - pad;
@@ -1275,11 +1290,7 @@
             })
             .then(text => {
                 const links = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                if (links.length > 0) {
-                    renderYTList(links);
-                } else {
-                    renderYTList(DEFAULT_YT_LINKS);
-                }
+                renderYTList(links.length > 0 ? links : DEFAULT_YT_LINKS);
             })
             .catch(() => {
                 renderYTList(DEFAULT_YT_LINKS);
@@ -1291,24 +1302,41 @@
         if(!container) return;
         
         let html = '';
-        links.forEach(url => {
+        links.forEach((url, idx) => {
             const id = getYouTubeId(url);
             if(id) {
-                const meta = YT_MOCK_METADATA[id] || { title: `YouTube Video` };
+                const tempTitle = YT_MOCK_METADATA[id] ? YT_MOCK_METADATA[id].title : "Loading video title...";
                 const thumb = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-                // Elegant iOS 7 Card list - only display video titles with no extra fields
+                
+                // Classic unrounded (border-radius: 0) iOS 7 Cards - only displays title
                 html += `
-                    <div onclick="watchYouTubeVideo('${id}')" style="display:flex; flex-direction:column; margin-bottom:20px; cursor:pointer; background:#fff; border-radius:12px; overflow:hidden; border:1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                    <div onclick="watchYouTubeVideo('${id}')" style="display:flex; flex-direction:column; margin-bottom:20px; cursor:pointer; background:#fff; overflow:hidden; border:1px solid #ddd; border-radius:0;">
                         <div style="position:relative; width:100%; aspect-ratio:16/9; background:#000;">
-                            <img src="${thumb}" style="width:100%; height:100%; object-fit:cover;">
+                            <img src="${thumb}" style="width:100%; height:100%; object-fit:cover; border-radius:0;">
                             <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center;">
                                 <span class="material-icons" style="color:#fff; font-size:36px;">play_arrow</span>
                             </div>
                         </div>
                         <div style="padding:15px; background: #fff;">
-                            <div style="font-weight:500; font-size:16px; line-height:1.4; color:#000;">${meta.title}</div>
+                            <div id="yt-title-${id}-${idx}" style="font-weight:400; font-size:16px; line-height:1.4; color:#000;">${tempTitle}</div>
                         </div>
                     </div>`;
+                    
+                // Dynamically fetch live title from URL oembed endpoint to prevent static placeholders
+                fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        const el = document.getElementById(`yt-title-${id}-${idx}`);
+                        if (el && data && data.title) {
+                            el.innerText = data.title;
+                        }
+                    })
+                    .catch(() => {
+                        const el = document.getElementById(`yt-title-${id}-${idx}`);
+                        if (el && el.innerText === "Loading video title...") {
+                            el.innerText = `YouTube Video`;
+                        }
+                    });
             }
         });
         
