@@ -22,7 +22,7 @@
         
         html, body {
             margin: 0; padding: 0; width: 100vw; 
-            height: 100dvh; /* Unified single responsive viewport height style */
+            height: 100dvh; /* Unified, single Dynamic Viewport Height setting */
             font-family: var(--font); background: #000; color: #fff;
             overflow: hidden; user-select: none; -webkit-user-select: none;
             overscroll-behavior: none; font-weight: 200;
@@ -87,7 +87,7 @@
             background: transparent !important;
         }
 
-        /* --- DOCK CONTAINER --- */
+        /* --- DOCK CONTAINER (MORE TRANSPARENT) --- */
         #dock { 
             position: absolute;
             bottom: 0;
@@ -109,6 +109,7 @@
         .app { display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 1; width: 100%; will-change: transform; }
         #dock .app { width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         
+        /* App icons made slightly bigger */
         .app-icon { 
             width: 84px; height: 80px; margin: 0 auto; border-radius: 18px; 
             background-size: contain; background-repeat: no-repeat; background-position: center; 
@@ -252,6 +253,12 @@
 
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 85px; gap: 4px; padding: 4px; background: #000; align-content: end; padding-bottom: calc(30px + env(safe-area-inset-bottom, 15px));}
         .calc-btn { display: flex; justify-content: center; align-items: center; font-size: 35px; font-weight: 300; border-radius: 0; color: #fff; background: #333; cursor: pointer; transition: filter 0.1s; box-shadow: none !important; border: none; }
+        .calc-btn:active { filter: brightness(1.5); }
+        .calc-btn.op { background: #FF9F0A; color: #fff; }
+        .calc-btn.op:active { filter: brightness(1.2); }
+        .calc-btn.top { background: #A5A5A5; color: #000; }
+        .calc-btn.top:active { filter: brightness(0.8); }
+        .calc-btn.zero { grid-column: span 2; justify-content: flex-start; padding-left: 30px; }
         .calc-screen { display: flex; justify-content: flex-end; align-items: flex-end; padding: 10px 20px 30px; font-size: 85px; color: #fff; font-weight: 200; overflow: hidden; height: calc(180px + env(safe-area-inset-top, 20px)); }
 
         .filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px; background: #000; border-top: 1px solid #333; }
@@ -265,6 +272,21 @@
             display: none; justify-content: center; align-items: center;
             background: rgba(0,0,0,0.45); z-index: 999999 !important;
             opacity: 0; transition: opacity 0.25s ease; visibility: hidden;
+        }
+
+        /* --- HIGH-VISIBILITY FLOATING PAGE INDICATORS (MOVED EXACTLY ABOVE THE DOCK) --- */
+        #page-indicator {
+            position: absolute;
+            bottom: calc(135px + env(safe-area-inset-bottom, 15px)); /* Float exactly above the dock height */
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            height: 10px;
+            z-index: 30;
+            pointer-events: auto;
         }
     </style>
 </head>
@@ -289,8 +311,8 @@
         <div id="pages-viewport" style="position: relative; width: 100%; height: calc(100% - (145px + env(safe-area-inset-bottom, 15px))); overflow: hidden;">
             <div id="pages-container" style="display: flex; width: 100%; height: 100%; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform;"></div>
         </div>
-        <!-- PAGE DOT INDICATOR -->
-        <div id="page-indicator" style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 8px; height: 10px; z-index: 30; pointer-events: auto;"></div>
+        <!-- PAGE DOT INDICATOR (REPOSITIONED TO FLOAT PERFECTLY ON TOP of THE WALLPAPER VIEWPORT) -->
+        <div id="page-indicator"></div>
     </div>
     
     <!-- REPOSITIONED DOCK DIRECTLY SIBLING TO WALLPAPER -->
@@ -721,21 +743,28 @@
         let swipeTouchStartX = 0;
         let swipeTouchStartY = 0;
         let isPageSwiping = false;
-        let viewportWidth = 0;
+        let swipeHasMoved = false;
 
         viewport.addEventListener('touchstart', e => {
             if (isEditing) return;
             swipeTouchStartX = e.touches[0].clientX;
             swipeTouchStartY = e.touches[0].clientY;
-            viewportWidth = window.innerWidth;
             isPageSwiping = true;
-            pagesContainer.style.transition = 'none'; // Lock animations while finger dragging
+            swipeHasMoved = false;
         }, { passive: true });
 
         viewport.addEventListener('touchmove', e => {
             if (!isPageSwiping) return;
             let dx = e.touches[0].clientX - swipeTouchStartX;
             let dy = e.touches[0].clientY - swipeTouchStartY;
+            
+            // Throttle and filter out accidental tiny movements (<10px) to allow clean app clicks to register
+            if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+                swipeHasMoved = true;
+                pagesContainer.style.transition = 'none'; // Lock animations while finger dragging
+            } else {
+                return;
+            }
             
             if (Math.abs(dy) > Math.abs(dx)) {
                 isPageSwiping = false;
@@ -744,28 +773,33 @@
             }
             
             // Panning position with edge rubber-band resistance math
-            let targetOffset = -currentPageIndex * viewportWidth + dx;
+            let targetOffset = -currentPageIndex * window.innerWidth + dx;
             
             if (currentPageIndex === 0 && dx > 0) {
                 targetOffset = Math.pow(dx, 0.75); // Safe non-linear resistance curves
             } else if (currentPageIndex === visiblePages.length - 1 && dx < 0) {
-                targetOffset = -currentPageIndex * viewportWidth - Math.pow(Math.abs(dx), 0.75);
+                targetOffset = -currentPageIndex * window.innerWidth - Math.pow(Math.abs(dx), 0.75);
             }
             
             pagesContainer.style.transform = `translate3d(${targetOffset}px, 0, 0)`;
-        }, { passive: false });
+        }, { passive: true });
 
         viewport.addEventListener('touchend', e => {
             if (!isPageSwiping) return;
             isPageSwiping = false;
-            let dx = e.changedTouches[0].clientX - swipeTouchStartX;
             
+            if (!swipeHasMoved) {
+                // Ignore layout transformations on simple touch taps to let native openApp clicks fire flawlessly
+                return;
+            }
+            
+            let dx = e.changedTouches[0].clientX - swipeTouchStartX;
             if (dx > 50 && currentPageIndex > 0) {
                 scrollToPage(currentPageIndex - 1);
             } else if (dx < -50 && currentPageIndex < visiblePages.length - 1) {
                 scrollToPage(currentPageIndex + 1);
             } else {
-                scrollToPage(currentPageIndex); // Automatically snap back to original page coordinates
+                scrollToPage(currentPageIndex); // Snap back automatically on aborts
             }
         }, { passive: true });
 
@@ -1117,7 +1151,7 @@
         isEditing = true; 
         document.body.classList.add('editing'); 
         
-        // Dynamically insert trailing empty page nodes on edit start without causing Sortable active drag conflicts
+        // Dynamically append trailing empty page nodes on edit start without causing active drag conflicts
         const lastPage = state.gridApps[state.gridApps.length - 1];
         const lastHasApp = lastPage.some(app => app !== null);
         if (lastHasApp && state.gridApps.length < 10) {
@@ -1167,7 +1201,7 @@
             });
         });
         
-        // Filter out completely empty pages on layout configuration saves
+        // Filter out empty pages from home screen automatically when saving layout configs
         let filteredPages = [];
         tempGridPages.forEach((page, idx) => {
             let hasApp = page.some(app => app !== null);
@@ -1630,7 +1664,7 @@
             let descriptionTitle = parts.slice(1).join(' ').trim();
             const id = getYouTubeId(url);
             if(id) {
-                const tempTitle = descriptionTitle || (YT_MOCK_METADATA[id] ? YT_MOCK_METADATA[id].title : "Loading video title...");
+                const tempTitle = descriptionTitle || (YT_MOCK_METADATA[id] ? YT_MOCK_METADATA[id].title : "Loading video title... e.g. " + id);
                 const thumb = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
                 
                 // Classic unrounded (border-radius: 0) iOS 7 Cards - only displays title
