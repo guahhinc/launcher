@@ -8,6 +8,8 @@
     <meta name="apple-mobile-web-app-title" content="miniOS">
     <link rel="apple-touch-icon" href="https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Settings.png">
     <title>miniOS</title>
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
@@ -26,17 +28,22 @@
             overscroll-behavior: none; font-weight: 200;
         }
 
-        #screen { position: relative; width: 100vw; height: 100vh; overflow: hidden; background: #000;}
+        /* Fixed black bottom bar issue on iPhone Pro Max viewport */
+        #screen { 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; 
+            overflow: hidden; background: #000;
+        }
 
-        /* Enhanced Wallpaper Zoom from 1.25 to 0.92 */
+        /* Enhanced Default Wallpaper scale up to 1.4 */
         #wallpaper {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
             background-size: cover; background-position: center;
-            transform: scale(1.25) translateZ(0); filter: blur(0px);
+            transform: scale(1.4) translateZ(0); filter: blur(0px);
             transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1), filter 0.6s cubic-bezier(0.32, 0.72, 0, 1);
             will-change: transform, filter;
         }
-        #wallpaper.app-open { transform: scale(0.92) translateZ(0); filter: blur(15px); }
+        /* Zooms back to 0.9 and blurs when app opens */
+        #wallpaper.app-open { transform: scale(0.9) translateZ(0); filter: blur(15px); }
 
         .layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; }
         .glass { background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
@@ -79,7 +86,7 @@
         #home.unlocked { visibility: visible; }
         #home.app-open { opacity: 0; pointer-events: none; }
 
-        /* iPhone notch and home indicator layout adjustments */
+        /* iPhone safe areas adjustments */
         #app-grid { 
             display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center; gap: 15px 5px; 
             padding: calc(45px + env(safe-area-inset-top, 20px)) 10px 0; align-content: start; 
@@ -108,7 +115,6 @@
         @keyframes jiggle2 { 0% { transform: rotate(2deg); } 50% { transform: rotate(-2deg); } 100% { transform: rotate(2deg); } }
 
         /* --- SPOTLIGHT SEARCH --- */
-        /* Added visibility:hidden to cure iOS top status blur strip */
         #spotlight { z-index: 40; visibility: hidden; transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s, visibility 0.3s; transform: translateY(-100%); opacity: 0; padding-top: calc(50px + env(safe-area-inset-top, 20px)); pointer-events: none; }
         #spotlight.active { transform: translateY(0); opacity: 1; pointer-events: auto; visibility: visible; }
         #search-bar { width: 90%; margin: 0 auto; background: rgba(255,255,255,0.4); padding: 12px 15px; border-radius: 12px; display: flex; }
@@ -119,7 +125,6 @@
         .search-result small { display: block; font-size: 13px; color: #eee; margin-top: 4px; }
 
         /* --- APP CONTAINER (Hero Animation) --- */
-        /* Added visibility:hidden to cure iOS top status blur strip */
         #app-container {
             z-index: 80; background: #fff; color: #000;
             position: absolute; overflow: hidden; pointer-events: none; opacity: 0; visibility: hidden;
@@ -129,10 +134,25 @@
         #app-container.open { pointer-events: auto; visibility: visible; }
         #app-ui { height: 100%; width: 100%; overflow-y: auto; overflow-x: hidden; position: relative; }
 
-        /* --- NOTIFICATIONS --- */
-        .toast { position: absolute; top: calc(15px + env(safe-area-inset-top, 20px)); left: 5%; width: 90%; border-radius: 15px; padding: 15px; z-index: 1000; transform: translateY(-150%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); color: #fff; font-size: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); font-weight: 300; }
+        /* Left Edge swipe back trigger handles cross-origin maps iframe safely */
+        #app-edge-handle {
+            position: absolute; top: 0; left: 0; width: 40px; height: 100%; z-index: 9999;
+            background: transparent; pointer-events: auto;
+        }
+
+        /* --- NOTIFICATIONS (Dark glass iOS 7 style) --- */
+        .toast { 
+            position: absolute; top: calc(15px + env(safe-area-inset-top, 20px)); left: 5%; width: 90%; border-radius: 14px; padding: 12px; z-index: 1000; 
+            transform: translateY(-150%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); color: #fff;
+            font-size: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-weight: 300; display:flex; align-items:center;
+        }
         .toast.show { transform: translateY(0); }
-        .lock-notif { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; margin-bottom: 10px; backdrop-filter: blur(15px); }
+        
+        .lock-notif { 
+            background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); color: #fff;
+            padding: 12px; border-radius: 14px; margin-bottom: 10px; display:flex; align-items:center;
+        }
 
         /* --- SETTINGS/NATIVE UI CSS --- */
         .ios-list { background: #fff; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;}
@@ -141,7 +161,7 @@
         .ios-item:active { background: #f0f0f0; }
         .ios-title { color: #000; font-weight: 400; margin-bottom: 20px; font-size: 30px;}
         .ios-nav { display: flex; align-items: center; padding: calc(45px + env(safe-area-inset-top, 20px)) 20px 10px; background: #f8f8f8; border-bottom: 1px solid #ddd; }
-        .ios-back { color: #007AFF; font-size: 18px; cursor: pointer; padding-right: 15px; }
+        .ios-back { color: #007AFF; font-size: 18px; cursor: pointer; display:flex; align-items:center; }
 
         /* --- CALCULATOR CSS --- */
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 85px; gap: 4px; padding: 4px; background: #000; align-content: end; padding-bottom: calc(30px + env(safe-area-inset-bottom, 15px));}
@@ -163,6 +183,9 @@
         .msg-bubble { padding: 10px 14px; border-radius: 18px; margin-bottom: 8px; max-width: 70%; font-size: 16px; word-wrap: break-word; font-weight:300; }
         .msg-me { background: #007AFF; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
         .msg-them { background: #E5E5EA; color: #000; align-self: flex-start; border-bottom-left-radius: 4px; }
+
+        /* Mirror front facing cameras */
+        .mirrored { transform: scaleX(-1) !important; }
     </style>
 </head>
 <body>
@@ -191,7 +214,7 @@
         <div id="lock-notifications"></div>
         <div class="slider-container" id="slider">
             <div style="display:flex; justify-content:center; align-items:center; width: 100%;">
-                <span style="opacity: 0.3; margin-right: 10px;">></span> slide to unlock
+                <span class="material-icons" style="font-size:24px; opacity:0.6; margin-right:5px; vertical-align:middle;">chevron_right</span> slide to unlock
             </div>
         </div>
     </div>
@@ -212,10 +235,11 @@
 
     <!-- APP OPEN CONTAINER -->
     <div id="app-container" class="layer">
+        <div id="app-edge-handle"></div>
         <div id="app-ui"></div>
     </div>
 
-    <!-- CUSTOM iOS ALERT SYSTEM (Frost Glass) -->
+    <!-- CUSTOM NATIVE IOS 7 POPUP OVERLAY -->
     <div id="ios-alert-overlay" class="layer" style="display:none; justify-content:center; align-items:center; background:rgba(0,0,0,0.45); z-index:10000; opacity:0; transition:opacity 0.25s ease; visibility: hidden;">
         <div id="ios-alert" class="glass" style="width:270px; border-radius:14px; color:#000; display:flex; flex-direction:column; overflow:hidden; background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); transform:scale(1.2); transition:transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1.2);">
             <div style="padding:20px; text-align:center;">
@@ -263,39 +287,6 @@
         photos: [], reminders: [], contacts: [], emails: [], chats: {},
         noteText: "Welcome to miniOS!\n\nThis app automatically saves what you type."
     };
-
-    // --- CUSTOM ALERTS REPLACING CHROME POPUPS ---
-    function showiOSAlert(title, message, buttons = []) {
-        const overlay = document.getElementById('ios-alert-overlay');
-        const alertBox = document.getElementById('ios-alert');
-        document.getElementById('ios-alert-title').innerText = title;
-        document.getElementById('ios-alert-msg').innerText = message;
-        const btnContainer = document.getElementById('ios-alert-buttons');
-        btnContainer.innerHTML = '';
-        if (buttons.length === 0) buttons = [{ text: 'OK', onClick: closeiOSAlert }];
-        btnContainer.style.flexDirection = buttons.length === 2 ? 'row' : 'column';
-        buttons.forEach((btn, idx) => {
-            const el = document.createElement('div');
-            el.innerText = btn.text;
-            el.style.cssText = `
-                flex: 1; padding: 13px; text-align: center; font-size: 16px; 
-                font-weight: ${btn.bold ? '500' : '300'}; color: ${btn.color || '#007AFF'}; 
-                cursor: pointer; border-right: ${buttons.length === 2 && idx === 0 ? '1px solid rgba(0,0,0,0.1)' : 'none'};
-                border-top: ${buttons.length !== 2 && idx > 0 ? '1px solid rgba(0,0,0,0.1)' : 'none'};
-            `;
-            el.onclick = () => { closeiOSAlert(); if(btn.onClick) btn.onClick(); };
-            btnContainer.appendChild(el);
-        });
-        overlay.style.visibility = 'visible';
-        overlay.style.display = 'flex'; void overlay.offsetWidth;
-        overlay.style.opacity = '1'; alertBox.style.transform = 'scale(1)';
-    }
-    function closeiOSAlert() {
-        const overlay = document.getElementById('ios-alert-overlay');
-        const alertBox = document.getElementById('ios-alert');
-        overlay.style.opacity = '0'; alertBox.style.transform = 'scale(0.9)';
-        setTimeout(() => { overlay.style.display = 'none'; overlay.style.visibility = 'hidden'; }, 250);
-    }
 
     function loadState() {
         let saved = localStorage.getItem('minios_state');
@@ -358,10 +349,10 @@
         state.gridApps.forEach(app => grid.appendChild(createAppIcon(app)));
         state.dockApps.forEach(app => dock.appendChild(createAppIcon(app, true)));
 
-        // SortableJS integrated natively with 500ms long press delay
+        // Keep SortableJS fully active but bound to 500ms long press. Allows natural direct dragging on hold
         let options = { 
             animation: 150, 
-            delay: 500, // Native iOS hold-to-rearrange delay
+            delay: 500, 
             delayOnTouchOnly: true, 
             fallbackOnBody: true, 
             group: 'shared', 
@@ -435,6 +426,39 @@
         }
     });
 
+    // --- GESTURE TO SLIDE HOME SCREEN BACK TO LOCK SCREEN ---
+    let homeSwipeStartX = 0, isSwipingHome = false;
+    home.addEventListener('touchstart', e => {
+        if (isEditing) return; // Disable lock swipe during app rearranging jiggle
+        if (e.touches[0].clientX < 40) {
+            homeSwipeStartX = e.touches[0].clientX;
+            isSwipingHome = true;
+        }
+    });
+    home.addEventListener('touchmove', e => {
+        if (isSwipingHome) {
+            let dx = e.touches[0].clientX - homeSwipeStartX;
+            if (dx > 0) { e.preventDefault(); home.style.transform = `translateX(${dx}px)`; }
+        }
+    });
+    home.addEventListener('touchend', e => {
+        if (isSwipingHome) {
+            isSwipingHome = false;
+            let dx = e.changedTouches[0].clientX - homeSwipeStartX;
+            if (dx > 100) { lockDevice(); } 
+            else {
+                home.style.transition = 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
+                home.style.transform = 'translateX(0)';
+                setTimeout(() => home.style.transition = '', 400);
+            }
+        }
+    });
+    function lockDevice() {
+        lockScreen.style.display = 'flex'; void lockScreen.offsetWidth;
+        lockScreen.style.opacity = '1'; lockScreen.style.pointerEvents = 'auto';
+        home.classList.remove('unlocked'); home.style.transform = 'translateX(0)';
+    }
+
     // --- SPOTLIGHT ---
     let homeStartY = 0; const spotlight = document.getElementById('spotlight');
     home.addEventListener('touchstart', e => { if(!isEditing) homeStartY = e.touches[0].clientY; });
@@ -457,7 +481,7 @@
         resDiv.innerHTML = results.map(r => `<div class="search-result glass" onclick="closeSpotlight(); ${r.type==='App'?`openApp('${r.text}')`:'openApp(\''+r.type+'s\')'}"><strong>${r.text}</strong><small>${r.type}</small></div>`).join('');
     }
 
-    // --- APP CONTAINER & HERO ANIMATION (Immediate opening expansion, no delay) ---
+    // --- APP CONTAINER & HERO ANIMATION (Immediate expansion, no opening delay) ---
     const appContainer = document.getElementById('app-container');
     let activeAppId = null;
 
@@ -471,7 +495,7 @@
 
         let rect = iconElement ? iconElement.getBoundingClientRect() : { top: window.innerHeight/2, left: window.innerWidth/2, width: 0, height: 0 };
         
-        // Starts 10% smaller than icon size for a tighter expand feel
+        // Starts slightly tighter for snappy pop morph look
         const pad = rect.width * 0.1;
         const targetTop = rect.top + pad / 2;
         const targetLeft = rect.left + pad / 2;
@@ -490,7 +514,7 @@
 
         buildAppUI(id, ui);
 
-        // Immediate transition execution - NO opening delay
+        // Instantly morph open
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 appContainer.style.transition = 'all 0.6s cubic-bezier(0.32, 0.72, 0, 1)';
@@ -502,32 +526,26 @@
         });
     }
 
-    // --- LEFT EDGE SWIPE BACK ---
+    // --- LEFT EDGE SWIPE BACK (INTERCEPTED OVER IFRAMES NATIVELY VIA #app-edge-handle) ---
     let appSwipeStartX = 0, appSwipeStartY = 0, isSwipingApp = false;
-    appContainer.addEventListener('touchstart', e => {
-        if(e.touches[0].clientX < 35 && appContainer.classList.contains('open')) {
-            appSwipeStartX = e.touches[0].clientX; appSwipeStartY = e.touches[0].clientY;
-            isSwipingApp = true; appContainer.style.transition = 'none';
-        }
+    const edgeHandle = document.getElementById('app-edge-handle');
+
+    edgeHandle.addEventListener('touchstart', e => {
+        appSwipeStartX = e.touches[0].clientX; appSwipeStartY = e.touches[0].clientY;
+        isSwipingApp = true; appContainer.style.transition = 'none';
     });
-    appContainer.addEventListener('touchmove', e => {
+    edgeHandle.addEventListener('touchmove', e => {
         if(isSwipingApp) {
-            let dx = e.touches[0].clientX - appSwipeStartX; let dy = Math.abs(e.touches[0].clientY - appSwipeStartY);
-            if (dy > dx && dx < 20) { isSwipingApp = false; return; }
+            let dx = e.touches[0].clientX - appSwipeStartX;
             if (dx > 0) { e.preventDefault(); appContainer.style.transform = `translateX(${dx}px)`; }
         }
     });
-    appContainer.addEventListener('touchend', e => {
+    edgeHandle.addEventListener('touchend', e => {
         if(isSwipingApp) {
             isSwipingApp = false;
             let dx = e.changedTouches[0].clientX - appSwipeStartX;
-            if(dx > 80) { 
-                appContainer.style.transform = 'translateX(0)'; 
-                closeApp(); 
-            } else { 
-                appContainer.style.transition = 'all 0.4s cubic-bezier(0.32, 0.72, 0, 1)'; 
-                appContainer.style.transform = 'translateX(0)'; 
-            }
+            if(dx > 80) { appContainer.style.transform = 'translateX(0)'; closeApp(); } 
+            else { appContainer.style.transition = 'all 0.4s cubic-bezier(0.32, 0.72, 0, 1)'; appContainer.style.transform = 'translateX(0)'; }
         }
     });
 
@@ -547,7 +565,7 @@
                 const targetWidth = rect.width - pad;
                 const targetHeight = rect.height - pad;
 
-                // Fades out late (opacity duration 0.15s, after a 0.45s delay)
+                // Opacity fades late (last 0.15s of the 0.6s shrink duration)
                 appContainer.style.transition = 'top 0.6s cubic-bezier(0.32, 0.72, 0, 1), left 0.6s cubic-bezier(0.32, 0.72, 0, 1), width 0.6s cubic-bezier(0.32, 0.72, 0, 1), height 0.6s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.6s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.15s cubic-bezier(0.32, 0.72, 0, 1) 0.45s';
                 appContainer.style.top = targetTop + 'px'; appContainer.style.left = targetLeft + 'px';
                 appContainer.style.width = targetWidth + 'px'; appContainer.style.height = targetHeight + 'px';
@@ -555,12 +573,10 @@
                 appContainer.style.opacity = '0';
             }
         }
-        
         setTimeout(() => { 
             appContainer.classList.remove('open'); 
             appContainer.style.visibility = 'hidden';
-            document.getElementById('app-ui').innerHTML = ''; 
-            activeAppId = null; 
+            document.getElementById('app-ui').innerHTML = ''; activeAppId = null; 
         }, 600);
     }
 
@@ -598,7 +614,7 @@
                     <div style="height:140px; background:#000; display:flex; justify-content:space-around; align-items:center; padding-bottom:20px;">
                         <div style="width:50px;"></div>
                         <div onclick="capturePhoto()" style="width:75px; height:75px; border-radius:50%; background:#fff; border:5px solid #ccc; cursor:pointer;"></div>
-                        <div onclick="toggleCameraFacing()" style="color:#fff; font-size:30px; cursor:pointer; width:50px; text-align:center;">🔄</div>
+                        <div onclick="toggleCameraFacing()" style="color:#fff; cursor:pointer; width:50px; text-align:center;"><span class="material-icons" style="font-size:32px;">cached</span></div>
                     </div>
                 </div>`;
             startCamera();
@@ -656,21 +672,21 @@
                 <div style="padding: 60px 20px 20px;">
                     <h1 class="ios-title">Settings</h1>
                     <div class="ios-list">
-                        <div class="ios-item" onclick="renderSettingsPage('wallpapers')"><span>Wallpapers</span> <span style="color:#aaa;">></span></div>
-                        <div class="ios-item" onclick="renderSettingsPage('reset')"><span>Reset</span> <span style="color:#aaa;">></span></div>
-                        <div class="ios-item" onclick="createBackup()"><span>Backup Data</span> <span style="color:#aaa;">></span></div>
-                        <div class="ios-item" onclick="renderSettingsPage('about')"><span>About</span> <span style="color:#aaa;">></span></div>
+                        <div class="ios-item" onclick="renderSettingsPage('wallpapers')"><span>Wallpapers</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:16px;">chevron_right</span></span></div>
+                        <div class="ios-item" onclick="renderSettingsPage('reset')"><span>Reset</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:16px;">restart_alt</span></span></div>
+                        <div class="ios-item" onclick="createBackup()"><span>Backup Data</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:16px;">download</span></span></div>
+                        <div class="ios-item" onclick="renderSettingsPage('about')"><span>About</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:16px;">info</span></span></div>
                     </div>
                 </div>`;
         } else if (page === 'wallpapers') {
             ui.innerHTML = `
-                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')">< Back</span><span style="font-size:18px; font-weight:400; color:#000;">Wallpapers</span></div>
+                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')"><span class="material-icons">chevron_left</span>Settings</span><span style="font-size:18px; font-weight:400; color:#000; margin-left:20px;">Wallpapers</span></div>
                 <div style="padding: 20px; display:flex; flex-wrap:wrap; gap:10px;">
                     ${WALLPAPERS.map(w => `<div onclick="setWallpaper('${w}')" style="width:calc(50% - 5px); height:250px; background:url('${w}') center/cover; border-radius:0; cursor:pointer; ${state.wallpaper===w?'border:4px solid #007AFF':''}"></div>`).join('')}
                 </div>`;
         } else if (page === 'reset') {
             ui.innerHTML = `
-                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')">< Back</span><span style="font-size:18px; font-weight:400; color:#000;">Reset Option</span></div>
+                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')"><span class="material-icons">chevron_left</span>Settings</span><span style="font-size:18px; font-weight:400; color:#000; margin-left:20px;">Reset Option</span></div>
                 <div style="padding: 20px;">
                     <div class="ios-list">
                         <div class="ios-item" onclick="resetHomeLayout()" style="color:#007AFF; font-weight:400;">Reset Home Screen Layout</div>
@@ -679,7 +695,7 @@
                 </div>`;
         } else if (page === 'about') {
             ui.innerHTML = `
-                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')">< Back</span><span style="font-size:18px; font-weight:400; color:#000;">About</span></div>
+                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')"><span class="material-icons">chevron_left</span>Settings</span><span style="font-size:18px; font-weight:400; color:#000; margin-left:20px;">About</span></div>
                 <div style="padding: 30px 20px; text-align:center; color:#000;">
                     <div style="width:100px; height:100px; background:url('https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/128/Settings.png') center/cover; margin:0 auto 20px; border-radius:22px;"></div>
                     <h2 style="font-weight:300;">miniOS</h2><p style="color:#666;">Version 4.5</p>
@@ -714,7 +730,7 @@
                 <div style="padding: 60px 20px 20px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <h1 class="ios-title" style="margin:0;">Contacts</h1>
-                        <span onclick="renderContactsPage('add')" style="color:#007AFF; font-size:35px; font-weight:200; cursor:pointer; line-height:1;">+</span>
+                        <span onclick="renderContactsPage('add')" style="cursor:pointer; display:flex; align-items:center;"><span class="material-icons" style="font-size:30px; color:#007AFF;">add</span></span>
                     </div>
                     <div class="ios-list" style="margin-top:20px;">
                         ${state.contacts.length ? state.contacts.map((c, i) => `<div class="ios-item" onclick="showContactDetails(${i})">${c.first} ${c.last}</div>`).join('') : `<div style="padding:30px; text-align:center; color:#888;">No Contacts</div>`}
@@ -839,7 +855,7 @@
                 <div style="height:140px; background:#000; display:flex; justify-content:space-around; align-items:center; padding-bottom:20px;">
                     <div style="width:50px;"></div>
                     <div onclick="capturePBPhoto()" style="width:75px; height:75px; border-radius:50%; background:#fff; border:5px solid #ccc; cursor:pointer;"></div>
-                    <div onclick="toggleCameraPB()" style="color:#fff; font-size:30px; cursor:pointer; width:50px; text-align:center;">🔄</div>
+                    <div onclick="toggleCameraPB()" style="color:#fff; cursor:pointer; width:50px; text-align:center;"><span class="material-icons" style="font-size:32px;">cached</span></div>
                 </div>
             </div>`;
         startCameraPB();
@@ -847,7 +863,13 @@
     let pbFacingMode = 'user';
     function startCameraPB() {
         if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: pbFacingMode } }).then(stream => { window.cameraStream = stream; document.getElementById('photobooth-feed').srcObject = stream; }).catch(err => document.getElementById('photobooth-feed').parentElement.innerHTML = '<p style="color:#fff; text-align:center; margin-top:50px;">Front Camera disabled.</p>');
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: pbFacingMode } }).then(stream => { 
+                window.cameraStream = stream; 
+                const feed = document.getElementById('photobooth-feed');
+                feed.srcObject = stream; 
+                if (pbFacingMode === 'user') feed.classList.add('mirrored');
+                else feed.classList.remove('mirrored');
+            }).catch(err => document.getElementById('photobooth-feed').parentElement.innerHTML = '<p style="color:#fff; text-align:center; margin-top:50px;">Front Camera disabled.</p>');
         }
     }
     function toggleCameraPB() {
@@ -861,9 +883,12 @@
     }
     function capturePBPhoto() {
         const v = document.getElementById('photobooth-feed'); if(!v||!v.videoWidth) return;
-        const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
-        const ctx = c.getContext('2d'); ctx.filter = PB_FILTERS[pbFilter]; ctx.drawImage(v, 0, 0);
-        state.photos.unshift(c.toDataURL('image/jpeg', 0.8)); saveState(); notify("Photo Booth", "Photo saved with effect!");
+        const c = document.createElement('canvas'); 
+        c.width = 1080; c.height = Math.round(1080 * (v.videoHeight / v.videoWidth));
+        const ctx = c.getContext('2d'); 
+        if (pbFacingMode === 'user') { ctx.translate(c.width, 0); ctx.scale(-1, 1); } // Correct mirror on captured data
+        ctx.filter = PB_FILTERS[pbFilter]; ctx.drawImage(v, 0, 0, c.width, c.height);
+        state.photos.unshift(c.toDataURL('image/jpeg', 0.85)); saveState(); notify("Photo Booth", "Photo saved with effect!");
         const flash = document.createElement('div'); flash.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:#fff;z-index:99;transition:opacity 0.4s; pointer-events:none;';
         document.getElementById('app-ui').appendChild(flash); setTimeout(() => flash.style.opacity = '0', 50); setTimeout(() => flash.remove(), 450);
     }
@@ -895,7 +920,7 @@
                 <div style="padding: 60px 20px 20px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
                         <h1 class="ios-title" style="margin:0; text-transform:capitalize;">${page}</h1>
-                        <span onclick="renderMailPage('compose')" style="color:#007AFF; font-size:24px; cursor:pointer;">📝</span>
+                        <span onclick="renderMailPage('compose')" style="color:#007AFF; cursor:pointer; display:flex; align-items:center;"><span class="material-icons">edit</span></span>
                     </div>
                     <div style="display:flex; gap:10px; margin-bottom:20px;">
                         <button onclick="renderMailPage('inbox')" style="flex:1; padding:8px; border:none; background:${page==='inbox'?'#007AFF':'#ddd'}; color:${page==='inbox'?'#fff':'#000'}; border-radius:6px; font-family:var(--font);">Inbox</button>
@@ -917,7 +942,7 @@
             const m = state.emails.find(e => e.id === mailId);
             ui.innerHTML = `
                 <div class="ios-nav">
-                    <span class="ios-back" onclick="renderMailPage('${m.folder}')">< Back</span>
+                    <span class="ios-back" onclick="renderMailPage('${m.folder}')"><span class="material-icons">chevron_left</span>Back</span>
                     <span style="font-size:18px; font-weight:400; color:#000; flex-grow:1; text-align:center;">Details</span>
                 </div>
                 <div style="padding: 20px; color:#000;">
@@ -934,7 +959,7 @@
                 <div class="ios-nav">
                     <span class="ios-back" onclick="renderMailPage('inbox')">Cancel</span>
                     <span style="font-size:18px; font-weight:400; color:#000; flex-grow:1; text-align:center;">New Mail</span>
-                    <span class="ios-back" onclick="sendMail()" style="padding:0;">Send</span>
+                    <span class="ios-back" onclick="sendMail()" style="padding:0; font-weight:500;">Send</span>
                 </div>
                 <div style="padding: 20px;">
                     <div class="ios-list">
@@ -965,7 +990,7 @@
                 <div style="padding: 60px 20px 20px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
                         <h1 class="ios-title" style="margin:0;">Messages</h1>
-                        <span onclick="createNewChat()" style="color:#007AFF; font-size:24px; cursor:pointer;">📝</span>
+                        <span onclick="createNewChat()" style="color:#007AFF; cursor:pointer; display:flex; align-items:center;"><span class="material-icons">chat</span></span>
                     </div>
                     <div class="ios-list">
                         ${threads.length ? threads.map(t => {
@@ -984,7 +1009,7 @@
             const msgs = state.chats[threadName] || [];
             ui.innerHTML = `
                 <div class="ios-nav">
-                    <span class="ios-back" onclick="renderMessagesPage('threads')">< Back</span>
+                    <span class="ios-back" onclick="renderMessagesPage('threads')"><span class="material-icons">chevron_left</span>Back</span>
                     <span style="font-size:18px; font-weight:400; color:#000; flex-grow:1; text-align:center;">${threadName}</span>
                 </div>
                 <div style="display:flex; flex-direction:column; height:calc(100% - 100px); background:#fff; padding:15px;">
@@ -993,7 +1018,7 @@
                     </div>
                     <div style="display:flex; border-top:1px solid #eee; padding-top:10px;">
                         <input id="chat-input" type="text" placeholder="iMessage" style="flex:1; border:1px solid #ccc; border-radius:20px; padding:10px 15px; outline:none; font-family:var(--font); font-size:16px;">
-                        <button onclick="sendChatMessage('${threadName}')" style="background:#007AFF; color:#fff; border:none; border-radius:50%; width:38px; height:38px; margin-left:8px; display:flex; justify-content:center; align-items:center; font-size:16px; cursor:pointer;">↑</button>
+                        <button onclick="sendChatMessage('${threadName}')" style="background:#007AFF; color:#fff; border:none; border-radius:50%; width:38px; height:38px; margin-left:8px; display:flex; justify-content:center; align-items:center; cursor:pointer;"><span class="material-icons" style="font-size:20px;">arrow_upward</span></button>
                     </div>
                 </div>`;
             setTimeout(() => { const sc = document.getElementById('chat-scroller'); if(sc) sc.scrollTop = sc.scrollHeight; }, 50);
@@ -1047,7 +1072,13 @@
     let cameraFacingMode = 'environment';
     function startCamera() {
         if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: cameraFacingMode } }).then(stream => { window.cameraStream = stream; document.getElementById('camera-feed').srcObject = stream; }).catch(err => document.getElementById('camera-feed').parentElement.innerHTML = '<p style="color:#fff; text-align:center; margin-top:50px;">Camera disabled.</p>');
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: cameraFacingMode } }).then(stream => { 
+                window.cameraStream = stream; 
+                const feed = document.getElementById('camera-feed');
+                feed.srcObject = stream; 
+                if (cameraFacingMode === 'user') feed.classList.add('mirrored');
+                else feed.classList.remove('mirrored');
+            }).catch(err => document.getElementById('camera-feed').parentElement.innerHTML = '<p style="color:#fff; text-align:center; margin-top:50px;">Camera disabled.</p>');
         }
     }
     function toggleCameraFacing() {
@@ -1058,19 +1089,38 @@
     function capturePhoto() {
         const v = document.getElementById('camera-feed'); if(!v||!v.videoWidth) return;
         const c = document.createElement('canvas'); 
-        // Increased photo resolution to crisp 1080p
         c.width = 1080; c.height = Math.round(1080 * (v.videoHeight / v.videoWidth));
-        c.getContext('2d').drawImage(v, 0, 0, c.width, c.height); 
+        const ctx = c.getContext('2d');
+        if (cameraFacingMode === 'user') { ctx.translate(c.width, 0); ctx.scale(-1, 1); } // Correct mirror on captured data
+        ctx.drawImage(v, 0, 0, c.width, c.height); 
         state.photos.unshift(c.toDataURL('image/jpeg', 0.85)); saveState(); notify("Camera", "Saved to Photos.");
         const flash = document.createElement('div'); flash.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:#fff;z-index:99;transition:opacity 0.4s; pointer-events:none;';
         document.getElementById('app-ui').appendChild(flash); setTimeout(() => flash.style.opacity = '0', 50); setTimeout(() => flash.remove(), 450);
     }
 
-    // Global Clock & Notifications Trigger
+    // Dark notification layout featuring dynamic application icon lookups
     function notify(title, body) {
-        let ln = document.createElement('div'); ln.className = 'lock-notif glass'; ln.innerHTML = `<strong>${title}</strong>${body}`; document.getElementById('lock-notifications').prepend(ln);
-        let toast = document.createElement('div'); toast.className = 'toast glass'; toast.innerHTML = `<strong>${title}</strong>${body}`; document.body.appendChild(toast);
-        setTimeout(() => toast.classList.add('show'), 100); setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 4000);
+        let iconUrl = APP_DEFS[title] || APP_DEFS['Messages']; // Fallback to messages app icon if contact name
+        
+        let ln = document.createElement('div'); ln.className = 'lock-notif';
+        ln.innerHTML = `
+            <img src="${iconUrl}" style="width:38px; height:38px; border-radius:8px; margin-right:12px;">
+            <div style="flex:1;">
+                <strong style="display:block; font-size:14px; font-weight:500;">${title}</strong>
+                <span style="font-size:13px; font-weight:300; opacity:0.9;">${body}</span>
+            </div>`;
+        document.getElementById('lock-notifications').prepend(ln);
+
+        let toast = document.createElement('div'); toast.className = 'toast';
+        toast.innerHTML = `
+            <img src="${iconUrl}" style="width:38px; height:38px; border-radius:8px; margin-right:12px;">
+            <div style="flex:1;">
+                <strong style="display:block; font-size:14px; font-weight:500; color:#fff;">${title}</strong>
+                <span style="font-size:13px; font-weight:300; color:#eee;">${body}</span>
+            </div>`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 100); 
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 4000);
     }
     setInterval(() => {
         let d = new Date(), hrs = d.getHours().toString().padStart(2, '0'), mins = d.getMinutes().toString().padStart(2, '0'), t = `${hrs}:${mins}`;
