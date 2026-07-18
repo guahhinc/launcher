@@ -24,7 +24,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            transition: none !important; /* Zero animation latency for clean responsive feel */
+            transition: none !important; /* Instant sharp UI snaps, no lag */
         }
 
         body {
@@ -282,7 +282,7 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Simulation ticker viewport */
+        /* Simulation ticker box */
         .ticker-box {
             background-color: var(--bg-dark);
             border: 2px solid var(--border-color);
@@ -291,7 +291,7 @@
             padding: 1.2rem;
             font-family: monospace;
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Chronological bottom-scrolling */
             gap: 10px;
             font-size: 1rem;
         }
@@ -414,6 +414,12 @@
             font-size: 1.1rem;
         }
 
+        .team-logo-img {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+        }
+
         .lineup-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -523,7 +529,7 @@
     <main>
         <!-- TAB 1: ROSTERS & TRADES -->
         <section id="tab-rosters" class="tab-content active">
-            <!-- Custom Franchise settings and sandboxing -->
+            <!-- Custom Franchise Settings and Branding -->
             <div class="panel">
                 <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
                     <div>
@@ -843,7 +849,7 @@
 </div>
 
 <script>
-    // --- SANDBOX AND ROSTER STATE ---
+    // --- GLOBAL STATE ---
     let PLAYERS = [];
     let ALL_TEAMS = [];
 
@@ -853,23 +859,18 @@
     let currentSeasonRound = 0;
     let playoffsState = null;
 
-    // Custom starting rotation elements
     let customLineup = { PG: "", SG: "", SF: "", PF: "", C: "" };
 
-    // Game selections
     let activeExhibitionAway = "";
     let activeExhibitionHome = "";
 
-    // Exhibition simulation values
     let currentSimInterval = null;
     let exhibitionBox = null;
     let boxScoreView = "away";
 
-    // Directory Pagination State
     let directoryPage = 1;
     const directoryPageSize = 40;
 
-    // Transaction state
     let selectedTradePlayerA = null;
     let selectedTradePlayerB = null;
 
@@ -879,14 +880,12 @@
     // --- robustFetchJson PROXY FAIL-SAFE FOR LOCAL ORIGINS ---
     async function robustFetchJson(url) {
         try {
-            // Attempt direct fetch
             const res = await fetch(url);
             if (res.ok) return await res.json();
         } catch (e) {
             console.warn(`Direct fetch blocked for URL: ${url}. Initiating Proxy 1 (CodeTabs)...`);
         }
 
-        // Bypasses local CORS checks utilizing codetabs.com
         try {
             const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
             const res = await fetch(proxyUrl);
@@ -895,7 +894,6 @@
             console.warn(`CodeTabs proxy routing failed. Initiating Proxy 2 (AllOrigins)...`);
         }
 
-        // Bypasses local CORS checks utilizing allorigins.win
         try {
             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
             const res = await fetch(proxyUrl);
@@ -904,19 +902,18 @@
             console.warn(`AllOrigins proxy routing failed. Initiating Proxy 3 (Corsproxy.io)...`);
         }
 
-        // Bypasses local CORS checks utilizing corsproxy.io as fallback
         try {
             const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(url)}`;
             const res = await fetch(proxyUrl);
             if (res.ok) return await res.json();
         } catch (e) {
-            console.error(`All CORS proxies and native fetch options failed for URL: ${url}`);
+            console.error(`All CORS proxies failed for URL: ${url}`);
         }
 
         throw new Error(`Failed to establish connection to live server roster stream. Confirm internet connectivity.`);
     }
 
-    // --- 1. LOCAL STORAGE STATE PERSISTENCE ---
+    // --- LOCAL STORAGE STATE PERSISTENCE ---
     function saveRostersState() {
         localStorage.setItem("slam_sim_players_v6", JSON.stringify(PLAYERS));
         localStorage.setItem("slam_sim_teams_v6", JSON.stringify(ALL_TEAMS));
@@ -973,7 +970,7 @@
         return false;
     }
 
-    // --- 2. LIVE ROSTER INTAKE AND PARSING FROM ./data.json ---
+    // --- LIVE ROSTER INTAKE AND PARSING FROM ./data.json ---
     async function loadNBADataFromAPI() {
         const loader = document.getElementById("api-loader");
         const progress = document.getElementById("loader-progress");
@@ -1005,7 +1002,6 @@
                 players: [] // Dynamic roster load on-demand
             }));
 
-            // Create Sandbox Free Agency Pool
             tempTeams.push({
                 id: "FA",
                 name: "Free Agents Pool",
@@ -1016,7 +1012,6 @@
                 players: []
             });
             
-            // Add Custom Team (Seattle SuperSonics)
             tempTeams.push({
                 id: "CST",
                 name: "Seattle SuperSonics",
@@ -1030,7 +1025,6 @@
             ALL_TEAMS = tempTeams;
             PLAYERS = [];
 
-            // Pre-load active season teams
             const abbreviations = ["LAL", "BOS", "GS", "CHI", "PHX", "DEN", "MIA"];
             const preloads = ALL_TEAMS.filter(t => abbreviations.includes(t.abbreviation));
 
@@ -1043,7 +1037,7 @@
                 try {
                     await loadTeamRosterDynamically(team.id);
                 } catch (err) {
-                    console.warn(`Failed to preload roster for ${team.name}. Roster will lazy load on-demand.`, err);
+                    console.warn(`Failed to preload roster for ${team.name}.`, err);
                 }
             }
             
@@ -1086,7 +1080,6 @@
             };
             assignPlayerAttributes(playerObj);
             
-            // Clean duplicates
             if (!PLAYERS.some(p => p.id === playerObj.id)) {
                 PLAYERS.push(playerObj);
             }
@@ -1097,46 +1090,99 @@
         saveRostersState();
     }
 
-    function showLoaderError(errMsg) {
-        const msg = document.getElementById("loader-msg");
-        const progress = document.getElementById("loader-progress");
-        msg.innerHTML = `
-            <span style="color:var(--accent-red); font-weight:800; font-size:1.15rem; display:block; margin-bottom:1rem;">Initialization Failed</span>
-            <span style="font-size:0.9rem; color:var(--text-muted); display:block; line-height:1.4; max-width: 500px; text-align: left;">
-                Description: ${errMsg}<br><br>
-                Ensure <strong>data.json</strong> has been successfully placed in the same directory as this HTML file. Check internet connectivity for live roster streams.
-            </span>
-        `;
-        progress.style.backgroundColor = "var(--accent-red)";
-        
-        const retryBtnId = "loader-retry-btn";
-        if (!document.getElementById(retryBtnId)) {
-            const retryBtn = document.createElement("button");
-            retryBtn.id = retryBtnId;
-            retryBtn.className = "btn btn-primary";
-            retryBtn.style.marginTop = "1.5rem";
-            retryBtn.textContent = "Retry Initial Connection";
-            retryBtn.onclick = () => {
-                retryBtn.remove();
-                loadNBADataFromAPI();
-            };
-            document.getElementById("api-loader").appendChild(retryBtn);
+    // --- PLAYER STAT GENERATOR MODIFIERS ---
+    function assignPlayerAttributes(p) {
+        const superstars = {
+            "LeBron James": 98, "Stephen Curry": 97, "Nikola Jokic": 98, "Kevin Durant": 96,
+            "Giannis Antetokounmpo": 97, "Luka Doncic": 97, "Joel Embiid": 96, "Jayson Tatum": 95,
+            "Shai Gilgeous-Alexander": 96, "Anthony Davis": 95, "Jimmy Butler": 93, "Kawhi Leonard": 94,
+            "Devin Booker": 93, "Ja Morant": 92, "Kyrie Irving": 93, "Damian Lillard": 92,
+            "Donovan Mitchell": 92, "Tyrese Haliburton": 91, "De'Aaron Fox": 91, "Paul George": 91,
+            "James Harden": 90, "Anthony Edwards": 94, "Victor Wembanyama": 95, "Jalen Brunson": 93,
+            "Jaylen Brown": 93, "Bam Adebayo": 91, "Domantas Sabonis": 90, "Lauri Markkanen": 89,
+            "Paolo Banchero": 89, "Tyrese Maxey": 89, "Chet Holmgren": 89, "Cade Cunningham": 88
+        };
+
+        let baseOvr = superstars[p.name] || (72 + Math.floor(Math.random() * 15));
+        let off = baseOvr, def = baseOvr, reb = baseOvr, ast = baseOvr;
+
+        if (p.pos === "C" || p.pos === "PF") {
+            reb += 12; ast -= 10; def += 4;
+        } else if (p.pos === "PG") {
+            ast += 15; reb -= 12; off += 2;
+        } else if (p.pos === "SG") {
+            off += 6; ast -= 2; reb -= 8;
         }
+
+        p.off = Math.max(50, Math.min(99, off));
+        p.def = Math.max(50, Math.min(99, def));
+        p.reb = Math.max(50, Math.min(99, reb));
+        p.ast = Math.max(50, Math.min(99, ast));
+        p.ovr = Math.round((p.off + p.def + p.reb + p.ast) / 4);
     }
 
-    function resetDatabaseToDefault() {
-        localStorage.clear();
-        loadNBADataFromAPI();
+    // --- ROSTER SELECTION HELPERS (FORMERLY MISSING) ---
+    function populateRostersSelectors() {
+        const selectA = document.getElementById("roster-team-a");
+        const selectB = document.getElementById("roster-team-b");
+        if (!selectA || !selectB) return;
+        
+        const selAVal = selectA.value;
+        const selBVal = selectB.value;
+
+        selectA.innerHTML = "";
+        selectB.innerHTML = "";
+
+        ALL_TEAMS.forEach((t, i) => {
+            const optA = document.createElement("option");
+            optA.value = t.id;
+            optA.textContent = t.name;
+            if (selAVal ? t.id === selAVal : i === 0) optA.selected = true;
+
+            const optB = document.createElement("option");
+            optB.value = t.id;
+            optB.textContent = t.name;
+            if (selBVal ? t.id === selBVal : t.id === "FA") optB.selected = true;
+
+            selectA.appendChild(optA);
+            selectB.appendChild(optB);
+        });
     }
 
-    // --- 4. TABS NAVIGATION ENGINE & LIFECYCLE INITIALIZER ---
+    function renderLineupSelectors() {
+        const positions = ["PG", "SG", "SF", "PF", "C"];
+        const customPlayers = PLAYERS.filter(p => p.teamId === "CST");
+
+        positions.forEach(pos => {
+            const select = document.getElementById(`lineup-${pos}`);
+            if (!select) return;
+            select.innerHTML = "";
+
+            const defaultOpt = document.createElement("option");
+            defaultOpt.value = "";
+            defaultOpt.textContent = customPlayers.length === 0 ? "Sign players first!" : "-- Select Starter --";
+            select.appendChild(defaultOpt);
+
+            const candidates = customPlayers.filter(p => p.pos === pos);
+            candidates.forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p.id;
+                opt.textContent = `${p.name} (OVR ${p.ovr})`;
+                if (customLineup[pos] === p.id) {
+                    opt.selected = true;
+                }
+                select.appendChild(opt);
+            });
+        });
+    }
+
+    // --- LIFECYCLE INITIALIZER ---
     function initApp() {
         populateRostersSelectors();
         renderRosterSide('a');
         renderRosterSide('b');
         renderLineupSelectors();
         
-        // Auto-configure game selection if empty
         if (!activeExhibitionAway || !activeExhibitionHome) {
             const valid = ALL_TEAMS.filter(t => t.id !== "FA");
             activeExhibitionAway = valid[0]?.id || "";
@@ -1151,7 +1197,282 @@
         }
     }
 
-    // --- 5. CUSTOM BRANDING LOGOS DROPDOWNS MODULE ---
+    // --- TABS NAVIGATION ENGINE ---
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        
+        const idx = ['tab-rosters', 'tab-directory', 'tab-exhibition', 'tab-season'].indexOf(tabId);
+        document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+
+        if (tabId === 'tab-rosters') {
+            populateRostersSelectors();
+            renderLineupSelectors();
+        } else if (tabId === 'tab-directory') {
+            renderPlayerDirectory("", "ALL");
+        } else if (tabId === 'tab-exhibition') {
+            populateExhibitionSelectors();
+            updateExhibitionVisuals();
+        } else if (tabId === 'tab-season') {
+            renderStandings();
+            renderLeagueLeaders();
+        }
+    }
+
+    // --- CUSTOM TEAM SETTINGS ---
+    function updateCustomTeamSettings() {
+        const custom = ALL_TEAMS.find(t => t.id === "CST");
+        if (!custom) return;
+
+        const nameInput = document.getElementById("custom-team-name-input").value || "Seattle SuperSonics";
+        const col1 = document.getElementById("custom-color-1").value;
+        const col2 = document.getElementById("custom-color-2").value;
+
+        custom.name = nameInput;
+        custom.col1 = col1;
+        custom.col2 = col2;
+
+        PLAYERS.forEach(p => {
+            if (p.teamId === "CST") {
+                p.team = nameInput;
+                p.col1 = col1;
+                p.col2 = col2;
+            }
+        });
+
+        saveRostersState();
+        populateRostersSelectors();
+        renderRosterSide('a');
+        renderRosterSide('b');
+        renderLineupSelectors();
+    }
+
+    function saveLineupChoice(pos) {
+        const val = document.getElementById(`lineup-${pos}`).value;
+        customLineup[pos] = val;
+        saveRostersState();
+    }
+
+    // --- ROSTER SIDE RENDERING ---
+    function renderRosterSide(side) {
+        const teamId = document.getElementById(`roster-team-${side}`).value;
+        const tbody = document.getElementById(`roster-table-body-${side}`);
+        const searchContainer = document.getElementById(`roster-search-box-${side}`);
+        tbody.innerHTML = "";
+
+        const team = ALL_TEAMS.find(t => t.id === teamId);
+        if (!team) return;
+
+        if (teamId !== "FA" && teamId !== "CST" && (!team.players || team.players.length === 0)) {
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-muted);">🔄 Loading live roster via proxy...</td></tr>`;
+            searchContainer.style.display = "none";
+            
+            loadTeamRosterDynamically(teamId).then(() => {
+                renderRosterSide(side);
+                renderLineupSelectors();
+            }).catch(err => {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 3rem; color: var(--accent-red);">❌ Failed to load live stream: ${err.message}</td></tr>`;
+            });
+            return;
+        }
+
+        searchContainer.style.display = "flex";
+        if (teamId === "FA" || teamId === "CST") {
+            document.getElementById("trade-center-panel").style.display = "none";
+        } else {
+            document.getElementById("trade-center-panel").style.display = "block";
+        }
+
+        const searchQuery = (document.getElementById(`roster-query-${side}`)?.value || "").toLowerCase();
+        const posFilter = document.getElementById(`roster-pos-${side}`).value;
+
+        let rosterPlayers = PLAYERS.filter(p => p.teamId === teamId);
+
+        if (searchQuery) {
+            rosterPlayers = rosterPlayers.filter(p => p.name.toLowerCase().includes(searchQuery));
+        }
+
+        if (posFilter !== "ALL") {
+            rosterPlayers = rosterPlayers.filter(p => p.pos === posFilter);
+        }
+
+        rosterPlayers.sort((a, b) => b.ovr - a.ovr);
+
+        const activeCount = rosterPlayers.length;
+        let avgStrength = 0;
+        if (activeCount > 0) {
+            const topPlayers = rosterPlayers.slice(0, 15);
+            avgStrength = Math.round(topPlayers.reduce((acc, p) => acc + p.ovr, 0) / topPlayers.length);
+        }
+        document.getElementById(`roster-${side}-strength`).textContent = `TEAM OVR: ${avgStrength}`;
+
+        const playersToRender = teamId === "FA" ? rosterPlayers.slice(0, 50) : rosterPlayers;
+
+        playersToRender.forEach(p => {
+            const row = document.createElement("tr");
+            row.id = `player-row-${p.id}`;
+            
+            const isSel = (side === 'a' && selectedTradePlayerA?.id === p.id) || (side === 'b' && selectedTradePlayerB?.id === p.id);
+            if (isSel) row.classList.add('selected');
+
+            row.onclick = (e) => {
+                if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+                toggleTradeSelection(p, side);
+            };
+
+            const otherTeamId = document.getElementById(`roster-team-${side === 'a' ? 'b' : 'a'}`).value;
+
+            row.innerHTML = `
+                <td>
+                    <div class="player-row-info">
+                        <img src="${p.photo}" class="player-photo-mini" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">
+                        <div>
+                            <div style="font-weight: 700;">${p.name}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);"><span class="pos-badge" style="padding:1px 4px; font-size:0.65rem;">${p.pos}</span> • #${p.jersey}</div>
+                        </div>
+                    </div>
+                </td>
+                <td style="text-align: center; font-weight: 700; color: var(--accent-gold);">${p.ovr}</td>
+                <td style="text-align: right;">
+                    <div style="display:flex; gap: 4px; justify-content: flex-end;">
+                        <button class="btn" style="padding: 2px 6px; font-size: 0.7rem;" title="Move directly to opposite pane" onclick="transferPlayerDirect('${p.id}', '${teamId}', '${otherTeamId}')">
+                            ${side === 'a' ? '➡️ Sign' : '⬅️ Sign'}
+                        </button>
+                        ${teamId !== 'FA' ? `<button class="btn btn-danger" style="padding: 2px 6px; font-size: 0.7rem;" title="Release to Free Agency" onclick="transferPlayerDirect('${p.id}', '${teamId}', 'FA')">Release</button>` : ''}
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // --- TRANSACTION LOGIC ---
+    function toggleTradeSelection(player, side) {
+        if (side === 'a') {
+            if (selectedTradePlayerA?.id === player.id) selectedTradePlayerA = null;
+            else selectedTradePlayerA = player;
+        } else {
+            if (selectedTradePlayerB?.id === player.id) selectedTradePlayerB = null;
+            else selectedTradePlayerB = player;
+        }
+        renderRosterSide('a');
+        renderRosterSide('b');
+        updateTradeCenterPanel();
+    }
+
+    function processSelectedTrade() {
+        if (!selectedTradePlayerA || !selectedTradePlayerB) return;
+
+        const teamA = ALL_TEAMS.find(t => t.id === selectedTradePlayerA.teamId);
+        const teamB = ALL_TEAMS.find(t => t.id === selectedTradePlayerB.teamId);
+
+        if (!teamA || !teamB) return;
+
+        teamA.players = teamA.players.filter(id => id !== selectedTradePlayerA.id);
+        teamB.players = teamB.players.filter(id => id !== selectedTradePlayerB.id);
+
+        teamA.players.push(selectedTradePlayerB.id);
+        teamB.players.push(selectedTradePlayerA.id);
+
+        const tempA_teamId = selectedTradePlayerA.teamId;
+        const tempA_team = selectedTradePlayerA.team;
+        const tempA_col1 = selectedTradePlayerA.col1;
+        const tempA_col2 = selectedTradePlayerA.col2;
+
+        selectedTradePlayerA.teamId = selectedTradePlayerB.teamId;
+        selectedTradePlayerA.team = selectedTradePlayerB.team;
+        selectedTradePlayerA.col1 = selectedTradePlayerB.col1;
+        selectedTradePlayerA.col2 = selectedTradePlayerB.col2;
+
+        selectedTradePlayerB.teamId = tempA_teamId;
+        selectedTradePlayerB.team = tempA_team;
+        selectedTradePlayerB.col1 = tempA_col1;
+        selectedTradePlayerB.col2 = tempA_col2;
+
+        if (tempA_teamId === "CST") {
+            Object.keys(customLineup).forEach(pos => {
+                if (customLineup[pos] === selectedTradePlayerA.id) customLineup[pos] = "";
+            });
+        }
+        if (selectedTradePlayerA.teamId === "CST") {
+            Object.keys(customLineup).forEach(pos => {
+                if (customLineup[pos] === selectedTradePlayerB.id) customLineup[pos] = "";
+            });
+        }
+
+        alert(`Trade Complete!\n\n${selectedTradePlayerA.name} swap positions with ${selectedTradePlayerB.name}.`);
+
+        selectedTradePlayerA = null;
+        selectedTradePlayerB = null;
+
+        saveRostersState();
+        renderRosterSide('a');
+        renderRosterSide('b');
+        renderLineupSelectors();
+        updateTradeCenterPanel();
+    }
+
+    // --- DIRECTORY AND SEARCH ---
+    function renderPlayerDirectory(filterQuery = "", filterPos = "ALL") {
+        const grid = document.getElementById("directory-grid");
+        grid.innerHTML = "";
+
+        const query = filterQuery.toLowerCase();
+        
+        const filtered = PLAYERS.filter(p => {
+            const matchesQuery = p.name.toLowerCase().includes(query) || p.team.toLowerCase().includes(query);
+            const matchesPos = filterPos === "ALL" || p.pos === filterPos;
+            return matchesQuery && matchesPos;
+        });
+
+        const totalPages = Math.max(1, Math.ceil(filtered.length / directoryPageSize));
+        if (directoryPage > totalPages) directoryPage = totalPages;
+        
+        const startIndex = (directoryPage - 1) * directoryPageSize;
+        const pageSlice = filtered.slice(startIndex, startIndex + directoryPageSize);
+
+        document.getElementById("dir-page-indicator").textContent = `Page ${directoryPage} of ${totalPages} (${filtered.length} players found)`;
+        document.getElementById("dir-prev-btn").disabled = directoryPage === 1;
+        document.getElementById("dir-next-btn").disabled = directoryPage === totalPages;
+
+        pageSlice.forEach(p => {
+            const card = document.createElement("div");
+            card.className = "player-card";
+            card.innerHTML = `
+                <div class="ovr-badge">${p.ovr}</div>
+                <img src="${p.photo}" class="player-headshot-large" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">
+                <div style="font-weight: 800; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); display:flex; justify-content: space-between; margin-top: 6px; align-items:center;">
+                    <span><span class="pos-badge">${p.pos}</span> • #${p.jersey}</span>
+                    <span style="font-weight:700; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.team}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:0.75rem; border-top: 2px solid var(--border-color); padding-top:8px;">
+                    <span>OFF: <strong>${p.off}</strong></span>
+                    <span>DEF: <strong>${p.def}</strong></span>
+                    <span>REB: <strong>${p.reb}</strong></span>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function onDirectorySearchInput() {
+        directoryPage = 1;
+        const query = document.getElementById("directory-search").value;
+        const pos = document.getElementById("directory-pos-filter").value;
+        renderPlayerDirectory(query, pos);
+    }
+
+    function changeDirectoryPage(direction) {
+        directoryPage += direction;
+        const query = document.getElementById("directory-search").value;
+        const pos = document.getElementById("directory-pos-filter").value;
+        renderPlayerDirectory(query, pos);
+    }
+
+    // --- BRANDING AND LOGO CUSTOM DROPDOWNS ---
     function buildCustomLogoDropdowns() {
         const createMenu = (side) => {
             const menu = document.getElementById(`trigger-${side}-menu`);
@@ -1179,7 +1500,6 @@
     }
 
     function toggleCustomDropdown(side) {
-        // Toggle specific menu, close opposite
         const otherSide = side === "away" ? "home" : "away";
         const menu = document.getElementById(`trigger-${side}-menu`);
         const otherMenu = document.getElementById(`trigger-${otherSide}-menu`);
@@ -1192,7 +1512,6 @@
         }
     }
 
-    // Global listener to close dropdowns when clicking outside
     document.addEventListener("click", function(event) {
         if (!event.target.closest(".custom-dropdown-container")) {
             const menus = document.querySelectorAll(".dropdown-menu-list");
@@ -1206,10 +1525,7 @@
         } else {
             activeExhibitionHome = teamId;
         }
-        
-        // Hide menu
         document.getElementById(`trigger-${side}-menu`).style.display = "none";
-        
         updateExhibitionVisuals();
     }
 
@@ -1235,7 +1551,6 @@
         }
     }
 
-    // --- 6. SIMULATE GAME CORE ROTATION & FATIGUE SYSTEM ---
     function triggerExhibitionSim(isLive) {
         if (currentSimInterval) clearInterval(currentSimInterval);
 
@@ -1249,7 +1564,6 @@
 
         document.getElementById("ticker-feed").innerHTML = "";
 
-        // LAZY ROSTER LOADING IF TARGET IS EMPTY
         const triggerLoadAndSim = async () => {
             if (!teamAway.players || teamAway.players.length === 0) {
                 appendTickerMessage(`🔄 Fetching roster dynamically for ${teamAway.name}...`);
@@ -1279,20 +1593,65 @@
         });
     }
 
-    // FULL ROTATION ENGINE: Substitutes bench players and tracks fatiguing on-court lineups [12]
+    function appendTickerMessage(msg) {
+        const feed = document.getElementById("ticker-feed");
+        const entry = document.createElement("div");
+        entry.className = "ticker-entry";
+        entry.innerHTML = msg;
+        feed.appendChild(entry);
+        feed.scrollTop = feed.scrollHeight;
+    }
+
+    function switchBoxView(view) {
+        boxScoreView = view;
+        renderBoxScoreStats();
+    }
+
+    function renderBoxScoreStats() {
+        const tbody = document.getElementById("box-score-rows");
+        tbody.innerHTML = "";
+
+        if (!exhibitionBox) return;
+
+        document.getElementById("box-tab-away").className = `btn ${boxScoreView === 'away' ? 'btn-primary' : ''}`;
+        document.getElementById("box-tab-home").className = `btn ${boxScoreView === 'home' ? 'btn-primary' : ''}`;
+
+        const roster = boxScoreView === 'away' ? exhibitionBox.statsAway : exhibitionBox.statsHome;
+
+        roster.forEach(p => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>
+                    <div class="player-row-info">
+                        <img src="${p.photo}" class="player-photo-mini" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">
+                        <div>
+                            <strong>${p.name}</strong> 
+                            <span style="color:var(--text-muted); font-size:0.75rem;">${p.pos}</span>
+                        </div>
+                    </div>
+                </td>
+                <td>${p.min.toFixed(0)}</td>
+                <td>${p.pts}</td>
+                <td>${p.reb}</td>
+                <td>${p.ast}</td>
+                <td>${p.stl}</td>
+                <td>${p.blk}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // --- GAME SIMULATOR ALGORITHMS ---
     function executeGameRotationSimulation(teamAway, teamHome, isLive, onUpdate) {
-        // Collect full team rosters [12]
         let fullRosterAway = PLAYERS.filter(p => p.teamId === teamAway.id).map(p => ({ ...p, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, min: 0, gp: 1, fatigue: 100 }));
         let fullRosterHome = PLAYERS.filter(p => p.teamId === teamHome.id).map(p => ({ ...p, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, min: 0, gp: 1, fatigue: 100 }));
 
-        // Safe subs fill-up in case the rosters are empty on live server
         const positions = ["PG", "SG", "SF", "PF", "C"];
         positions.forEach((pos, idx) => {
             if (fullRosterAway.length < 5) fullRosterAway.push({ id: `sub_a_${idx}`, name: "Sub Away", pos: pos, ovr: 70, off: 70, def: 70, reb: 70, ast: 70, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, min: 0, gp: 1, fatigue: 100, photo: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png" });
             if (fullRosterHome.length < 5) fullRosterHome.push({ id: `sub_h_${idx}`, name: "Sub Home", pos: pos, ovr: 70, off: 70, def: 70, reb: 70, ast: 70, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, min: 0, gp: 1, fatigue: 100, photo: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png" });
         });
 
-        // Setup Starting 5 [12]
         let activeCourtAway = [];
         let activeCourtHome = [];
 
@@ -1304,7 +1663,6 @@
                     if (pObj) dest.push(pObj);
                 });
             }
-            // Auto starters fill-up if CST configuration is incomplete
             positions.forEach(pos => {
                 if (dest.length < 5 && !dest.some(rx => rx.pos === pos)) {
                     let candidates = roster.filter(p => p.pos === pos && !dest.some(rx => rx.id === p.id));
@@ -1314,7 +1672,6 @@
                     }
                 }
             });
-            // Complete fill
             roster.forEach(p => {
                 if (dest.length < 5 && !dest.some(rx => rx.id === p.id)) {
                     dest.push(p);
@@ -1335,10 +1692,9 @@
             let fullOffRoster = isAwayPoss ? fullRosterAway : fullRosterHome;
             let fullDefRoster = isAwayPoss ? fullRosterHome : fullRosterAway;
 
-            // Increment fatigue for on-court players, minutes, and recuperate bench [12]
             fullOffRoster.forEach(p => {
                 if (offSquad.some(ox => ox.id === p.id)) {
-                    p.min += 0.5; // Roughly 0.5 mins per possession
+                    p.min += 0.5;
                     p.fatigue = Math.max(40, p.fatigue - 1.5);
                 } else {
                     p.fatigue = Math.min(100, p.fatigue + 3.0);
@@ -1353,24 +1709,21 @@
                 }
             });
 
-            // Perform automatic logical lineup substitutions [12]
             let subMessage = "";
             const makeSubs = (court, roster, sideLabel) => {
                 for (let i = 0; i < court.length; i++) {
                     let player = court[i];
-                    if (player.fatigue < 65) { // Tired, make substitution [12]
+                    if (player.fatigue < 65) {
                         let benchCandidates = roster.filter(p => !court.some(cx => cx.id === p.id) && p.fatigue > 85);
                         if (benchCandidates.length > 0) {
-                            // Find closest position or highest OVR
                             let bestMatch = benchCandidates.find(p => p.pos === player.pos);
                             if (!bestMatch) {
                                 benchCandidates.sort((a, b) => b.ovr - a.ovr);
                                 bestMatch = benchCandidates[0];
                             }
-                            // Swap court and roster [12]
                             court[i] = bestMatch;
                             subMessage += `🔄 Substitution (${sideLabel}): <strong>${bestMatch.name}</strong> enters the game for <strong>${player.name}</strong>.<br>`;
-                            break; // Swap one player per possession to keep rot realistic
+                            break;
                         }
                     }
                 }
@@ -1379,9 +1732,8 @@
             makeSubs(activeCourtAway, fullRosterAway, "Away");
             makeSubs(activeCourtHome, fullRosterHome, "Home");
 
-            // Usage weights based on on-court ratings
             let usage = offSquad.map(p => {
-                let u = p.off * (p.fatigue / 100); // Fatigue decreases shot utilization slightly
+                let u = p.off * (p.fatigue / 100);
                 if (p.pos === "PG" || p.pos === "SG") u += 15;
                 return u;
             });
@@ -1392,10 +1744,9 @@
 
             let successCap = 46 + (shooter.off - defender.def) * 0.45;
             let dice = Math.random() * 100;
-            let msg = subMessage; // Prepend substitutions to the live stream text
+            let msg = subMessage;
 
             if (dice < successCap) {
-                // BASKET SUCCESS
                 let isThree = (shooter.pos === "PG" || shooter.pos === "SG") && Math.random() < 0.35;
                 let pts = isThree ? 3 : 2;
                 shooter.pts += pts;
@@ -1413,7 +1764,6 @@
                     `🎯 <strong>${shooter.name}</strong> drills a deep 3-pointer! ${assister ? `(Assist: ${assister.name})` : ''}` :
                     `🏀 <strong>${shooter.name}</strong> drives inside for a layup. ${assister ? `(Assist: ${assister.name})` : ''}`;
             } else {
-                // MISS REBOUND OR BLOCK
                 let block = Math.random() * 100 < (defender.def * 0.1);
                 if (block) {
                     let blockers = defSquad.filter(p => p.pos === "C" || p.pos === "PF");
@@ -1462,7 +1812,7 @@
                     clearInterval(currentSimInterval);
                     currentSimInterval = null;
                 }
-            }, 350); // Live Stream Speed (Slowed down to 350ms per prompt request)
+            }, 350);
         } else {
             let finalState = {};
             for (let p = 0; p < totalPossessions; p++) {
@@ -1472,12 +1822,178 @@
             onUpdate(finalState);
         }
 
-        // Return full roster to render all box scores [12]
         return { statsAway: fullRosterAway, statsHome: fullRosterHome };
     }
 
-    // --- 10. SIMULATE SEASON MODULE ---
-    // FIXED: ASYNC hydration safeguards to automatically load empty rosters before sim
+    function getSimStartingRotation(team) {
+        let rotation = [];
+
+        if (team.id === "CST") {
+            const positions = ["PG", "SG", "SF", "PF", "C"];
+            positions.forEach(pos => {
+                let pId = customLineup[pos];
+                let pObj = PLAYERS.find(p => p.id === pId && p.teamId === "CST");
+                if (pObj) {
+                    rotation.push({ ...pObj, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, gp: 1 });
+                }
+            });
+        }
+
+        if (rotation.length < 5) {
+            let teamPlayers = PLAYERS.filter(p => p.teamId === team.id);
+            const positions = ["PG", "SG", "SF", "PF", "C"];
+            
+            positions.forEach(pos => {
+                if (rotation.length < 5 && !rotation.some(rx => rx.pos === pos)) {
+                    let candidates = teamPlayers.filter(p => p.pos === pos && !rotation.some(rx => rx.id === p.id));
+                    if (candidates.length > 0) {
+                        candidates.sort((a, b) => b.ovr - a.ovr);
+                        rotation.push({ ...candidates[0], pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, gp: 1 });
+                    }
+                }
+            });
+
+            teamPlayers.forEach(p => {
+                if (rotation.length < 5 && !rotation.some(rx => rx.id === p.id)) {
+                    rotation.push({ ...p, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, gp: 1 });
+                }
+            });
+        }
+
+        while (rotation.length < 5) {
+            rotation.push({ name: "Sub Rotation", pos: "G", ovr: 70, off: 70, def: 70, reb: 70, ast: 70, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, gp: 1 });
+        }
+
+        return rotation;
+    }
+
+    function getWeightedRandomIdx(w) {
+        let sum = w.reduce((a, b) => a + b, 0);
+        let rand = Math.random() * sum;
+        let accum = 0;
+        for (let i = 0; i < w.length; i++) {
+            accum += w[i];
+            if (rand <= accum) return i;
+        }
+        return w.length - 1;
+    }
+
+    // --- SIMULATE SEASON MODULE ---
+    function initSeason() {
+        const abbreviations = ["LAL", "BOS", "GS", "CHI", "PHX", "DEN", "MIA"];
+        const activePool = [];
+        
+        abbreviations.forEach(abbr => {
+            const found = ALL_TEAMS.find(t => t.abbreviation === abbr);
+            if (found) activePool.push(found);
+        });
+
+        while (activePool.length < 7 && ALL_TEAMS.length > 0) {
+            const extra = ALL_TEAMS.find(t => t.id !== "CST" && t.id !== "FA" && !activePool.includes(t));
+            if (extra) activePool.push(extra);
+            else break;
+        }
+
+        const custom = ALL_TEAMS.find(t => t.id === "CST");
+        if (custom) activePool.push(custom);
+
+        activePool.forEach(t => {
+            while (t.players.length < 5) {
+                const faPlayers = PLAYERS.filter(p => p.teamId === "FA");
+                if (faPlayers.length > 0) {
+                    const randomFA = faPlayers[Math.floor(Math.random() * faPlayers.length)];
+                    randomFA.teamId = t.id;
+                    randomFA.team = t.name;
+                    randomFA.col1 = t.col1;
+                    randomFA.col2 = t.col2;
+                    t.players.push(randomFA.id);
+                    
+                    const faTeam = ALL_TEAMS.find(team => team.id === "FA");
+                    if (faTeam) faTeam.players = faTeam.players.filter(id => id !== randomFA.id);
+                } else {
+                    break;
+                }
+            }
+        });
+
+        seasonStandings = activePool.map(t => ({
+            id: t.id, name: t.name, wins: 0, losses: 0, ptsFor: 0, ptsAgainst: 0, pct: 0
+        }));
+
+        playerSeasonStats = {};
+        PLAYERS.forEach(p => {
+            playerSeasonStats[p.id] = { name: p.name, pos: p.pos, pts: 0, reb: 0, ast: 0, gp: 0 };
+        });
+
+        currentSeasonRound = 0;
+        playoffsState = null;
+
+        document.getElementById("playoff-bracket").style.display = "none";
+        document.getElementById("season-champ-card").style.display = "none";
+        document.getElementById("sim-day-btn").disabled = false;
+        document.getElementById("sim-all-btn").disabled = false;
+        document.getElementById("sim-day-btn").textContent = "📅 Simulate Next Game-day";
+
+        generateSeasonSchedule(activePool);
+        saveRostersState();
+        renderStandings();
+        renderLeagueLeaders();
+    }
+
+    function generateSeasonSchedule(teams) {
+        seasonSchedule = [];
+        let list = [...teams];
+        let n = list.length;
+
+        for (let r = 0; r < (n - 1) * 2; r++) {
+            let roundGames = [];
+            for (let i = 0; i < n / 2; i++) {
+                let home = list[i];
+                let away = list[n - 1 - i];
+                if (r >= n - 1) {
+                    roundGames.push({ home: away, away: home, played: false, scoreH: 0, scoreA: 0 });
+                } else {
+                    roundGames.push({ home: home, away: away, played: false, scoreH: 0, scoreA: 0 });
+                }
+            }
+            list.splice(1, 0, list.pop());
+            seasonSchedule.push(roundGames);
+        }
+    }
+
+    function renderStandings() {
+        seasonStandings.sort((a, b) => {
+            if (b.wins !== a.wins) return b.wins - a.wins;
+            return (b.ptsFor - b.ptsAgainst) - (a.ptsFor - a.ptsAgainst);
+        });
+
+        const tbody = document.getElementById("season-standings-body");
+        tbody.innerHTML = "";
+
+        seasonStandings.forEach((t, i) => {
+            let pct = t.wins + t.losses > 0 ? (t.wins / (t.wins + t.losses)).toFixed(3) : ".000";
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><strong>#${i+1}</strong> <span style="font-weight:700;">${t.name}</span></td>
+                <td style="text-align: center;">${t.wins}</td>
+                <td style="text-align: center;">${t.losses}</td>
+                <td style="text-align: center; color: var(--text-muted); font-family: monospace;">${pct}</td>
+                <td style="text-align: center;">${t.ptsFor}</td>
+                <td style="text-align: center;">${t.ptsAgainst}</td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        const stage = document.getElementById("season-stage");
+        if (currentSeasonRound < seasonSchedule.length) {
+            stage.textContent = `Round ${currentSeasonRound + 1} / ${seasonSchedule.length}`;
+        } else if (!playoffsState) {
+            stage.textContent = "Regular Season Complete";
+        } else {
+            stage.textContent = `Playoffs - ${playoffsState.round.toUpperCase()}`;
+        }
+    }
+
     async function simSeasonDay() {
         if (currentSeasonRound >= seasonSchedule.length) {
             if (!playoffsState) {
@@ -1496,7 +2012,6 @@
         for (let i = 0; i < games.length; i++) {
             const g = games[i];
 
-            // AUTO-HYDRATE ROSTERS VIA PROXY TO PREVENT SIMULATION CRASHES
             if (!g.away.players || g.away.players.length === 0) {
                 try { await loadTeamRosterDynamically(g.away.id); } catch (e) { console.error("Roster failed to load", e); }
             }
@@ -1590,7 +2105,6 @@
         makeList("leader-ast-list", "ast");
     }
 
-    // --- 11. PLAYOFFS SYSTEM ---
     function initPlayoffBracket() {
         document.getElementById("playoff-bracket").style.display = "block";
         document.getElementById("sim-day-btn").textContent = "🏆 Run Semifinals";
@@ -1624,7 +2138,6 @@
         document.getElementById("sim-day-btn").disabled = true;
 
         if (playoffsState.round === "semis") {
-            // Auto-hydrate semi team rosters if needed
             if (!playoffsState.semi1.t1.players || playoffsState.semi1.t1.players.length === 0) {
                 try { await loadTeamRosterDynamically(playoffsState.semi1.t1.id); } catch(e){}
             }
@@ -1647,7 +2160,7 @@
             document.getElementById("bracket-s1-t1").innerHTML = `(1) ${playoffsState.semi1.t1.abbreviation} - <strong>${score1A}</strong>`;
             document.getElementById("bracket-s1-t2").innerHTML = `(4) ${playoffsState.semi1.t2.abbreviation} - <strong>${score1H}</strong>`;
 
-            let box2 = executeGameSimulation(playoffsState.semi2.t1, playoffsState.semi2.t2, false, () => {});
+            let box2 = executeGameRotationSimulation(playoffsState.semi2.t1, playoffsState.semi2.t2, false, () => {});
             let score2A = box2.statsAway.reduce((sum, p) => sum + p.pts, 0);
             let score2H = box2.statsHome.reduce((sum, p) => sum + p.pts, 0);
             let w2 = score2A > score2H ? playoffsState.semi2.t1 : playoffsState.semi2.t2;
@@ -1690,7 +2203,7 @@
         initSeason();
     }
 
-    // --- 12. RUNTIME BOOTSTRAP GATEWAY ---
+    // --- RUNTIME BOOTSTRAP GATEWAY ---
     window.onload = () => {
         if (checkRostersState()) {
             initApp();
