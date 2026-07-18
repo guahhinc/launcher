@@ -1292,58 +1292,91 @@
         const progress = document.getElementById("loader-progress");
         const msg = document.getElementById("loader-msg");
         
-        loader.style.display = "flex";
-        progress.style.width = "0%";
+        if (loader) loader.style.display = "flex";
+        if (progress) progress.style.width = "0%";
         
         try {
-            msg.textContent = "Loading NBA Franchises locally from `./data.json`...";
-            progress.style.width = "20%";
+            if (msg) msg.textContent = "Attempting to load NBA Franchises from local `data.json`...";
+            if (progress) progress.style.width = "10%";
             
-            const teamsRes = await fetch('./data.json');
-            if (!teamsRes.ok) throw new Error("Could not find local data.json.");
-            const teamsData = await teamsRes.json();
-            
-            const rawTeams = teamsData.sports[0].leagues[0].teams.map(t => t.team);
-            
-            const tempTeams = rawTeams.map(t => ({
-                id: t.id,
-                name: t.displayName,
-                abbreviation: t.abbreviation,
-                col1: t.color ? `#${t.color}` : "#3b82f6",
-                col2: t.alternateColor ? `#${t.alternateColor}` : "#ffffff",
-                logo: t.logos?.[0]?.href || "",
-                players: [] 
-            }));
-
-            tempTeams.push({
-                id: "FA",
-                name: "Free Agents Pool",
-                abbreviation: "FA",
-                col1: "#475569",
-                col2: "#cbd5e1",
-                logo: "",
-                players: []
-            });
-
-            ALL_TEAMS = tempTeams;
-            PLAYERS = [];
-
-            const preloads = ALL_TEAMS.filter(t => t.id !== "FA");
-            for (let i = 0; i < Math.min(preloads.length, 30); i++) {
-                const team = preloads[i];
-                const pct = Math.round(((i + 1) / preloads.length) * 70) + 20;
-                progress.style.width = `${pct}%`;
-                msg.textContent = `Pre-loading live roster data... (${i + 1}/${preloads.length})`;
-                try { await loadTeamRosterDynamically(team.id); } catch (err) {}
+            let teamsData;
+            try {
+                const teamsRes = await fetch('./data.json');
+                if (teamsRes.ok) {
+                    teamsData = await teamsRes.json();
+                }
+            } catch(e) {
+                console.log("Local data.json not found, trying ESPN API...");
             }
             
-            progress.style.width = "100%";
+            let rawTeams = [];
+            
+            if (teamsData && teamsData.sports && teamsData.sports[0].leagues[0].teams) {
+                rawTeams = teamsData.sports[0].leagues[0].teams.map(t => t.team);
+            } else {
+                // Tier 2: Try to fetch live ESPN API
+                if (msg) msg.textContent = "Fetching live NBA franchises from ESPN API...";
+                if (progress) progress.style.width = "20%";
+                try {
+                    const espnData = await robustFetchJson("https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams");
+                    if (espnData && espnData.sports && espnData.sports[0].leagues[0].teams) {
+                        rawTeams = espnData.sports[0].leagues[0].teams.map(t => t.team);
+                    }
+                } catch(err) {
+                    console.log("ESPN API failed, using self-contained local fallback rosters...");
+                }
+            }
+            
+            if (rawTeams.length > 0) {
+                const tempTeams = rawTeams.map(t => ({
+                    id: t.id,
+                    name: t.displayName,
+                    abbreviation: t.abbreviation,
+                    col1: t.color ? `#${t.color}` : "#3b82f6",
+                    col2: t.alternateColor ? `#${t.alternateColor}` : "#ffffff",
+                    logo: t.logos?.[0]?.href || "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png",
+                    players: [] 
+                }));
+
+                tempTeams.push({
+                    id: "FA",
+                    name: "Free Agents Pool",
+                    abbreviation: "FA",
+                    col1: "#475569",
+                    col2: "#cbd5e1",
+                    logo: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png",
+                    players: []
+                });
+
+                ALL_TEAMS = tempTeams;
+                PLAYERS = [];
+
+                const preloads = ALL_TEAMS.filter(t => t.id !== "FA");
+                for (let i = 0; i < Math.min(preloads.length, 30); i++) {
+                    const team = preloads[i];
+                    const pct = Math.round(((i + 1) / preloads.length) * 70) + 20;
+                    if (progress) progress.style.width = `${pct}%`;
+                    if (msg) msg.textContent = `Pre-loading live roster data... (${i + 1}/${preloads.length})`;
+                    try { await loadTeamRosterDynamically(team.id); } catch (err) {}
+                }
+            } else {
+                // Tier 3: Completely self-contained generation of mock franchises & rosters
+                if (msg) msg.textContent = "Offline Mode: Generating mock NBA rosters...";
+                if (progress) progress.style.width = "50%";
+                generateMockRosters();
+            }
+            
+            if (progress) progress.style.width = "100%";
             saveRostersState();
-            loader.style.display = "none";
+            if (loader) loader.style.display = "none";
             initApp();
         } catch (err) {
-            alert("Error loading data. Initializing fail-safe configuration.");
-            loader.style.display = "none";
+            console.error(err);
+            generateMockRosters();
+            if (progress) progress.style.width = "100%";
+            saveRostersState();
+            if (loader) loader.style.display = "none";
+            initApp();
         }
     }
 
@@ -1396,71 +1429,123 @@
         saveRostersState();
     }
 
-    // --- LIFECYCLE ---
-    function initApp() {
-        const posOpts = [
-            {label:'All Pos', value:'ALL'},{label:'PG', value:'PG'},{label:'SG', value:'SG'},
-            {label:'SF', value:'SF'},{label:'PF', value:'PF'},{label:'C', value:'C'}
+    // --- OFFLINE / LIVE FALLBACK GENERATOR ---
+    function generateMockRosters() {
+        const mockFranchises = [
+            { id: "1", name: "Atlanta Hawks", abbreviation: "ATL", col1: "#e31837", col2: "#c1d32f" },
+            { id: "2", name: "Boston Celtics", abbreviation: "BOS", col1: "#007a33", col2: "#ba9653" },
+            { id: "3", name: "Brooklyn Nets", abbreviation: "BKN", col1: "#000000", col2: "#ffffff" },
+            { id: "4", name: "Charlotte Hornets", abbreviation: "CHA", col1: "#1d1160", col2: "#00788c" },
+            { id: "5", name: "Chicago Bulls", abbreviation: "CHI", col1: "#ce1141", col2: "#000000" },
+            { id: "6", name: "Cleveland Cavaliers", abbreviation: "CLE", col1: "#860038", col2: "#fdbb30" },
+            { id: "7", name: "Dallas Mavericks", abbreviation: "DAL", col1: "#0053bc", col2: "#bbc4c9" },
+            { id: "8", name: "Denver Nuggets", abbreviation: "DEN", col1: "#0e2240", col2: "#fec524" },
+            { id: "9", name: "Detroit Pistons", abbreviation: "DET", col1: "#c8102e", col2: "#1d428a" },
+            { id: "10", name: "Golden State Warriors", abbreviation: "GSW", col1: "#1d428a", col2: "#ffc72c" },
+            { id: "11", name: "Houston Rockets", abbreviation: "HOU", col1: "#ce1141", col2: "#000000" },
+            { id: "12", name: "Indiana Pacers", abbreviation: "IND", col1: "#002d62", col2: "#fdbb30" },
+            { id: "13", name: "Los Angeles Clippers", abbreviation: "LAC", col1: "#c8102e", col2: "#1d428a" },
+            { id: "14", name: "Los Angeles Lakers", abbreviation: "LAL", col1: "#552583", col2: "#fdb927" },
+            { id: "15", name: "Memphis Grizzlies", abbreviation: "MEM", col1: "#5d76a9", col2: "#12173f" },
+            { id: "16", name: "Miami Heat", abbreviation: "MIA", col1: "#98002e", col2: "#f9a01b" },
+            { id: "17", name: "Milwaukee Bucks", abbreviation: "MIL", col1: "#00471b", col2: "#eee1c6" },
+            { id: "18", name: "Minnesota Timberwolves", abbreviation: "MIN", col1: "#0c2340", col2: "#78be20" },
+            { id: "19", name: "New Orleans Pelicans", abbreviation: "NOP", col1: "#0c2340", col2: "#c8102e" },
+            { id: "20", name: "New York Knicks", abbreviation: "NYK", col1: "#006bb6", col2: "#f58426" },
+            { id: "21", name: "Oklahoma City Thunder", abbreviation: "OKC", col1: "#007ac1", col2: "#ef3b24" },
+            { id: "22", name: "Orlando Magic", abbreviation: "ORL", col1: "#0077c0", col2: "#c4ced4" },
+            { id: "23", name: "Philadelphia 76ers", abbreviation: "PHI", col1: "#006bb6", col2: "#ed174c" },
+            { id: "24", name: "Phoenix Suns", abbreviation: "PHX", col1: "#1d1160", col2: "#e56020" },
+            { id: "25", name: "Portland Trail Blazers", abbreviation: "POR", col1: "#e03a3e", col2: "#000000" },
+            { id: "26", name: "Sacramento Kings", abbreviation: "SAC", col1: "#5a2d81", col2: "#63727a" },
+            { id: "27", name: "San Antonio Spurs", abbreviation: "SAS", col1: "#c4ced4", col2: "#000000" },
+            { id: "28", name: "Toronto Raptors", abbreviation: "TOR", col1: "#ce1141", col2: "#000000" },
+            { id: "29", name: "Utah Jazz", abbreviation: "UTA", col1: "#002b5c", col2: "#f9a01b" },
+            { id: "30", name: "Washington Wizards", abbreviation: "WAS", col1: "#002b5c", col2: "#e31837" }
         ];
-        createDropdown('pos-a', posOpts, 'ALL', '', 'onRosterPosA');
-        createDropdown('pos-b', posOpts, 'ALL', '', 'onRosterPosB');
-        
-        updateMCDisplay();
-        
-        if (!userTeamId) {
-            document.body.style.overflow = "hidden";
-            renderStartupTeamSelectors();
-            document.getElementById("team-selection-overlay").style.display = "flex";
-        } else {
-            document.body.style.overflow = "";
-            document.getElementById("team-selection-overlay").style.display = "none";
-            switchTab("tab-rosters");
-            updateUserTeamDisplay();
-            renderRosterSide('a');
-            buildCustomLogoDropdowns();
-            renderLineupSelectors();
-        }
 
-        renderNewsFeed();
-        if(seasonStandings.length === 0 && userTeamId) startSeason();
+        ALL_TEAMS = mockFranchises.map(t => ({
+            id: t.id,
+            name: t.name,
+            abbreviation: t.abbreviation,
+            col1: t.col1,
+            col2: t.col2,
+            logo: `https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500/${t.abbreviation.toLowerCase()}.png`,
+            players: []
+        }));
+
+        ALL_TEAMS.push({
+            id: "FA",
+            name: "Free Agents Pool",
+            abbreviation: "FA",
+            col1: "#475569",
+            col2: "#cbd5e1",
+            logo: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png",
+            players: []
+        });
+
+        PLAYERS = [];
+
+        const positions = ["PG", "SG", "SF", "PF", "C"];
+        let playerIdCounter = 10000;
+
+        ALL_TEAMS.forEach(team => {
+            if (team.id === "FA") return;
+
+            const teamPlayerIds = [];
+            for (let i = 0; i < 10; i++) {
+                const pos = positions[i % 5];
+                const pName = generateRealisticSubstituteName();
+                const pId = (playerIdCounter++).toString();
+                
+                const playerObj = {
+                    id: pId,
+                    name: pName,
+                    pos: pos,
+                    team: team.name,
+                    teamId: team.id,
+                    jersey: Math.floor(Math.random() * 99).toString(),
+                    photo: `https://cdn.nba.com/headshots/nba/latest/1040x760/${Math.floor(Math.random() * 200000) + 1600000}.png`,
+                    col1: team.col1,
+                    col2: team.col2,
+                    injuryDays: 0,
+                    injuryType: ""
+                };
+                assignPlayerAttributes(playerObj);
+                PLAYERS.push(playerObj);
+                teamPlayerIds.push(pId);
+            }
+            team.players = teamPlayerIds;
+        });
+
+        const faTeam = ALL_TEAMS.find(t => t.id === "FA");
+        const faPlayerIds = [];
+        for (let i = 0; i < 20; i++) {
+            const pos = positions[i % 5];
+            const pName = generateRealisticSubstituteName();
+            const pId = (playerIdCounter++).toString();
+            
+            const playerObj = {
+                id: pId,
+                name: pName,
+                pos: pos,
+                team: "Free Agent",
+                teamId: "FA",
+                jersey: Math.floor(Math.random() * 99).toString(),
+                photo: `https://cdn.nba.com/headshots/nba/latest/1040x760/${Math.floor(Math.random() * 200000) + 1600000}.png`,
+                col1: "#475569",
+                col2: "#cbd5e1",
+                injuryDays: 0,
+                injuryType: ""
+            };
+            assignPlayerAttributes(playerObj);
+            PLAYERS.push(playerObj);
+            faPlayerIds.push(pId);
+        }
+        if (faTeam) faTeam.players = faPlayerIds;
     }
 
-    window.onRosterPosA = (v) => { renderRosterSide('a'); }
-    window.onRosterPosB = (v) => { renderRosterSide('b'); }
-
-    window.onLineupPG = (val) => { customLineup.PG = val; saveRostersState(); }
-    window.onLineupSG = (val) => { customLineup.SG = val; saveRostersState(); }
-    window.onLineupSF = (val) => { customLineup.SF = val; saveRostersState(); }
-    window.onLineupPF = (val) => { customLineup.PF = val; saveRostersState(); }
-    window.onLineupC  = (val) => { customLineup.C  = val; saveRostersState(); }
-
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        
-        document.getElementById(tabId).classList.add('active');
-        
-        const idx = ['tab-rosters', 'tab-play', 'tab-upgrades', 'tab-news'].indexOf(tabId);
-        if(document.querySelectorAll('.nav-btn')[idx]) {
-            document.querySelectorAll('.nav-btn')[idx].classList.add('active');
-        }
-
-        if (tabId === 'tab-rosters') {
-            renderRosterSide('a');
-            renderRosterSide('b');
-            renderLineupSelectors();
-        } else if (tabId === 'tab-play') {
-            updateMatchupPreview();
-            renderStandings();
-            renderLeagueLeaders();
-        } else if (tabId === 'tab-upgrades') {
-            buildCustomUpgradesDropdown();
-        } else if (tabId === 'tab-news') {
-            renderNewsFeed();
-        }
-    }
-
-    // --- MYCASH INDICATOR AND DATA CONTROLLER ---
+    // --- MYCASH MANAGEMENT INDICATION ---
     function updateMCDisplay() {
         const badge = document.getElementById("mm-display");
         if(badge) badge.innerHTML = `💰 ${formatMC(userMC)} MC`;
@@ -1845,7 +1930,7 @@
         selectedFA.col1 = targetTeam.col1;
         selectedFA.col2 = targetTeam.col2;
         
-        addNewsItem('trade', `✍ {Claim Success}: The <strong>${targetTeam.name}</strong> have claimed <strong>${selectedFA.name}</strong> (${selectedFA.pos}, OVR ${selectedFA.ovr}) from the Free Agents Pool.`);
+        addNewsItem('trade', `✍ <strong>Waiver Claim</strong>: The <strong>${targetTeam.name}</strong> have claimed <strong>${selectedFA.name}</strong> (${selectedFA.pos}, OVR ${selectedFA.ovr}) from the Free Agents Pool.`);
     }
 
     // --- INJURY SYSTEM ---
@@ -1910,11 +1995,14 @@
                 const awayTeam = userMatch.t1;
                 const homeTeam = userMatch.t2;
                 
-                document.getElementById("ex-logo-away").innerHTML = awayTeam.logo ? `<img src="${awayTeam.logo}" class="team-logo-img" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">` : `🏀`;
+                const logoA = (awayTeam && awayTeam.logo && awayTeam.logo.trim() !== "") ? awayTeam.logo : "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png";
+                const logoH = (homeTeam && homeTeam.logo && homeTeam.logo.trim() !== "") ? homeTeam.logo : "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png";
+
+                document.getElementById("ex-logo-away").innerHTML = `<img src="${logoA}" class="team-logo-img" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">`;
                 document.getElementById("ex-name-away").textContent = awayTeam.name;
                 document.getElementById("box-tab-away").textContent = awayTeam.name;
                 
-                document.getElementById("ex-logo-home").innerHTML = homeTeam.logo ? `<img src="${homeTeam.logo}" class="team-logo-img" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">` : `🏀`;
+                document.getElementById("ex-logo-home").innerHTML = `<img src="${logoH}" class="team-logo-img" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">`;
                 document.getElementById("ex-name-home").textContent = homeTeam.name;
                 document.getElementById("box-tab-home").textContent = homeTeam.name;
                 
@@ -1941,11 +2029,14 @@
                 const awayTeam = userGame.away;
                 const homeTeam = userGame.home;
                 
-                document.getElementById("ex-logo-away").innerHTML = awayTeam.logo ? `<img src="${awayTeam.logo}" class="team-logo-img" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">` : `🏀`;
+                const logoA = (awayTeam && awayTeam.logo && awayTeam.logo.trim() !== "") ? awayTeam.logo : "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png";
+                const logoH = (homeTeam && homeTeam.logo && homeTeam.logo.trim() !== "") ? homeTeam.logo : "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png";
+
+                document.getElementById("ex-logo-away").innerHTML = `<img src="${logoA}" class="team-logo-img" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">`;
                 document.getElementById("ex-name-away").textContent = awayTeam.name;
                 document.getElementById("box-tab-away").textContent = awayTeam.name;
                 
-                document.getElementById("ex-logo-home").innerHTML = homeTeam.logo ? `<img src="${homeTeam.logo}" class="team-logo-img" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">` : `🏀`;
+                document.getElementById("ex-logo-home").innerHTML = `<img src="${logoH}" class="team-logo-img" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">`;
                 document.getElementById("ex-name-home").textContent = homeTeam.name;
                 document.getElementById("box-tab-home").textContent = homeTeam.name;
                 
@@ -2007,7 +2098,7 @@
                 if (update.isFinished) {
                     processPostgameResolution(update.scoreAway, update.scoreHome, activeMatchRef);
                 }
-            }, 100); // Live Sim delay reduced to 100ms for quicker matches
+            }, 100); 
         };
 
         executeMergedScheduleStep().catch(err => {
@@ -2466,60 +2557,7 @@
         updateMatchupPreview();
     }
 
-    function generateSeasonSchedule(teams) {
-        seasonSchedule = [];
-        let list = [...teams];
-        let n = list.length; 
-
-        for (let r = 0; r < n - 1; r++) {
-            let roundGames = [];
-            for (let i = 0; i < n / 2; i++) {
-                let home = list[i];
-                let away = list[n - 1 - i];
-                roundGames.push({ home: home, away: away, played: false, scoreH: 0, scoreA: 0 });
-            }
-            list.splice(1, 0, list.pop());
-            seasonSchedule.push(roundGames);
-        }
-    }
-
-    function renderStandings() {
-        seasonStandings.sort((a, b) => {
-            if (b.wins !== a.wins) return b.wins - a.wins;
-            return (b.ptsFor - b.ptsAgainst) - (a.ptsFor - a.ptsAgainst);
-        });
-
-        const tbody = document.getElementById("season-standings-body");
-        if (!tbody) return;
-        tbody.innerHTML = "";
-
-        seasonStandings.forEach((t, i) => {
-            let pct = t.wins + t.losses > 0 ? (t.wins / (t.wins + t.losses)).toFixed(3) : ".000";
-            const row = document.createElement("tr");
-            
-            if(t.id === userTeamId) row.className = "user-team";
-            
-            row.innerHTML = `
-                <td><strong>#${i+1}</strong></td>
-                <td><span style="font-weight:700;">${t.name}</span></td>
-                <td style="text-align: center;">${t.wins}</td>
-                <td style="text-align: center;">${t.losses}</td>
-                <td style="text-align: center; color: var(--text-muted); font-family: monospace;">${pct}</td>
-            `;
-            tbody.appendChild(row);
-        });
-
-        const stage = document.getElementById("season-stage");
-        if (currentSeasonRound < REGULAR_SEASON_LENGTH) {
-            if (stage) stage.textContent = `Round ${currentSeasonRound + 1} / ${REGULAR_SEASON_LENGTH}`;
-        } else if (!playoffsState) {
-            if (stage) stage.textContent = "Regular Season Complete";
-        } else {
-            if (stage) stage.textContent = `Playoffs - ${playoffsState.round.toUpperCase()}`;
-        }
-    }
-
-    async function simSeasonDay() {
+    function simSeasonDay() {
         if (currentSeasonRound >= REGULAR_SEASON_LENGTH && !playoffsState) {
             alert("The Regular Season is completed! Start playoffs or restart season.");
             return;
@@ -2547,11 +2585,6 @@
         const liveGrid = document.getElementById("live-games-grid");
         if(liveBoard) liveBoard.style.display = "block";
         if(liveGrid) liveGrid.innerHTML = "";
-
-        for (let g of games) {
-            if (!g.away.players || g.away.players.length === 0) try { await loadTeamRosterDynamically(g.away.id); } catch(e){}
-            if (!g.home.players || g.home.players.length === 0) try { await loadTeamRosterDynamically(g.home.id); } catch(e){}
-        }
 
         games.forEach((g) => {
             let box = executeGameRotationSimulation(g.away, g.home, false, () => {});
@@ -2612,19 +2645,6 @@
     }
 
     // --- PLAYOFF BRACKET MANAGEMENT ---
-    function findActiveUserPlayoffMatch() {
-        if (!playoffsState) return null;
-        const r = playoffsState.round;
-        if (r === "quarters") {
-            return [playoffsState.q1, playoffsState.q2, playoffsState.q3, playoffsState.q4].find(m => m.t1.id === userTeamId || m.t2.id === userTeamId);
-        } else if (r === "semis") {
-            return [playoffsState.semi1, playoffsState.semi2].find(m => m.t1.id === userTeamId || m.t2.id === userTeamId);
-        } else if (r === "finals") {
-            return (playoffsState.finals.t1.id === userTeamId || playoffsState.finals.t2.id === userTeamId) ? playoffsState.finals : null;
-        }
-        return null;
-    }
-
     function initPlayoffBracket() {
         let top8 = [];
         let qualified = false;
