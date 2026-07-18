@@ -1079,7 +1079,7 @@
     let upgradeProposedStats = { off: 0, def: 0, reb: 0, ast: 0 };
     let upgradeOriginalStats = { off: 0, def: 0, reb: 0, ast: 0 };
 
-    // --- FALLBACK NBA FRANCHISES (Completely protects system against CORS proxy failures) ---
+    // --- FALLBACK NBA FRANCHISES ---
     const FALLBACK_TEAMS = [
         { id: "1", name: "Atlanta Hawks", abbreviation: "ATL", color: "e31837", alternateColor: "c1d32f", logos: [{ href: "https://a.espncdn.com/i/teamlogos/nba/500/atl.png" }] },
         { id: "2", name: "Boston Celtics", abbreviation: "BOS", color: "007a33", alternateColor: "ba9653", logos: [{ href: "https://a.espncdn.com/i/teamlogos/nba/500/bos.png" }] },
@@ -1292,38 +1292,39 @@
     }
 
     // --- LOCAL STORAGE STATE PERSISTENCE ---
+    // Updated save/load keys to v12 to cleanly purge older corrupted cache databases
     function saveRostersState() {
-        localStorage.setItem("slam_sim_players_v10", JSON.stringify(PLAYERS));
-        localStorage.setItem("slam_sim_teams_v10", JSON.stringify(ALL_TEAMS));
-        localStorage.setItem("slam_sim_season_standings", JSON.stringify(seasonStandings));
-        localStorage.setItem("slam_sim_season_schedule", JSON.stringify(seasonSchedule));
-        localStorage.setItem("slam_sim_season_round", currentSeasonRound.toString());
-        localStorage.setItem("slam_sim_playoffs_state", JSON.stringify(playoffsState));
-        localStorage.setItem("slam_sim_player_season_stats", JSON.stringify(playerSeasonStats));
+        localStorage.setItem("slam_sim_players_v12", JSON.stringify(PLAYERS));
+        localStorage.setItem("slam_sim_teams_v12", JSON.stringify(ALL_TEAMS));
+        localStorage.setItem("slam_sim_season_standings_v12", JSON.stringify(seasonStandings));
+        localStorage.setItem("slam_sim_season_schedule_v12", JSON.stringify(seasonSchedule));
+        localStorage.setItem("slam_sim_season_round_v12", currentSeasonRound.toString());
+        localStorage.setItem("slam_sim_playoffs_state_v12", JSON.stringify(playoffsState));
+        localStorage.setItem("slam_sim_player_season_stats_v12", JSON.stringify(playerSeasonStats));
         
-        localStorage.setItem("slam_sim_user_team", userTeamId);
-        localStorage.setItem("slam_sim_user_mc", userMC.toString());
-        localStorage.setItem("slam_sim_custom_lineup", JSON.stringify(customLineup));
-        localStorage.setItem("slam_sim_news_feed", JSON.stringify(NEWS));
+        localStorage.setItem("slam_sim_user_team_v12", userTeamId);
+        localStorage.setItem("slam_sim_user_mc_v12", userMC.toString());
+        localStorage.setItem("slam_sim_custom_lineup_v12", JSON.stringify(customLineup));
+        localStorage.setItem("slam_sim_news_feed_v12", JSON.stringify(NEWS));
     }
 
     function checkRostersState() {
-        const cachedPlayers = localStorage.getItem("slam_sim_players_v10");
-        const cachedTeams = localStorage.getItem("slam_sim_teams_v10");
+        const cachedPlayers = localStorage.getItem("slam_sim_players_v12");
+        const cachedTeams = localStorage.getItem("slam_sim_teams_v12");
         if (cachedPlayers && cachedTeams) {
             PLAYERS = JSON.parse(cachedPlayers);
             ALL_TEAMS = JSON.parse(cachedTeams);
 
-            const sStand = localStorage.getItem("slam_sim_season_standings");
-            const sSched = localStorage.getItem("slam_sim_season_schedule");
-            const sRound = localStorage.getItem("slam_sim_season_round");
-            const sPlay = localStorage.getItem("slam_sim_playoffs_state");
-            const sStats = localStorage.getItem("slam_sim_player_season_stats");
-            const sNews = localStorage.getItem("slam_sim_news_feed");
+            const sStand = localStorage.getItem("slam_sim_season_standings_v12");
+            const sSched = localStorage.getItem("slam_sim_season_schedule_v12");
+            const sRound = localStorage.getItem("slam_sim_season_round_v12");
+            const sPlay = localStorage.getItem("slam_sim_playoffs_state_v12");
+            const sStats = localStorage.getItem("slam_sim_player_season_stats_v12");
+            const sNews = localStorage.getItem("slam_sim_news_feed_v12");
             
-            const sTeam = localStorage.getItem("slam_sim_user_team");
-            const sMC = localStorage.getItem("slam_sim_user_mc");
-            const sLine = localStorage.getItem("slam_sim_custom_lineup");
+            const sTeam = localStorage.getItem("slam_sim_user_team_v12");
+            const sMC = localStorage.getItem("slam_sim_user_mc_v12");
+            const sLine = localStorage.getItem("slam_sim_custom_lineup_v12");
 
             if (sStand) seasonStandings = JSON.parse(sStand);
             if (sSched) seasonSchedule = JSON.parse(sSched);
@@ -1336,7 +1337,7 @@
             if (sMC) userMC = parseInt(sMC, 10);
             if (sLine) customLineup = JSON.parse(sLine);
 
-            // Safety check for cached saves that lack roster players
+            // Safety sync check to prevent alignment mixups
             ALL_TEAMS.forEach(team => {
                 if (team.id !== "FA" && (!team.players || team.players.length === 0)) {
                     generateSynchronousRoster(team);
@@ -1348,7 +1349,7 @@
         return false;
     }
 
-    // --- procedurally generate starting offline rosters ---
+    // --- PROCEDURAL OFFLINE ROSTER GENERATOR ---
     function generateSynchronousRoster(team) {
         if (team.id === "FA") return;
         const positions = ["PG", "SG", "SF", "PF", "C", "PG", "SG", "SF", "PF", "C"];
@@ -1372,6 +1373,11 @@
                 };
                 assignPlayerAttributes(playerObj);
                 PLAYERS.push(playerObj);
+            } else {
+                playerObj.team = team.name;
+                playerObj.teamId = team.id;
+                playerObj.col1 = team.col1;
+                playerObj.col2 = team.col2;
             }
             teamPlayerIds.push(fallbackId);
         });
@@ -1405,15 +1411,29 @@
                 rawTeams = FALLBACK_TEAMS;
             }
             
-            const tempTeams = rawTeams.map(t => ({
-                id: t.id.toString(),
-                name: t.name || t.displayName,
-                abbreviation: t.abbreviation,
-                col1: t.color ? `#${t.color}` : "#3b82f6",
-                col2: t.alternateColor ? `#${t.alternateColor}` : "#ffffff",
-                logo: t.logos?.[0]?.href || "",
-                players: [] 
-            }));
+            const tempTeams = rawTeams.map(t => {
+                let color1 = "#3b82f6";
+                let color2 = "#ffffff";
+                if (t.color) {
+                    color1 = t.color.startsWith("#") ? t.color : `#${t.color}`;
+                } else if (t.col1) {
+                    color1 = t.col1;
+                }
+                if (t.alternateColor) {
+                    color2 = t.alternateColor.startsWith("#") ? t.alternateColor : `#${t.alternateColor}`;
+                } else if (t.col2) {
+                    color2 = t.col2;
+                }
+                return {
+                    id: t.id.toString(),
+                    name: t.name || t.displayName,
+                    abbreviation: t.abbreviation,
+                    col1: color1,
+                    col2: color2,
+                    logo: t.logos?.[0]?.href || t.logo || "",
+                    players: []
+                };
+            });
 
             tempTeams.push({
                 id: "FA",
@@ -1462,41 +1482,55 @@
             PLAYERS = PLAYERS.filter(p => !p.id.startsWith(`fb-${teamId}-`) && p.teamId !== teamId);
             const teamPlayerIds = [];
 
-            athletes.forEach((a, index) => {
+            athletes.forEach((a) => {
                 let posAbbr = a.position?.abbreviation || "G";
                 if (posAbbr === "G") posAbbr = "SG";
                 if (posAbbr === "F") posAbbr = "SF";
                 if (posAbbr === "F-C" || posAbbr === "C-F") posAbbr = "PF";
                 if (posAbbr === "G-F" || posAbbr === "F-G") posAbbr = "SF";
 
-                const isFA = index >= 12;
-
                 const playerObj = {
                     id: a.id.toString(),
                     name: a.fullName,
                     pos: posAbbr,
-                    team: isFA ? "Free Agent" : team.name,
-                    teamId: isFA ? "FA" : team.id,
+                    team: team.name,
+                    teamId: team.id, // Keeping all athletes on their actual teams prevents mixed rosters
                     jersey: a.jersey || "00",
                     photo: a.headshot?.href || `https://cdn.nba.com/headshots/nba/latest/1040x760/${a.id}.png`,
-                    col1: isFA ? "#475569" : team.col1,
-                    col2: isFA ? "#cbd5e1" : team.col2,
+                    col1: team.col1,
+                    col2: team.col2,
                     injuryDays: 0,
                     injuryType: ""
                 };
                 assignPlayerAttributes(playerObj);
                 
                 if (!PLAYERS.some(p => p.id === playerObj.id)) { PLAYERS.push(playerObj); }
-
-                if (!isFA) {
-                    teamPlayerIds.push(playerObj.id);
-                } else {
-                    const faTeam = ALL_TEAMS.find(t => t.id === "FA");
-                    if (faTeam && !faTeam.players.includes(playerObj.id)) {
-                        faTeam.players.push(playerObj.id);
-                    }
-                }
+                teamPlayerIds.push(playerObj.id);
             });
+
+            // Fallback back-fill if ESPN roster payload has fewer than 8 players
+            const positions = ["PG", "SG", "SF", "PF", "C"];
+            while (teamPlayerIds.length < 8) {
+                const fallbackId = `fb-${teamId}-extra-${teamPlayerIds.length}`;
+                const fallbackPlayer = {
+                    id: fallbackId,
+                    name: generateRealisticSubstituteName(),
+                    pos: positions[teamPlayerIds.length % positions.length],
+                    team: team.name,
+                    teamId: team.id,
+                    jersey: Math.floor(Math.random() * 99).toString(),
+                    photo: `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png`,
+                    col1: team.col1,
+                    col2: team.col2,
+                    injuryDays: 0,
+                    injuryType: ""
+                };
+                assignPlayerAttributes(fallbackPlayer);
+                if (!PLAYERS.some(p => p.id === fallbackId)) {
+                    PLAYERS.push(fallbackPlayer);
+                }
+                teamPlayerIds.push(fallbackId);
+            }
 
             team.players = teamPlayerIds;
         } catch (err) {
@@ -2193,7 +2227,7 @@
             standHome.wins++; standAway.losses++;
         }
 
-        // Regular Season payout rewards (500,000 MyCASH for win, 150,000 MyCASH for loss)
+        // Regular Season payout rewards (50,000 MC for win, 15,000 MC for loss)
         const games = seasonSchedule[currentSeasonRound];
         const userMatch = games.find(g => g.away.id === userTeamId || g.home.id === userTeamId);
         if (userMatch) {
@@ -2201,11 +2235,11 @@
             const userWon = (userIsAway && scoreAway > scoreHome) || (!userIsAway && scoreHome > scoreAway);
             
             if (userWon) {
-                addMC(500000);
-                addNewsItem('milestone', `💰 <strong>Victory Payout</strong>: Your franchise earned <strong>500,000 MyCASH</strong> for securing the win against the ${userIsAway ? userMatch.home.name : userMatch.away.name}!`);
+                addMC(50000);
+                addNewsItem('milestone', `💰 <strong>Victory Payout</strong>: Your franchise earned <strong>50,000 MyCASH</strong> for securing the win against the ${userIsAway ? userMatch.home.name : userMatch.away.name}!`);
             } else {
-                addMC(150000);
-                addNewsItem('milestone', `💰 <strong>Consolation Payout</strong>: Your franchise earned <strong>150,000 MyCASH</strong> for competing against the ${userIsAway ? userMatch.home.name : userMatch.away.name}.`);
+                addMC(15000);
+                addNewsItem('milestone', `💰 <strong>Consolation Payout</strong>: Your franchise earned <strong>15,000 MyCASH</strong> for competing against the ${userIsAway ? userMatch.home.name : userMatch.away.name}.`);
             }
         }
 
@@ -2339,19 +2373,8 @@
         const activePool = ALL_TEAMS.filter(t => t.id !== "FA");
         
         activePool.forEach(t => {
-            while (t.players.length < 5) {
-                const faPlayers = PLAYERS.filter(p => p.teamId === "FA");
-                if (faPlayers.length > 0) {
-                    const randomFA = faPlayers[Math.floor(Math.random() * faPlayers.length)];
-                    randomFA.teamId = t.id;
-                    randomFA.team = t.name;
-                    t.players.push(randomFA.id);
-                    
-                    const faTeam = ALL_TEAMS.find(team => team.id === "FA");
-                    if (faTeam) faTeam.players = faTeam.players.filter(id => id !== randomFA.id);
-                } else {
-                    break;
-                }
+            if (!t.players || t.players.length < 5) {
+                generateSynchronousRoster(t);
             }
         });
 
@@ -2567,9 +2590,9 @@
                 return;
             }
 
-            // Award 2,000,000 MC for making Semis
-            addMC(2000000);
-            addNewsItem('milestone', `💰 <strong>Postseason Payout</strong>: Received <strong>2,000,000 MyCASH</strong> for advancing to the Semifinals!`);
+            // Award 500,000 MC for making Semis
+            addMC(500000);
+            addNewsItem('milestone', `💰 <strong>Postseason Payout</strong>: Received <strong>500,000 MyCASH</strong> for advancing to the Semifinals!`);
 
             playoffsState.semi1.t1 = playoffsState.q1.winner;
             playoffsState.semi1.t2 = playoffsState.q2.winner;
@@ -2613,9 +2636,9 @@
                 return;
             }
 
-            // Award 5,000,000 MC for making Finals
-            addMC(5000000);
-            addNewsItem('milestone', `💰 <strong>Postseason Payout</strong>: Received <strong>5,000,000 MyCASH</strong> for advancing to the Grand Finals!`);
+            // Award 1,500,000 MC for making Finals
+            addMC(1500000);
+            addNewsItem('milestone', `💰 <strong>Postseason Payout</strong>: Received <strong>1,500,000 MyCASH</strong> for advancing to the Grand Finals!`);
 
             playoffsState.finals.t1 = playoffsState.semi1.winner;
             playoffsState.finals.t2 = playoffsState.semi2.winner;
@@ -2634,11 +2657,11 @@
             let runnerUp = scoreA > scoreH ? playoffsState.finals.t2 : playoffsState.finals.t1;
 
             if (champ.id === userTeamId) {
-                addMC(30000000); 
-                addNewsItem('milestone', `🏆 <strong>FINALS BONUS</strong>: Your team won the Grand Finals! Payout of 30,000,000 MyCASH processed.`);
+                addMC(25000000); 
+                addNewsItem('milestone', `🏆 <strong>CHAMPIONS BONUS</strong>: Your team won the Grand Finals! Payout of 25,000,000 MyCASH processed.`);
             } else if (runnerUp.id === userTeamId) {
-                addMC(10000000); 
-                addNewsItem('milestone', `🥈 <strong>FINALS BONUS</strong>: Your team finished as the runner-up. Payout of 10,000,000 MyCASH processed.`);
+                addMC(8000000); 
+                addNewsItem('milestone', `🥈 <strong>RUNNER-UP BONUS</strong>: Your team finished as the runner-up. Payout of 8,000,000 MyCASH processed.`);
             }
 
             document.getElementById("bracket-f-t1").innerHTML = `${playoffsState.finals.t1.abbreviation} - <strong>${scoreA}</strong>`;
