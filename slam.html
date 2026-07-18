@@ -24,7 +24,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            transition: none !important; /* Zero transition delay for snappy responses */
+            transition: none !important;
         }
 
         body {
@@ -32,7 +32,7 @@
             color: var(--text-main);
             font-family: var(--font-main);
             line-height: 1.5;
-            font-size: 18px; /* Globally enlarged UI base scale */
+            font-size: 18px;
             overflow-x: hidden;
         }
 
@@ -68,7 +68,7 @@
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
         }
 
         .logo-title {
@@ -80,6 +80,17 @@
 
         .logo-title span {
             color: var(--accent-blue);
+        }
+
+        .mm-badge {
+            background-color: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 900;
+            font-size: 1.1rem;
+            display: none; /* Only visible in MyNBA */
         }
 
         nav {
@@ -126,7 +137,6 @@
             display: block;
         }
 
-        /* Scaled Controls */
         .btn {
             background-color: var(--bg-hover);
             color: var(--text-main);
@@ -217,7 +227,6 @@
             text-transform: uppercase;
         }
 
-        /* Split Panel layout */
         .trades-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -247,6 +256,12 @@
             padding: 12px 14px;
             text-align: left;
             border-bottom: 2px solid var(--border-color);
+        }
+        
+        /* User team highlighting in standings */
+        .roster-table tr.user-team {
+            background-color: rgba(234, 179, 8, 0.1);
+            border-left: 3px solid var(--accent-gold);
         }
 
         .roster-table tr.selected {
@@ -282,7 +297,6 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Simulation ticker box */
         .ticker-box {
             background-color: var(--bg-dark);
             border: 2px solid var(--border-color);
@@ -291,7 +305,7 @@
             padding: 1.2rem;
             font-family: monospace;
             display: flex;
-            flex-direction: column; /* Chronological bottom-scrolling */
+            flex-direction: column;
             gap: 10px;
             font-size: 1rem;
         }
@@ -301,7 +315,6 @@
             padding-left: 10px;
         }
 
-        /* Loader Overlay */
         .loader-overlay {
             position: fixed;
             top: 0;
@@ -332,7 +345,6 @@
             background-color: var(--accent-blue);
         }
 
-        /* Player database directory */
         .players-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -388,6 +400,7 @@
         .scoreboard-score {
             font-size: 4rem;
             font-weight: 900;
+            font-variant-numeric: tabular-nums;
         }
 
         .simulator-split {
@@ -420,27 +433,7 @@
             object-fit: contain;
         }
 
-        .lineup-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-top: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .lineup-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .lineup-slot {
-            background-color: var(--bg-hover);
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            text-align: center;
-        }
-
-        /* CUSTOM DROPDOWN SELECTOR WITH LOGOS */
+        /* CUSTOM DROPDOWN SELECTOR */
         .custom-dropdown-container {
             position: relative;
             width: 100%;
@@ -500,14 +493,29 @@
             height: 32px;
             object-fit: contain;
         }
+
+        /* Season Live Matchup Scores */
+        .live-game-card {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 800;
+        }
+        .live-score {
+            font-size: 1.3rem;
+            font-variant-numeric: tabular-nums;
+            color: var(--accent-blue);
+        }
     </style>
 </head>
 <body>
 
-<!-- API Loader Progress Screen -->
 <div class="loader-overlay" id="api-loader" style="display: none;">
     <h2 style="font-weight: 900; letter-spacing: -0.05em; text-transform: uppercase; font-size: 1.8rem;">SLAM <span>SIMULATOR</span></h2>
-    <div id="loader-msg" style="color: var(--text-muted); font-size: 1.1rem; text-align: center;">Pre-loading live NBA data feeds...</div>
+    <div id="loader-msg" style="color: var(--text-muted); font-size: 1.1rem; text-align: center;">Starting live NBA data streams...</div>
     <div class="loader-bar-outer">
         <div class="loader-bar-inner" id="loader-progress"></div>
     </div>
@@ -517,96 +525,78 @@
     <header>
         <div class="logo-container">
             <span class="logo-title">SLAM <span>SIMULATOR</span></span>
-            
-            <!-- Dynamic Real vs Sandbox Mode Switcher -->
-            <div style="display:flex; align-items:center; gap:6px; margin-left:25px; background:var(--bg-hover); padding:4px; border:1px solid var(--border-color); border-radius:2px;">
+            <div style="display:flex; align-items:center; gap:6px; margin-left:20px; background:var(--bg-hover); padding:4px; border:1px solid var(--border-color); border-radius:2px;">
                 <button class="btn" id="mode-btn-nba" onclick="setSimulationMode('NBA')" style="padding:4px 10px; font-size:0.75rem; border:none;">NBA</button>
                 <button class="btn" id="mode-btn-mynba" onclick="setSimulationMode('MyNBA')" style="padding:4px 10px; font-size:0.75rem; border:none;">MyNBA</button>
             </div>
         </div>
-        <nav>
-            <button class="nav-btn active" id="tab-btn-rosters" onclick="switchTab('tab-rosters')">Rosters & Trades</button>
-            <button class="nav-btn" onclick="switchTab('tab-directory')">Directory</button>
-            <button class="nav-btn" onclick="switchTab('tab-exhibition')">Simulate Game</button>
-            <button class="nav-btn" onclick="switchTab('tab-season')">Simulate Season</button>
-        </nav>
+        <div style="display: flex; align-items: center;">
+            <div class="mm-badge" id="mm-display">💰 0 MM</div>
+            <nav style="margin-left: 20px;">
+                <button class="nav-btn active" id="tab-btn-rosters" onclick="switchTab('tab-rosters')">Rosters & Trades</button>
+                <button class="nav-btn" onclick="switchTab('tab-directory')">Directory</button>
+                <button class="nav-btn" onclick="switchTab('tab-exhibition')">Simulate Game</button>
+                <button class="nav-btn" onclick="switchTab('tab-season')">Simulate Season</button>
+            </nav>
+        </div>
     </header>
 
     <main>
         <!-- TAB 1: ROSTERS & TRADES (MYNBA Mode Only) -->
         <section id="tab-rosters" class="tab-content active">
-            <!-- Custom Franchise Settings and Branding -->
             <div class="panel">
-                <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
+                <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
                     <div>
-                        <h3 style="font-weight: 800; font-size: 1.3rem; text-transform: uppercase;">Sandbox Franchise Settings</h3>
-                        <p style="font-size:0.9rem; color:var(--text-muted);">Trade or transfer real players. Set custom starting lineup configurations below.</p>
+                        <h3 style="font-weight: 800; font-size: 1.3rem; text-transform: uppercase; color: var(--accent-gold);">MyNBA Franchise Management</h3>
+                        <p style="font-size:0.9rem; color:var(--text-muted); margin-top: 5px;">Take over an existing NBA team. Propose trades (AI will reject unfair deals) and spend MM to upgrade your players.</p>
+                        
+                        <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">
+                            <span style="font-weight: 700; font-size: 0.9rem;">Your Franchise:</span>
+                            <div class="custom-dropdown-container" id="container-user-team" style="width: 280px;">
+                                <button class="dropdown-trigger" onclick="toggleCustomDropdown('user-team')" style="padding: 0.5rem 1rem;">
+                                    <span id="trigger-user-team-text" style="display:flex; align-items:center; gap:8px;">Select Team</span>
+                                    <span>▼</span>
+                                </button>
+                                <div class="dropdown-menu-list" id="trigger-user-team-menu"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                        <input type="text" class="search-input" id="custom-team-name-input" value="Seattle SuperSonics" oninput="updateCustomTeamSettings()" placeholder="Rename Custom Team..." style="font-size: 0.95rem; width: 250px;">
-                        <input type="color" id="custom-color-1" value="#00653a" onchange="updateCustomTeamSettings()" style="width: 44px; height: 44px; border: 2px solid var(--border-color); cursor: pointer; padding: 0;">
-                        <input type="color" id="custom-color-2" value="#ffc222" onchange="updateCustomTeamSettings()" style="width: 44px; height: 44px; border: 2px solid var(--border-color); cursor: pointer; padding: 0;">
-                        <button class="btn btn-danger" onclick="resetDatabaseToDefault()">Refetch API Data</button>
+
+                    <div style="background: var(--bg-dark); border: 1px solid var(--border-color); padding: 15px; width: 350px;">
+                        <h4 style="font-size: 0.85rem; text-transform: uppercase; color: var(--accent-green); margin-bottom: 8px;">Player Development (Cost: 1,000 MM)</h4>
+                        <div style="display: flex; gap: 8px;">
+                            <select class="select-filter" id="upgrade-player-select" style="flex: 1; font-size: 0.85rem; padding: 0.4rem;"></select>
+                            <button class="btn btn-success" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="buyPlayerUpgrade()">+1 OVR</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Position Lineup Builder -->
-                <div id="lineup-builder-container">
-                    <h4 style="font-size: 1rem; font-weight: 800; text-transform: uppercase; color: var(--accent-gold);">Custom Team Starting 5 Lineup</h4>
-                    <div class="lineup-grid">
-                        <div class="lineup-slot">
-                            <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-blue);">POINT GUARD (PG)</div>
-                            <select class="select-filter" id="lineup-PG" onchange="saveLineupChoice('PG')" style="width: 100%; font-size: 0.85rem; margin-top: 5px;"></select>
-                        </div>
-                        <div class="lineup-slot">
-                            <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-blue);">SHOOTING GUARD (SG)</div>
-                            <select class="select-filter" id="lineup-SG" onchange="saveLineupChoice('SG')" style="width: 100%; font-size: 0.85rem; margin-top: 5px;"></select>
-                        </div>
-                        <div class="lineup-slot">
-                            <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-blue);">SMALL FORWARD (SF)</div>
-                            <select class="select-filter" id="lineup-SF" onchange="saveLineupChoice('SF')" style="width: 100%; font-size: 0.85rem; margin-top: 5px;"></select>
-                        </div>
-                        <div class="lineup-slot">
-                            <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-blue);">POWER FORWARD (PF)</div>
-                            <select class="select-filter" id="lineup-PF" onchange="saveLineupChoice('PF')" style="width: 100%; font-size: 0.85rem; margin-top: 5px;"></select>
-                        </div>
-                        <div class="lineup-slot">
-                            <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-blue);">CENTER (C)</div>
-                            <select class="select-filter" id="lineup-C" onchange="saveLineupChoice('C')" style="width: 100%; font-size: 0.85rem; margin-top: 5px;"></select>
-                        </div>
-                    </div>
+                <div style="text-align: right;">
+                    <button class="btn btn-danger" onclick="resetMyNBAMode()">⚠️ Reset MyNBA Save</button>
                 </div>
             </div>
 
             <!-- Active Trade Negotiator -->
-            <div class="trade-center-panel" id="trade-center-panel" style="display:none; margin-bottom: 2rem;">
+            <div class="trade-center-panel" id="trade-center-panel" style="margin-bottom: 2rem;">
                 <div class="trade-negotiator-box">
                     <div id="trade-negotiator-msg" style="color: var(--text-muted); font-weight: 700;">Select a player on both sides below to begin negotiating.</div>
                     <div id="trade-actions" style="display: none; align-items: center; gap: 20px; width: 100%; justify-content: space-between;">
                         <div style="font-weight: 700;" id="trade-proposal-text">Trade Offer</div>
-                        <button class="btn btn-success" onclick="processSelectedTrade()">🤝 Execute Trade</button>
+                        <button class="btn btn-primary" onclick="proposeTrade()">📥 Propose Trade</button>
                     </div>
                 </div>
             </div>
 
             <!-- Side-by-side Roster Explorer -->
             <div class="trades-grid">
-                <!-- Side A -->
+                <!-- Side A (Locked to User Team) -->
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 10px;">
-                        <!-- Custom logo dropdown Team A -->
-                        <div class="custom-dropdown-container" id="container-roster-a" style="flex:1;">
-                            <button class="dropdown-trigger" onclick="toggleCustomDropdown('roster-a')">
-                                <span id="trigger-roster-a-text" style="display:flex; align-items:center; gap:8px;">Select Team A</span>
-                                <span>▼</span>
-                            </button>
-                            <div class="dropdown-menu-list" id="trigger-roster-a-menu"></div>
-                        </div>
-                        <div id="roster-a-strength" style="font-size: 0.95rem; font-weight: 800; color:var(--accent-gold); white-space:nowrap;">OVR --</div>
+                        <div style="flex: 1; font-weight: 900; font-size: 1.2rem; background: var(--bg-card); padding: 0.6rem 1rem; border: 2px solid var(--border-color); text-transform: uppercase; color: var(--accent-gold);" id="roster-a-title">Your Team</div>
+                        <div id="roster-a-strength" style="font-size: 0.95rem; font-weight: 800; color:var(--text-muted); white-space:nowrap;">OVR --</div>
                     </div>
-                    <!-- Search input & Positions Filter row -->
-                    <div class="roster-search-container" id="roster-search-box-a" style="display:flex; gap: 8px; padding: 8px; background: var(--bg-card); border: 2px solid var(--border-color); border-bottom: none;">
-                        <input type="text" class="search-input" id="roster-query-a" placeholder="Search roster..." oninput="renderRosterSide('a')" style="flex: 1; font-size: 0.9rem;">
+                    <div class="roster-search-container" style="display:flex; gap: 8px; padding: 8px; background: var(--bg-card); border: 2px solid var(--border-color); border-bottom: none;">
+                        <input type="text" class="search-input" id="roster-query-a" placeholder="Search your roster..." oninput="renderRosterSide('a')" style="flex: 1; font-size: 0.9rem;">
                         <select class="select-filter" id="roster-pos-a" onchange="renderRosterSide('a')" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;">
                             <option value="ALL">All Pos</option>
                             <option value="PG">PG</option>
@@ -622,7 +612,6 @@
                                 <tr>
                                     <th>Player</th>
                                     <th style="text-align: center;">OVR</th>
-                                    <th style="text-align: right;">Roster Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="roster-table-body-a"></tbody>
@@ -630,10 +619,9 @@
                     </div>
                 </div>
 
-                <!-- Side B -->
+                <!-- Side B (Other Teams / FA) -->
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 10px;">
-                        <!-- Custom logo dropdown Team B -->
                         <div class="custom-dropdown-container" id="container-roster-b" style="flex:1;">
                             <button class="dropdown-trigger" onclick="toggleCustomDropdown('roster-b')">
                                 <span id="trigger-roster-b-text" style="display:flex; align-items:center; gap:8px;">Select Team B</span>
@@ -641,11 +629,10 @@
                             </button>
                             <div class="dropdown-menu-list" id="trigger-roster-b-menu"></div>
                         </div>
-                        <div id="roster-b-strength" style="font-size: 0.95rem; font-weight: 800; color:var(--accent-gold); white-space:nowrap;">OVR --</div>
+                        <div id="roster-b-strength" style="font-size: 0.95rem; font-weight: 800; color:var(--text-muted); white-space:nowrap;">OVR --</div>
                     </div>
-                    <!-- Search input & Positions Filter row -->
-                    <div class="roster-search-container" id="roster-search-box-b" style="display:flex; gap: 8px; padding: 8px; background: var(--bg-card); border: 2px solid var(--border-color); border-bottom: none;">
-                        <input type="text" class="search-input" id="roster-query-b" placeholder="Search roster..." oninput="renderRosterSide('b')" style="flex: 1; font-size: 0.9rem;">
+                    <div class="roster-search-container" style="display:flex; gap: 8px; padding: 8px; background: var(--bg-card); border: 2px solid var(--border-color); border-bottom: none;">
+                        <input type="text" class="search-input" id="roster-query-b" placeholder="Search target roster..." oninput="renderRosterSide('b')" style="flex: 1; font-size: 0.9rem;">
                         <select class="select-filter" id="roster-pos-b" onchange="renderRosterSide('b')" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;">
                             <option value="ALL">All Pos</option>
                             <option value="PG">PG</option>
@@ -661,7 +648,6 @@
                                 <tr>
                                     <th>Player</th>
                                     <th style="text-align: center;">OVR</th>
-                                    <th style="text-align: right;">Roster Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="roster-table-body-b"></tbody>
@@ -689,7 +675,6 @@
             </div>
             <div class="players-grid" id="directory-grid"></div>
             
-            <!-- High Performance Page Pagination Footer -->
             <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 2.5rem;" id="directory-pagination">
                 <button class="btn" id="dir-prev-btn" onclick="changeDirectoryPage(-1)">◀ Prev</button>
                 <span id="dir-page-indicator" style="font-weight: 800; font-size: 1.1rem; color: var(--accent-blue);">Page 1 of 1</span>
@@ -700,7 +685,6 @@
         <!-- TAB 3: SIMULATE GAME -->
         <section id="tab-exhibition" class="tab-content">
             <div class="scoreboard-panel" style="position: relative; z-index: 10;">
-                <!-- Away Dropdown -->
                 <div style="width: 35%;">
                     <div id="ex-logo-away" style="margin-bottom: 1rem;"></div>
                     <div class="custom-dropdown-container" id="container-away">
@@ -722,7 +706,6 @@
                     </div>
                 </div>
 
-                <!-- Home Dropdown -->
                 <div style="width: 35%;">
                     <div id="ex-logo-home" style="margin-bottom: 1rem;"></div>
                     <div class="custom-dropdown-container" id="container-home">
@@ -737,7 +720,6 @@
             </div>
 
             <div class="simulator-split" style="position: relative; z-index: 1;">
-                <!-- Play-by-play -->
                 <div class="panel" style="margin-bottom: 0;">
                     <div class="panel-title">Live Ticker</div>
                     <div class="ticker-box" id="ticker-feed">
@@ -745,7 +727,6 @@
                     </div>
                 </div>
 
-                <!-- Box Score -->
                 <div class="panel" style="margin-bottom: 0;">
                     <div class="panel-title">
                         <span>Box Score</span>
@@ -779,7 +760,6 @@
         <!-- TAB 4: SIMULATE SEASON -->
         <section id="tab-season" class="tab-content">
             <div class="trades-grid">
-                <!-- Standings and Playoffs Bracket -->
                 <div>
                     <div class="panel">
                         <div class="panel-title">
@@ -789,23 +769,20 @@
                         <table class="roster-table" style="font-size: 0.95rem;">
                             <thead>
                                 <tr>
+                                    <th style="width: 40px;">Rank</th>
                                     <th>Team</th>
                                     <th style="text-align: center;">W</th>
                                     <th style="text-align: center;">L</th>
                                     <th style="text-align: center;">PCT</th>
-                                    <th style="text-align: center;">PF</th>
-                                    <th style="text-align: center;">PA</th>
                                 </tr>
                             </thead>
                             <tbody id="season-standings-body"></tbody>
                         </table>
                     </div>
 
-                    <!-- Post-season layout -->
                     <div class="panel" id="playoff-bracket" style="display: none; border-color: var(--accent-gold);">
-                        <div class="panel-title" style="color: var(--accent-gold); border-bottom: 2px solid rgba(234, 179, 8, 0.3)">Postseason Bracket (Single Elimination)</div>
+                        <div class="panel-title" style="color: var(--accent-gold); border-bottom: 2px solid rgba(234, 179, 8, 0.3)">Postseason Bracket</div>
                         <div style="display: flex; justify-content: space-around; align-items: center; padding: 1.5rem 0;">
-                            <!-- Semis -->
                             <div style="display: flex; flex-direction: column; gap: 3rem;">
                                 <div style="background-color: var(--bg-dark); border: 2px solid var(--border-color); padding: 12px; font-size: 0.95rem; width: 250px;">
                                     <div id="bracket-s1-t1">--</div>
@@ -816,7 +793,6 @@
                                     <div id="bracket-s2-t2">--</div>
                                 </div>
                             </div>
-                            <!-- Finals -->
                             <div style="display: flex; flex-direction: column; justify-content: center; height: 200px;">
                                 <div style="background-color: var(--bg-dark); border: 2px solid var(--accent-gold); padding: 12px; font-size: 0.95rem; width: 250px;">
                                     <div id="bracket-f-t1">--</div>
@@ -826,27 +802,30 @@
                         </div>
                     </div>
 
-                    <!-- Championship visual -->
                     <div class="panel" id="season-champ-card" style="display: none; text-align: center; border-color: var(--accent-green); background: linear-gradient(180deg, rgba(16,185,129,0.1) 0%, rgba(15,21,36,1) 100%);">
                         <h2 style="color: var(--accent-green); font-weight: 900; font-size: 1.8rem; text-transform: uppercase;">🏆 League Champion Crowned</h2>
                         <h1 id="season-champ-name" style="font-weight: 900; margin-top: 0.5rem; letter-spacing: -0.02em; font-size: 2.5rem;">--</h1>
-                        <button class="btn btn-success" style="margin-top: 1.5rem;" onclick="resetSeason()">Setup Next Season</button>
+                        <button class="btn btn-success" style="margin-top: 1.5rem;" onclick="startSeason()">Start Next Season</button>
                     </div>
                 </div>
 
-                <!-- Simulation Controls & Leaders -->
                 <div>
                     <div class="panel">
-                        <div class="panel-title">Simulation Control Center</div>
+                        <div class="panel-title">Season Controls</div>
                         <div style="display: flex; flex-direction: column; gap: 12px;">
                             <button class="btn btn-primary" id="sim-day-btn" onclick="simSeasonDay()">📅 Simulate Next Game-day</button>
-                            <button class="btn btn-success" id="sim-all-btn" onclick="simWholeSeason()">⏩ Fast-Simulate Regular Season</button>
-                            <button class="btn btn-danger" onclick="resetSeason()">🔄 Restart / Reset Season</button>
+                            <button class="btn btn-danger" onclick="startSeason()">🔄 Reset Season</button>
                         </div>
                     </div>
 
+                    <!-- LIVE SCOREBOARD FOR SEASON TICKING -->
+                    <div class="panel" id="live-season-scoreboard" style="display: none; border-color: var(--accent-blue);">
+                        <div class="panel-title" style="color: var(--accent-blue);">Today's Games</div>
+                        <div id="live-games-grid" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                    </div>
+
                     <div class="panel">
-                        <div class="panel-title">League stat leaders</div>
+                        <div class="panel-title">League Stat Leaders</div>
                         <div style="display: flex; flex-direction: column; gap: 1.5rem; font-size: 0.95rem;">
                             <div>
                                 <h4 style="color: var(--accent-blue); font-weight: 800; text-transform: uppercase; margin-bottom: 8px;">Points Per Game</h4>
@@ -870,10 +849,10 @@
 
 <script>
     // --- GLOBAL DATA STORES ---
-    let REAL_PLAYERS = [];  // Isolated immutable real-life rosters
-    let REAL_TEAMS = [];    // Isolated immutable real-life teams
-    let PLAYERS = [];       // Sandboxed sandbox rosters (MyNBA)
-    let ALL_TEAMS = [];     // Sandboxed sandbox teams (MyNBA)
+    let REAL_PLAYERS = [];
+    let REAL_TEAMS = [];
+    let PLAYERS = [];
+    let ALL_TEAMS = [];
 
     let seasonStandings = [];
     let seasonSchedule = [];
@@ -881,118 +860,106 @@
     let currentSeasonRound = 0;
     let playoffsState = null;
 
-    let customLineup = { PG: "", SG: "", SF: "", PF: "", C: "" };
+    let currentMode = "NBA"; // "NBA" or "MyNBA"
+    
+    // MyNBA Specific State
+    let userTeamId = ""; 
+    let userMM = 0;
 
-    let currentMode = "NBA"; // Active Simulation Mode ("NBA" or "MyNBA")
-
-    // Matchup selections
     let activeExhibitionAway = "";
     let activeExhibitionHome = "";
 
     // active roster view selections
-    let activeRosterTeamA = "";
-    let activeRosterTeamB = "";
+    let activeRosterTeamB = "FA";
 
-    // Exhibition simulation values
     let currentSimInterval = null;
     let exhibitionBox = null;
     let boxScoreView = "away";
 
-    // Directory Pagination State
     let directoryPage = 1;
     const directoryPageSize = 40;
 
-    // Transaction state
     let selectedTradePlayerA = null;
     let selectedTradePlayerB = null;
 
-    // --- robustFetchJson PROXY FAIL-SAFE FOR LOCAL ORIGINS ---
+    const ESPN_TEAMS_API = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams";
+
+    // --- PROXY FAIL-SAFE FOR LOCAL ORIGINS ---
     async function robustFetchJson(url) {
         try {
             const res = await fetch(url);
             if (res.ok) return await res.json();
         } catch (e) {
-            console.warn(`Direct fetch blocked for URL: ${url}. Initiating Proxy 1 (CodeTabs)...`);
+            console.warn(`Direct fetch blocked. Proxy 1...`);
         }
-
         try {
             const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
             const res = await fetch(proxyUrl);
             if (res.ok) return await res.json();
         } catch (e) {
-            console.warn(`CodeTabs proxy routing failed. Initiating Proxy 2 (AllOrigins)...`);
+            console.warn(`Proxy 1 failed. Proxy 2...`);
         }
-
         try {
             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
             const res = await fetch(proxyUrl);
             if (res.ok) return await res.json();
         } catch (e) {
-            console.warn(`AllOrigins proxy routing failed. Initiating Proxy 3 (Corsproxy.io)...`);
+            console.warn(`Proxy 2 failed. Proxy 3...`);
         }
-
         try {
             const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(url)}`;
             const res = await fetch(proxyUrl);
             if (res.ok) return await res.json();
         } catch (e) {
-            console.error(`All CORS proxies failed for URL: ${url}`);
+            console.error(`All proxies failed.`);
         }
-
-        throw new Error(`Failed to establish connection to live server roster stream. Confirm internet connectivity.`);
+        throw new Error(`Failed to establish connection. Check internet or CORS limits.`);
     }
 
     // --- LOCAL STORAGE STATE PERSISTENCE ---
     function saveRostersState() {
-        localStorage.setItem("slam_sim_players_v6", JSON.stringify(PLAYERS));
-        localStorage.setItem("slam_sim_teams_v6", JSON.stringify(ALL_TEAMS));
+        localStorage.setItem("slam_sim_players_v7", JSON.stringify(PLAYERS));
+        localStorage.setItem("slam_sim_teams_v7", JSON.stringify(ALL_TEAMS));
         localStorage.setItem("slam_sim_season_standings", JSON.stringify(seasonStandings));
         localStorage.setItem("slam_sim_season_schedule", JSON.stringify(seasonSchedule));
         localStorage.setItem("slam_sim_season_round", currentSeasonRound.toString());
         localStorage.setItem("slam_sim_playoffs_state", JSON.stringify(playoffsState));
         localStorage.setItem("slam_sim_player_season_stats", JSON.stringify(playerSeasonStats));
-        localStorage.setItem("slam_sim_custom_lineup", JSON.stringify(customLineup));
         
-        const custom = ALL_TEAMS.find(t => t.id === "CST");
-        if (custom) {
-            localStorage.setItem("slam_sim_custom_config", JSON.stringify({ name: custom.name, col1: custom.col1, col2: custom.col2 }));
-        }
+        localStorage.setItem("slam_sim_user_team", userTeamId);
+        localStorage.setItem("slam_sim_user_mm", userMM.toString());
     }
 
     function checkRostersState() {
-        const cachedPlayers = localStorage.getItem("slam_sim_players_v6");
-        const cachedTeams = localStorage.getItem("slam_sim_teams_v6");
+        const cachedPlayers = localStorage.getItem("slam_sim_players_v7");
+        const cachedTeams = localStorage.getItem("slam_sim_teams_v7");
         if (cachedPlayers && cachedTeams) {
             PLAYERS = JSON.parse(cachedPlayers);
             ALL_TEAMS = JSON.parse(cachedTeams);
             
+            // Reconstruct Real NBA reference if loading from save
+            if (REAL_PLAYERS.length === 0) {
+                 REAL_PLAYERS = JSON.parse(cachedPlayers);
+                 REAL_TEAMS = JSON.parse(cachedTeams);
+            }
+
             const sStand = localStorage.getItem("slam_sim_season_standings");
             const sSched = localStorage.getItem("slam_sim_season_schedule");
             const sRound = localStorage.getItem("slam_sim_season_round");
             const sPlay = localStorage.getItem("slam_sim_playoffs_state");
             const sStats = localStorage.getItem("slam_sim_player_season_stats");
-            const sLineup = localStorage.getItem("slam_sim_custom_lineup");
+            
+            const sTeam = localStorage.getItem("slam_sim_user_team");
+            const sMM = localStorage.getItem("slam_sim_user_mm");
 
             if (sStand) seasonStandings = JSON.parse(sStand);
             if (sSched) seasonSchedule = JSON.parse(sSched);
             if (sRound) currentSeasonRound = parseInt(sRound, 10);
             if (sPlay) playoffsState = JSON.parse(sPlay);
             if (sStats) playerSeasonStats = JSON.parse(sStats);
-            if (sLineup) customLineup = JSON.parse(sLineup);
-
-            const customConfig = localStorage.getItem("slam_sim_custom_config");
-            if (customConfig) {
-                const conf = JSON.parse(customConfig);
-                const custom = ALL_TEAMS.find(t => t.id === "CST");
-                if (custom) {
-                    custom.name = conf.name;
-                    custom.col1 = conf.col1;
-                    custom.col2 = conf.col2;
-                    document.getElementById("custom-team-name-input").value = conf.name;
-                    document.getElementById("custom-color-1").value = conf.col1;
-                    document.getElementById("custom-color-2").value = conf.col2;
-                }
-            }
+            
+            if (sTeam) userTeamId = sTeam;
+            if (sMM) userMM = parseInt(sMM, 10);
 
             return true;
         }
@@ -1013,12 +980,9 @@
             progress.style.width = "20%";
             
             const teamsRes = await fetch('./data.json');
-            if (!teamsRes.ok) throw new Error("Could not find or load local data.json. Ensure data.json resides in the same directory as this file.");
+            if (!teamsRes.ok) throw new Error("Could not find local data.json.");
             const teamsData = await teamsRes.json();
             
-            if (!teamsData.sports || !teamsData.sports[0] || !teamsData.sports[0].leagues || !teamsData.sports[0].leagues[0]) {
-                throw new Error("Local data.json payload format is invalid.");
-            }
             const rawTeams = teamsData.sports[0].leagues[0].teams.map(t => t.team);
             
             const tempTeams = rawTeams.map(t => ({
@@ -1028,10 +992,9 @@
                 col1: t.color ? `#${t.color}` : "#3b82f6",
                 col2: t.alternateColor ? `#${t.alternateColor}` : "#ffffff",
                 logo: t.logos?.[0]?.href || "",
-                players: [] // Dynamic roster load on-demand
+                players: [] 
             }));
 
-            // Create Sandbox Free Agency Pool
             tempTeams.push({
                 id: "FA",
                 name: "Free Agents Pool",
@@ -1041,23 +1004,13 @@
                 logo: "",
                 players: []
             });
-            
-            // Add Custom Team (Seattle SuperSonics)
-            tempTeams.push({
-                id: "CST",
-                name: "Seattle SuperSonics",
-                abbreviation: "SEA",
-                col1: "#00653a",
-                col2: "#ffc222",
-                logo: "🏀",
-                players: []
-            });
 
             ALL_TEAMS = tempTeams;
             PLAYERS = [];
+            
+            if(!userTeamId) userTeamId = ALL_TEAMS[0].id; // Default
 
-            // Pre-load active season teams
-            const abbreviations = ["LAL", "BOS", "GS", "CHI", "PHX", "DEN", "MIA"];
+            const abbreviations = ["LAL", "BOS", "GS", "CHI", "PHX", "DEN", "MIA", "NY"];
             const preloads = ALL_TEAMS.filter(t => abbreviations.includes(t.abbreviation));
 
             for (let i = 0; i < preloads.length; i++) {
@@ -1065,15 +1018,9 @@
                 const pct = Math.round(((i + 1) / preloads.length) * 70) + 20;
                 progress.style.width = `${pct}%`;
                 msg.textContent = `Pre-loading live roster data... (${i + 1}/${preloads.length})`;
-                
-                try {
-                    await loadTeamRosterDynamically(team.id);
-                } catch (err) {
-                    console.warn(`Failed to preload roster for ${team.name}.`, err);
-                }
+                try { await loadTeamRosterDynamically(team.id); } catch (err) {}
             }
             
-            // Clone real-life rosters from sandbox startup to isolate states
             REAL_PLAYERS = JSON.parse(JSON.stringify(PLAYERS));
             REAL_TEAMS = JSON.parse(JSON.stringify(ALL_TEAMS));
 
@@ -1082,7 +1029,7 @@
             loader.style.display = "none";
             initApp();
         } catch (err) {
-            console.error("Critical Connection Error:", err);
+            console.error("Critical Error:", err);
             showLoaderError(err.message);
         }
     }
@@ -1116,9 +1063,7 @@
             };
             assignPlayerAttributes(playerObj);
             
-            if (!PLAYERS.some(p => p.id === playerObj.id)) {
-                PLAYERS.push(playerObj);
-            }
+            if (!PLAYERS.some(p => p.id === playerObj.id)) { PLAYERS.push(playerObj); }
             teamPlayerIds.push(playerObj.id);
         });
 
@@ -1129,22 +1074,10 @@
     function showLoaderError(errMsg) {
         const msg = document.getElementById("loader-msg");
         const progress = document.getElementById("loader-progress");
-        msg.innerHTML = `
-            <span style="color:var(--accent-red); font-weight:800; font-size:1.15rem; display:block; margin-bottom:1rem;">Initialization Failed</span>
-            <span style="font-size:0.9rem; color:var(--text-muted); display:block; line-height:1.4; max-width: 500px; text-align: left;">
-                Description: ${errMsg}<br><br>
-                Ensure <strong>data.json</strong> has been successfully placed in the same directory as this HTML file. Check internet connectivity for live roster streams.
-            </span>
-        `;
+        msg.innerHTML = `<span style="color:var(--accent-red); font-weight:800; font-size:1.15rem;">Error: ${errMsg}</span>`;
         progress.style.backgroundColor = "var(--accent-red)";
     }
 
-    function resetDatabaseToDefault() {
-        localStorage.clear();
-        loadNBADataFromAPI();
-    }
-
-    // --- PLAYER STAT GENERATOR MODIFIERS ---
     function assignPlayerAttributes(p) {
         const superstars = {
             "LeBron James": 98, "Stephen Curry": 97, "Nikola Jokic": 98, "Kevin Durant": 96,
@@ -1153,20 +1086,15 @@
             "Devin Booker": 93, "Ja Morant": 92, "Kyrie Irving": 93, "Damian Lillard": 92,
             "Donovan Mitchell": 92, "Tyrese Haliburton": 91, "De'Aaron Fox": 91, "Paul George": 91,
             "James Harden": 90, "Anthony Edwards": 94, "Victor Wembanyama": 95, "Jalen Brunson": 93,
-            "Jaylen Brown": 93, "Bam Adebayo": 91, "Domantas Sabonis": 90, "Lauri Markkanen": 89,
-            "Paolo Banchero": 89, "Tyrese Maxey": 89, "Chet Holmgren": 89, "Cade Cunningham": 88
+            "Jaylen Brown": 93, "Bam Adebayo": 91, "Domantas Sabonis": 90, "Lauri Markkanen": 89
         };
 
         let baseOvr = superstars[p.name] || (72 + Math.floor(Math.random() * 15));
         let off = baseOvr, def = baseOvr, reb = baseOvr, ast = baseOvr;
 
-        if (p.pos === "C" || p.pos === "PF") {
-            reb += 12; ast -= 10; def += 4;
-        } else if (p.pos === "PG") {
-            ast += 15; reb -= 12; off += 2;
-        } else if (p.pos === "SG") {
-            off += 6; ast -= 2; reb -= 8;
-        }
+        if (p.pos === "C" || p.pos === "PF") { reb += 12; ast -= 10; def += 4; }
+        else if (p.pos === "PG") { ast += 15; reb -= 12; off += 2; }
+        else if (p.pos === "SG") { off += 6; ast -= 2; reb -= 8; }
 
         p.off = Math.max(50, Math.min(99, off));
         p.def = Math.max(50, Math.min(99, def));
@@ -1175,94 +1103,57 @@
         p.ovr = Math.round((p.off + p.def + p.reb + p.ast) / 4);
     }
 
-    // --- ROSTER SELECTION HELPERS ---
-    function populateRostersSelectors() {
-        if (!activeRosterTeamA || !activeRosterTeamB) {
-            activeRosterTeamA = ALL_TEAMS[0]?.id || "";
-            activeRosterTeamB = "FA";
-        }
-    }
-
-    function renderLineupSelectors() {
-        const positions = ["PG", "SG", "SF", "PF", "C"];
-        const customPlayers = PLAYERS.filter(p => p.teamId === "CST");
-
-        positions.forEach(pos => {
-            const select = document.getElementById(`lineup-${pos}`);
-            if (!select) return;
-            select.innerHTML = "";
-
-            const defaultOpt = document.createElement("option");
-            defaultOpt.value = "";
-            defaultOpt.textContent = customPlayers.length === 0 ? "Sign players first!" : "-- Select Starter --";
-            select.appendChild(defaultOpt);
-
-            const candidates = customPlayers.filter(p => p.pos === pos);
-            candidates.forEach(p => {
-                const opt = document.createElement("option");
-                opt.value = p.id;
-                opt.textContent = `${p.name} (OVR ${p.ovr})`;
-                if (customLineup[pos] === p.id) {
-                    opt.selected = true;
-                }
-                select.appendChild(opt);
-            });
-        });
-    }
-
-    // --- MODE SWITCHER (NBA VS MyNBA SPLIT) ---
+    // --- MODE SWITCHER (NBA VS MyNBA) ---
     function setSimulationMode(mode) {
         currentMode = mode;
         
-        // Setup UI Highlights
         document.getElementById("mode-btn-nba").className = `btn ${mode === 'NBA' ? 'btn-primary' : ''}`;
         document.getElementById("mode-btn-mynba").className = `btn ${mode === 'MyNBA' ? 'btn-primary' : ''}`;
 
         const rostersNavBtn = document.getElementById("tab-btn-rosters");
+        const mmDisplay = document.getElementById("mm-display");
 
         if (mode === "NBA") {
-            // Immutable mode, disable editing tools
             rostersNavBtn.style.display = "none";
-            switchTab("tab-directory"); // Switch tab away from rosters to prevent dead states
+            mmDisplay.style.display = "none";
+            switchTab("tab-directory");
             
-            // Restore isolated actual NBA configurations
+            // Restore unaltered NBA
             PLAYERS = JSON.parse(JSON.stringify(REAL_PLAYERS));
             ALL_TEAMS = JSON.parse(JSON.stringify(REAL_TEAMS));
         } else {
-            // Sandbox mode, allow full customization
             rostersNavBtn.style.display = "block";
+            mmDisplay.style.display = "block";
+            updateMMDisplay();
             
-            // Reload cached sandboxed layouts
-            const cachedP = localStorage.getItem("slam_sim_players_v6");
-            const cachedT = localStorage.getItem("slam_sim_teams_v6");
+            const cachedP = localStorage.getItem("slam_sim_players_v7");
+            const cachedT = localStorage.getItem("slam_sim_teams_v7");
             if (cachedP && cachedT) {
                 PLAYERS = JSON.parse(cachedP);
                 ALL_TEAMS = JSON.parse(cachedT);
             }
             switchTab("tab-rosters");
+            renderUserTeamSelectors();
         }
 
-        // Re-align all Dropdowns, Directories and Standings dynamically
-        populateRostersSelectors();
         renderRosterSide('a');
         renderRosterSide('b');
         buildCustomLogoDropdowns();
         
-        // Auto select fallback exhibition teams to avoid custom CST team in pure NBA mode
-        const valid = ALL_TEAMS.filter(t => t.id !== "FA" && (currentMode === "MyNBA" || t.id !== "CST"));
+        const valid = ALL_TEAMS.filter(t => t.id !== "FA");
         activeExhibitionAway = valid[0]?.id || "";
         activeExhibitionHome = valid[1]?.id || "";
 
         updateExhibitionVisuals();
-        initSeason();
+        startSeason(); // Reset season layout for mode change
     }
 
     // --- LIFECYCLE INITIALIZER ---
     function initApp() {
-        populateRostersSelectors();
+        if(!userTeamId && ALL_TEAMS.length > 0) userTeamId = ALL_TEAMS[0].id;
+
         renderRosterSide('a');
         renderRosterSide('b');
-        renderLineupSelectors();
         
         if (!activeExhibitionAway || !activeExhibitionHome) {
             const valid = ALL_TEAMS.filter(t => t.id !== "FA");
@@ -1274,14 +1165,13 @@
         updateExhibitionVisuals();
 
         if (seasonStandings.length === 0) {
-            initSeason();
+            startSeason();
         }
         
-        // Highlight first state
         setSimulationMode("NBA");
     }
 
-    // --- TABS NAVIGATION ENGINE ---
+    // --- TABS NAVIGATION ---
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -1289,15 +1179,16 @@
         document.getElementById(tabId).classList.add('active');
         
         const idx = ['tab-rosters', 'tab-directory', 'tab-exhibition', 'tab-season'].indexOf(tabId);
-        document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+        if(document.querySelectorAll('.nav-btn')[idx]) {
+            document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+        }
 
         if (tabId === 'tab-rosters') {
-            populateRostersSelectors();
-            renderLineupSelectors();
+            renderRosterSide('a');
+            renderRosterSide('b');
         } else if (tabId === 'tab-directory') {
             renderPlayerDirectory("", "ALL");
         } else if (tabId === 'tab-exhibition') {
-            populateExhibitionSelectors();
             updateExhibitionVisuals();
         } else if (tabId === 'tab-season') {
             renderStandings();
@@ -1305,43 +1196,117 @@
         }
     }
 
-    // --- CUSTOM TEAM SETTINGS ---
-    function updateCustomTeamSettings() {
-        const custom = ALL_TEAMS.find(t => t.id === "CST");
-        if (!custom) return;
-
-        const nameInput = document.getElementById("custom-team-name-input").value || "Seattle SuperSonics";
-        const col1 = document.getElementById("custom-color-1").value;
-        const col2 = document.getElementById("custom-color-2").value;
-
-        custom.name = nameInput;
-        custom.col1 = col1;
-        custom.col2 = col2;
-
-        PLAYERS.forEach(p => {
-            if (p.teamId === "CST") {
-                p.team = nameInput;
-                p.col1 = col1;
-                p.col2 = col2;
-            }
-        });
-
+    // --- MYNBA MANAGEMENT ---
+    function updateMMDisplay() {
+        document.getElementById("mm-display").textContent = `💰 ${userMM} MM`;
         saveRostersState();
-        populateRostersSelectors();
-        renderRosterSide('a');
-        renderRosterSide('b');
-        renderLineupSelectors();
     }
 
-    function saveLineupChoice(pos) {
-        const val = document.getElementById(`lineup-${pos}`).value;
-        customLineup[pos] = val;
+    function addMM(amount) {
+        if (currentMode !== "MyNBA") return; // Only earn MM in MyNBA mode
+        userMM += amount;
+        updateMMDisplay();
+    }
+
+    function resetMyNBAMode() {
+        if(confirm("Are you sure you want to reset your MyNBA Franchise? All trades and player upgrades will be lost!")) {
+            PLAYERS = JSON.parse(JSON.stringify(REAL_PLAYERS));
+            ALL_TEAMS = JSON.parse(JSON.stringify(REAL_TEAMS));
+            userMM = 0;
+            saveRostersState();
+            setSimulationMode("MyNBA");
+        }
+    }
+
+    function renderUserTeamSelectors() {
+        const select = document.getElementById("trigger-user-team-menu");
+        if (!select) return;
+        select.innerHTML = "";
+
+        const activeTeams = ALL_TEAMS.filter(t => t.id !== "FA");
+        activeTeams.forEach(t => {
+            const item = document.createElement("div");
+            item.className = "dropdown-item";
+            item.onclick = () => {
+                userTeamId = t.id;
+                saveRostersState();
+                document.getElementById("trigger-user-team-menu").style.display = "none";
+                updateUserTeamDisplay();
+                renderRosterSide('a');
+                populateUpgradeList();
+            };
+
+            const logoHTML = t.logo ? `<img src="${t.logo}" class="dropdown-logo-mini">` : `<span style="font-size:1.3rem;">🏀</span>`;
+            item.innerHTML = `${logoHTML} <span>${t.name}</span>`;
+            select.appendChild(item);
+        });
+        updateUserTeamDisplay();
+        populateUpgradeList();
+    }
+
+    function updateUserTeamDisplay() {
+        const team = ALL_TEAMS.find(t => t.id === userTeamId);
+        if(!team) return;
+        
+        const trigger = document.getElementById("trigger-user-team-text");
+        const title = document.getElementById("roster-a-title");
+        
+        if (trigger) {
+            const logoTrigger = team.logo ? `<img src="${team.logo}" class="dropdown-logo-mini">` : `🏀`;
+            trigger.innerHTML = `${logoTrigger} <span style="margin-left:8px;">${team.name}</span>`;
+        }
+        if (title) {
+            title.textContent = team.name;
+        }
+    }
+
+    function populateUpgradeList() {
+        const select = document.getElementById("upgrade-player-select");
+        if(!select) return;
+        select.innerHTML = "";
+        
+        const roster = PLAYERS.filter(p => p.teamId === userTeamId);
+        roster.sort((a, b) => b.ovr - a.ovr);
+        
+        roster.forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p.id;
+            opt.textContent = `${p.name} (OVR ${p.ovr})`;
+            select.appendChild(opt);
+        });
+    }
+
+    function buyPlayerUpgrade() {
+        const pId = document.getElementById("upgrade-player-select").value;
+        const player = PLAYERS.find(p => p.id === pId);
+        
+        if (!player) return;
+        if (userMM < 1000) {
+            alert("Not enough MM! You need 1,000 MM to upgrade a player.");
+            return;
+        }
+        if (player.ovr >= 99) {
+            alert(`${player.name} is already at max overall (99).`);
+            return;
+        }
+
+        userMM -= 1000;
+        player.off = Math.min(99, player.off + 1);
+        player.def = Math.min(99, player.def + 1);
+        player.reb = Math.min(99, player.reb + 1);
+        player.ast = Math.min(99, player.ast + 1);
+        player.ovr += 1;
+        
+        updateMMDisplay();
+        renderRosterSide('a');
+        populateUpgradeList();
         saveRostersState();
     }
 
     // --- ROSTER SIDE RENDERING ---
     function renderRosterSide(side) {
-        const teamId = (side === "a") ? activeRosterTeamA : activeRosterTeamB;
+        // Side A is ALWAYS userTeam in MyNBA
+        const teamId = (side === "a") ? userTeamId : activeRosterTeamB;
         const tbody = document.getElementById(`roster-table-body-${side}`);
         const searchContainer = document.getElementById(`roster-search-box-${side}`);
         if (!tbody) return;
@@ -1350,35 +1315,25 @@
         const team = ALL_TEAMS.find(t => t.id === teamId);
         if (!team) return;
 
-        // Lazy-load live roster if team players list is empty (and not CST / FA pools)
-        if (teamId !== "FA" && teamId !== "CST" && (!team.players || team.players.length === 0)) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-muted);">🔄 Loading live roster via proxy...</td></tr>`;
-            searchContainer.style.display = "none";
+        if (teamId !== "FA" && (!team.players || team.players.length === 0)) {
+            tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 3rem; color: var(--text-muted);">🔄 Loading live roster via proxy...</td></tr>`;
+            if (searchContainer) searchContainer.style.display = "none";
             
             loadTeamRosterDynamically(teamId).then(() => {
                 renderRosterSide(side);
-                renderLineupSelectors();
-            }).catch(err => {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 3rem; color: var(--accent-red);">❌ Failed to load live stream: ${err.message}</td></tr>`;
             });
             return;
         }
 
-        searchContainer.style.display = "flex";
-        document.getElementById("trade-center-panel").style.display = "block";
-
+        if(searchContainer) searchContainer.style.display = "flex";
+        
         const searchQuery = (document.getElementById(`roster-query-${side}`)?.value || "").toLowerCase();
-        const posFilter = document.getElementById(`roster-pos-${side}`).value;
+        const posFilter = document.getElementById(`roster-pos-${side}`)?.value || "ALL";
 
         let rosterPlayers = PLAYERS.filter(p => p.teamId === teamId);
 
-        if (searchQuery) {
-            rosterPlayers = rosterPlayers.filter(p => p.name.toLowerCase().includes(searchQuery));
-        }
-
-        if (posFilter !== "ALL") {
-            rosterPlayers = rosterPlayers.filter(p => p.pos === posFilter);
-        }
+        if (searchQuery) rosterPlayers = rosterPlayers.filter(p => p.name.toLowerCase().includes(searchQuery));
+        if (posFilter !== "ALL") rosterPlayers = rosterPlayers.filter(p => p.pos === posFilter);
 
         rosterPlayers.sort((a, b) => b.ovr - a.ovr);
 
@@ -1388,7 +1343,8 @@
             const topPlayers = rosterPlayers.slice(0, 15);
             avgStrength = Math.round(topPlayers.reduce((acc, p) => acc + p.ovr, 0) / topPlayers.length);
         }
-        document.getElementById(`roster-${side}-strength`).textContent = `TEAM OVR: ${avgStrength}`;
+        const strEl = document.getElementById(`roster-${side}-strength`);
+        if (strEl) strEl.textContent = `TEAM OVR: ${avgStrength}`;
 
         const playersToRender = teamId === "FA" ? rosterPlayers.slice(0, 50) : rosterPlayers;
 
@@ -1399,12 +1355,7 @@
             const isSel = (side === 'a' && selectedTradePlayerA?.id === p.id) || (side === 'b' && selectedTradePlayerB?.id === p.id);
             if (isSel) row.classList.add('selected');
 
-            row.onclick = (e) => {
-                if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
-                toggleTradeSelection(p, side);
-            };
-
-            const otherTeamId = (side === "a") ? activeRosterTeamB : activeRosterTeamA;
+            row.onclick = () => toggleTradeSelection(p, side);
 
             row.innerHTML = `
                 <td>
@@ -1416,73 +1367,111 @@
                         </div>
                     </div>
                 </td>
-                <td style="text-align: center; font-weight: 700; color: var(--accent-gold);">${p.ovr}</td>
-                <td style="text-align: right;">
-                    <div style="display:flex; gap: 4px; justify-content: flex-end;">
-                        <button class="btn" style="padding: 2px 6px; font-size: 0.7rem;" title="Move directly to opposite pane" onclick="transferPlayerDirect('${p.id}', '${teamId}', '${otherTeamId}')">
-                            ${side === 'a' ? '➡️ Sign' : '⬅️ Sign'}
-                        </button>
-                        ${teamId !== 'FA' ? `<button class="btn btn-danger" style="padding: 2px 6px; font-size: 0.7rem;" title="Release to Free Agency" onclick="transferPlayerDirect('${p.id}', '${teamId}', 'FA')">Release</button>` : ''}
-                    </div>
-                </td>
+                <td style="text-align: center; font-weight: 700; color: var(--accent-gold); font-size: 1.1rem;">${p.ovr}</td>
             `;
             tbody.appendChild(row);
         });
     }
 
     // --- TRANSACTION LOGIC ---
-    function transferPlayerDirect(playerId, fromId, toId) {
-        if (fromId === toId) {
-            alert("Roster source and roster destination matches.");
-            return;
+    function toggleTradeSelection(player, side) {
+        if (side === 'a') {
+            if (selectedTradePlayerA?.id === player.id) selectedTradePlayerA = null;
+            else selectedTradePlayerA = player;
+        } else {
+            if (selectedTradePlayerB?.id === player.id) selectedTradePlayerB = null;
+            else selectedTradePlayerB = player;
         }
+        renderRosterSide('a');
+        renderRosterSide('b');
+        updateTradeCenterPanel();
+    }
 
-        const fromTeam = ALL_TEAMS.find(t => t.id === fromId);
-        const toTeam = ALL_TEAMS.find(t => t.id === toId);
-        const player = PLAYERS.find(p => p.id === playerId);
+    function updateTradeCenterPanel() {
+        const msg = document.getElementById("trade-negotiator-msg");
+        const actions = document.getElementById("trade-actions");
+        const proposal = document.getElementById("trade-proposal-text");
 
-        if (!player) return;
+        if (selectedTradePlayerA && selectedTradePlayerB) {
+            msg.style.display = "none";
+            actions.style.display = "flex";
+            proposal.innerHTML = `Offer: <span style="color: var(--accent-blue);">${selectedTradePlayerA.name}</span> (${selectedTradePlayerA.ovr}) 🔄 Receive: <span style="color: var(--accent-gold);">${selectedTradePlayerB.name}</span> (${selectedTradePlayerB.ovr})`;
+        } else {
+            msg.style.display = "block";
+            actions.style.display = "none";
+            let b = "Negotiation: ";
+            if (selectedTradePlayerA) b += `Trading Away: ${selectedTradePlayerA.name}. `;
+            if (selectedTradePlayerB) b += `Trading For: ${selectedTradePlayerB.name}. `;
+            if (!selectedTradePlayerA && !selectedTradePlayerB) b = "Select a player from your team and the target team to begin trade negotiations.";
+            msg.textContent = b;
+        }
+    }
 
-        // Minimum roster safeguard
-        if (fromId !== "FA" && fromId !== "CST") {
-            const activeCount = PLAYERS.filter(p => p.teamId === fromId).length;
-            if (activeCount <= 5) {
-                alert(`Transaction Rejected: ${fromTeam.name} roster size is currently at 5 players. Minimum rotation required to play is 5.`);
-                return;
+    function processSelectedTrade() {
+        if (!selectedTradePlayerA || !selectedTradePlayerB) return;
+
+        const teamA = ALL_TEAMS.find(t => t.id === selectedTradePlayerA.teamId);
+        const teamB = ALL_TEAMS.find(t => t.id === selectedTradePlayerB.teamId);
+
+        if (!teamA || !teamB) return;
+
+        // Trade AI Evaluation
+        // AI expects equal or better value. If player is trying to rip them off, reject.
+        let userOvr = selectedTradePlayerA.ovr;
+        let cpuOvr = selectedTradePlayerB.ovr;
+
+        // If target team is FA, they auto accept. Otherwise CPU logic applies.
+        if (teamB.id !== "FA" && userOvr < cpuOvr) {
+            let diff = cpuOvr - userOvr;
+            let bribeCost = diff * 150;
+            
+            if(confirm(`TRADE REJECTED: The ${teamB.name} GM feels they are giving up too much value (${cpuOvr} OVR for ${userOvr} OVR). \n\nDo you want to use a Front Office Bribe to force this trade for ${bribeCost} MM?`)) {
+                if (userMM >= bribeCost) {
+                    userMM -= bribeCost;
+                    updateMMDisplay();
+                    alert(`Bribe successful. The NBA front office looks the other way. Trade executed.`);
+                } else {
+                    alert(`Transaction failed: You do not have enough MM (${userMM} / ${bribeCost}).`);
+                    return; // Abort
+                }
+            } else {
+                return; // User cancelled
             }
         }
 
-        // Process transaction
-        if (fromTeam) fromTeam.players = fromTeam.players.filter(id => id !== playerId);
-        if (toTeam) {
-            toTeam.players.push(playerId);
-            player.teamId = toTeam.id;
-            player.team = toTeam.name;
-            player.col1 = toTeam.col1;
-            player.col2 = toTeam.col2;
-        } else if (toId === "FA") {
-            player.teamId = "FA";
-            player.team = "Free Agent";
-            player.col1 = "#475569";
-            player.col2 = "#cbd5e1";
-            const fa = ALL_TEAMS.find(t => t.id === "FA");
-            if (fa) fa.players.push(playerId);
+        // Execute Swaps
+        teamA.players = teamA.players.filter(id => id !== selectedTradePlayerA.id);
+        teamB.players = teamB.players.filter(id => id !== selectedTradePlayerB.id);
+
+        teamA.players.push(selectedTradePlayerB.id);
+        teamB.players.push(selectedTradePlayerA.id);
+
+        const tempA_teamId = selectedTradePlayerA.teamId;
+        const tempA_team = selectedTradePlayerA.team;
+        const tempA_col1 = selectedTradePlayerA.col1;
+        const tempA_col2 = selectedTradePlayerA.col2;
+
+        selectedTradePlayerA.teamId = selectedTradePlayerB.teamId;
+        selectedTradePlayerA.team = selectedTradePlayerB.team;
+        selectedTradePlayerA.col1 = selectedTradePlayerB.col1;
+        selectedTradePlayerA.col2 = selectedTradePlayerB.col2;
+
+        selectedTradePlayerB.teamId = tempA_teamId;
+        selectedTradePlayerB.team = tempA_team;
+        selectedTradePlayerB.col1 = tempA_col1;
+        selectedTradePlayerB.col2 = tempA_col2;
+
+        if (userOvr >= cpuOvr) {
+             alert(`Trade Accepted!\n\n${teamB.name} agreed to the deal.`);
         }
 
-        // Clean starting lineup configuration if player is moved off custom team
-        if (fromId === "CST") {
-            Object.keys(customLineup).forEach(pos => {
-                if (customLineup[pos] === playerId) customLineup[pos] = "";
-            });
-        }
-
-        if (selectedTradePlayerA?.id === playerId) selectedTradePlayerA = null;
-        if (selectedTradePlayerB?.id === playerId) selectedTradePlayerB = null;
+        selectedTradePlayerA = null;
+        selectedTradePlayerB = null;
 
         saveRostersState();
         renderRosterSide('a');
         renderRosterSide('b');
-        renderLineupSelectors();
+        populateUpgradeList();
         updateTradeCenterPanel();
     }
 
@@ -1551,19 +1540,14 @@
             if (!menu) return;
             menu.innerHTML = "";
 
-            // Hide sandbox Custom Team ("CST") if active mode is standard real-life NBA
-            const activeTeams = ALL_TEAMS.filter(t => t.id !== "FA" && (currentMode === "MyNBA" || t.id !== "CST"));
-
+            const activeTeams = ALL_TEAMS.filter(t => t.id !== "FA");
             activeTeams.forEach(t => {
                 const item = document.createElement("div");
                 item.className = "dropdown-item";
                 item.onclick = () => selectTeamCustomDropdown(side, t.id);
 
                 const logoHTML = t.logo ? `<img src="${t.logo}" class="dropdown-logo-mini">` : `<span style="font-size:1.3rem;">🏀</span>`;
-                item.innerHTML = `
-                    ${logoHTML}
-                    <span>${t.name}</span>
-                `;
+                item.innerHTML = `${logoHTML}<span>${t.name}</span>`;
                 menu.appendChild(item);
             });
         };
@@ -1573,40 +1557,34 @@
             if (!menu) return;
             menu.innerHTML = "";
 
-            // Rosters side selectors include all teams including FA and CST sandbox pools
             ALL_TEAMS.forEach(t => {
                 const item = document.createElement("div");
                 item.className = "dropdown-item";
                 item.onclick = () => selectRosterTeamCustom(side, t.id);
 
                 const logoHTML = t.logo ? `<img src="${t.logo}" class="dropdown-logo-mini">` : `<span style="font-size:1.3rem;">🏀</span>`;
-                item.innerHTML = `
-                    ${logoHTML}
-                    <span>${t.name}</span>
-                `;
+                item.innerHTML = `${logoHTML}<span>${t.name}</span>`;
                 menu.appendChild(item);
             });
         };
 
         createMenu("away");
         createMenu("home");
-        createRostersMenu("a");
-        createRostersMenu("b");
+        createRostersMenu("b"); // Only b gets populated because A is locked to userTeamId
     }
 
-    function toggleCustomDropdown(side) {
-        const otherSides = ["away", "home", "roster-a", "roster-b"].filter(x => x !== side);
-        const menu = document.getElementById(`trigger-${side}-menu`);
+    function toggleCustomDropdown(id) {
+        const menus = document.querySelectorAll(".dropdown-menu-list");
+        const target = document.getElementById(`trigger-${id}-menu`);
         
-        otherSides.forEach(s => {
-            const el = document.getElementById(`trigger-${s}-menu`);
-            if (el) el.style.display = "none";
+        menus.forEach(m => {
+            if(m !== target) m.style.display = "none";
         });
 
-        if (menu.style.display === "block") {
-            menu.style.display = "none";
+        if (target.style.display === "block") {
+            target.style.display = "none";
         } else {
-            menu.style.display = "block";
+            target.style.display = "block";
         }
     }
 
@@ -1618,25 +1596,17 @@
     });
 
     function selectTeamCustomDropdown(side, teamId) {
-        if (side === "away") {
-            activeExhibitionAway = teamId;
-        } else {
-            activeExhibitionHome = teamId;
-        }
+        if (side === "away") activeExhibitionAway = teamId;
+        else activeExhibitionHome = teamId;
+        
         document.getElementById(`trigger-${side}-menu`).style.display = "none";
         updateExhibitionVisuals();
     }
 
     function selectRosterTeamCustom(side, teamId) {
-        if (side === "a") {
-            activeRosterTeamA = teamId;
-        } else {
-            activeRosterTeamB = teamId;
-        }
-        
+        activeRosterTeamB = teamId;
         document.getElementById(`trigger-roster-${side}-menu`).style.display = "none";
         
-        // Cancel trade options if sides are switched
         selectedTradePlayerA = null;
         selectedTradePlayerB = null;
 
@@ -1646,16 +1616,9 @@
     }
 
     function updateRostersSelectorLabels() {
-        const tA = ALL_TEAMS.find(t => t.id === activeRosterTeamA);
         const tB = ALL_TEAMS.find(t => t.id === activeRosterTeamB);
-
-        const lblA = document.getElementById("trigger-roster-a-text");
         const lblB = document.getElementById("trigger-roster-b-text");
 
-        if (tA && lblA) {
-            const logo = tA.logo ? `<img src="${tA.logo}" class="dropdown-logo-mini">` : `🏀`;
-            lblA.innerHTML = `${logo} <span style="margin-left:8px;">${tA.name}</span>`;
-        }
         if (tB && lblB) {
             const logo = tB.logo ? `<img src="${tB.logo}" class="dropdown-logo-mini">` : `🏀`;
             lblB.innerHTML = `${logo} <span style="margin-left:8px;">${tB.name}</span>`;
@@ -1715,11 +1678,16 @@
                 document.getElementById("game-status").textContent = update.isFinished ? "FINAL" : `QUARTER ${update.quarter}`;
                 document.getElementById("simulation-clock").textContent = update.time;
 
-                if (update.tickerMessage) {
-                    appendTickerMessage(update.tickerMessage);
+                if (update.tickerMessage) appendTickerMessage(update.tickerMessage);
+                
+                if (update.isFinished) {
+                    renderBoxScoreStats();
+                    // Award MM for Exhibition Win
+                    if(currentMode === "MyNBA") {
+                         if(update.scoreAway > update.scoreHome && teamAway.id === userTeamId) addMM(100);
+                         else if(update.scoreHome > update.scoreAway && teamHome.id === userTeamId) addMM(100);
+                    }
                 }
-
-                renderBoxScoreStats();
             });
         };
 
@@ -1753,8 +1721,10 @@
         document.getElementById("box-tab-home").className = `btn ${boxScoreView === 'home' ? 'btn-primary' : ''}`;
 
         const roster = boxScoreView === 'away' ? exhibitionBox.statsAway : exhibitionBox.statsHome;
+        roster.sort((a,b) => b.min - a.min); // Sort by minutes played
 
         roster.forEach(p => {
+            if(p.min === 0) return; // Hide DNP
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>
@@ -1778,7 +1748,7 @@
     }
 
     // --- GAME SIMULATOR ALGORITHMS ---
-    function executeGameRotationSimulation(teamAway, teamHome, isLive, onUpdate) {
+    function executeGameRotationSimulation(teamAway, teamHome, isLive, onUpdate, loopDelay = 350) {
         let fullRosterAway = PLAYERS.filter(p => p.teamId === teamAway.id).map(p => ({ ...p, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, min: 0, gp: 1, fatigue: 100 }));
         let fullRosterHome = PLAYERS.filter(p => p.teamId === teamHome.id).map(p => ({ ...p, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, min: 0, gp: 1, fatigue: 100 }));
 
@@ -1792,13 +1762,6 @@
         let activeCourtHome = [];
 
         const assignStarters = (roster, dest, team) => {
-            if (team.id === "CST") {
-                positions.forEach(pos => {
-                    let pId = customLineup[pos];
-                    let pObj = roster.find(p => p.id === pId);
-                    if (pObj) dest.push(pObj);
-                });
-            }
             positions.forEach(pos => {
                 if (dest.length < 5 && !dest.some(rx => rx.pos === pos)) {
                     let candidates = roster.filter(p => p.pos === pos && !dest.some(rx => rx.id === p.id));
@@ -1830,19 +1793,13 @@
 
             fullOffRoster.forEach(p => {
                 if (offSquad.some(ox => ox.id === p.id)) {
-                    p.min += 0.5;
-                    p.fatigue = Math.max(40, p.fatigue - 1.5);
-                } else {
-                    p.fatigue = Math.min(100, p.fatigue + 3.0);
-                }
+                    p.min += 0.5; p.fatigue = Math.max(40, p.fatigue - 1.5);
+                } else { p.fatigue = Math.min(100, p.fatigue + 3.0); }
             });
             fullDefRoster.forEach(p => {
                 if (defSquad.some(dx => dx.id === p.id)) {
-                    p.min += 0.5;
-                    p.fatigue = Math.max(40, p.fatigue - 1.5);
-                } else {
-                    p.fatigue = Math.min(100, p.fatigue + 3.0);
-                }
+                    p.min += 0.5; p.fatigue = Math.max(40, p.fatigue - 1.5);
+                } else { p.fatigue = Math.min(100, p.fatigue + 3.0); }
             });
 
             let subMessage = "";
@@ -1858,7 +1815,7 @@
                                 bestMatch = benchCandidates[0];
                             }
                             court[i] = bestMatch;
-                            subMessage += `🔄 Substitution (${sideLabel}): <strong>${bestMatch.name}</strong> enters the game for <strong>${player.name}</strong>.<br>`;
+                            if(isLive && loopDelay > 50) subMessage += `🔄 Substitution (${sideLabel}): <strong>${bestMatch.name}</strong> enters the game for <strong>${player.name}</strong>.<br>`;
                             break;
                         }
                     }
@@ -1895,17 +1852,19 @@
                     assister = offSquad[getWeightedRandomIdx(astWeights)];
                     assister.ast += 1;
                 }
-
-                msg += isThree ? 
-                    `🎯 <strong>${shooter.name}</strong> drills a deep 3-pointer! ${assister ? `(Assist: ${assister.name})` : ''}` :
-                    `🏀 <strong>${shooter.name}</strong> drives inside for a layup. ${assister ? `(Assist: ${assister.name})` : ''}`;
+                
+                if(isLive && loopDelay > 50) {
+                    msg += isThree ? 
+                        `🎯 <strong>${shooter.name}</strong> drills a deep 3-pointer! ${assister ? `(Assist: ${assister.name})` : ''}` :
+                        `🏀 <strong>${shooter.name}</strong> drives inside for a layup. ${assister ? `(Assist: ${assister.name})` : ''}`;
+                }
             } else {
                 let block = Math.random() * 100 < (defender.def * 0.1);
                 if (block) {
                     let blockers = defSquad.filter(p => p.pos === "C" || p.pos === "PF");
                     let blocker = blockers.length > 0 ? blockers[Math.floor(Math.random() * blockers.length)] : defender;
                     blocker.blk += 1;
-                    msg += `❌ <strong>${shooter.name}</strong> shoots, but it's rejected by <strong>${blocker.name}</strong>!`;
+                    if(isLive && loopDelay > 50) msg += `❌ <strong>${shooter.name}</strong> shoots, but it's rejected by <strong>${blocker.name}</strong>!`;
                 } else {
                     let rebOff = offSquad.map(p => p.reb);
                     let rebDef = defSquad.map(p => p.reb * 1.5);
@@ -1914,11 +1873,11 @@
                     if (Math.random() < (rebOff.reduce((a, b) => a + b, 0) / totalRebSum)) {
                         let reber = offSquad[getWeightedRandomIdx(rebOff)];
                         reber.reb += 1;
-                        msg += `🗑️ Offensive board secured by <strong>${reber.name}</strong>.`;
+                        if(isLive && loopDelay > 50) msg += `🗑️ Offensive board secured by <strong>${reber.name}</strong>.`;
                     } else {
                         let reber = defSquad[getWeightedRandomIdx(rebDef)];
                         reber.reb += 1;
-                        msg += `🛡️ Defensive board secured by <strong>${reber.name}</strong>.`;
+                        if(isLive && loopDelay > 50) msg += `🛡️ Defensive board secured by <strong>${reber.name}</strong>.`;
                     }
                 }
             }
@@ -1926,7 +1885,7 @@
             if (Math.random() < 0.08) {
                 let stealer = defSquad[getWeightedRandomIdx(defSquad.map(p => p.def))];
                 stealer.stl += 1;
-                msg += `<br>⚡ Turnover! <strong>${stealer.name}</strong> intercepts the pass cleanly.`;
+                if(isLive && loopDelay > 50) msg += `<br>⚡ Turnover! <strong>${stealer.name}</strong> intercepts the pass cleanly.`;
             }
 
             let q = Math.min(4, Math.floor((currentPoss / totalPossessions) * 4) + 1);
@@ -1940,7 +1899,7 @@
         }
 
         if (isLive) {
-            appendTickerMessage("🏀 Tip-off! The match has begun.");
+            if(loopDelay > 50) appendTickerMessage("🏀 Tip-off! The match has begun.");
             currentSimInterval = setInterval(() => {
                 let state = runNextPossession();
                 onUpdate(state);
@@ -1948,7 +1907,7 @@
                     clearInterval(currentSimInterval);
                     currentSimInterval = null;
                 }
-            }, 350);
+            }, loopDelay);
         } else {
             let finalState = {};
             for (let p = 0; p < totalPossessions; p++) {
@@ -1959,48 +1918,6 @@
         }
 
         return { statsAway: fullRosterAway, statsHome: fullRosterHome };
-    }
-
-    function getSimStartingRotation(team) {
-        let rotation = [];
-
-        if (team.id === "CST") {
-            const positions = ["PG", "SG", "SF", "PF", "C"];
-            positions.forEach(pos => {
-                let pId = customLineup[pos];
-                let pObj = PLAYERS.find(p => p.id === pId && p.teamId === "CST");
-                if (pObj) {
-                    rotation.push({ ...pObj, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, gp: 1 });
-                }
-            });
-        }
-
-        if (rotation.length < 5) {
-            let teamPlayers = PLAYERS.filter(p => p.teamId === team.id);
-            const positions = ["PG", "SG", "SF", "PF", "C"];
-            
-            positions.forEach(pos => {
-                if (rotation.length < 5 && !rotation.some(rx => rx.pos === pos)) {
-                    let candidates = teamPlayers.filter(p => p.pos === pos && !rotation.some(rx => rx.id === p.id));
-                    if (candidates.length > 0) {
-                        candidates.sort((a, b) => b.ovr - a.ovr);
-                        rotation.push({ ...candidates[0], pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, gp: 1 });
-                    }
-                }
-            });
-
-            teamPlayers.forEach(p => {
-                if (rotation.length < 5 && !rotation.some(rx => rx.id === p.id)) {
-                    rotation.push({ ...p, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, gp: 1 });
-                }
-            });
-        }
-
-        while (rotation.length < 5) {
-            rotation.push({ name: "Sub Rotation", pos: "G", ovr: 70, off: 70, def: 70, reb: 70, ast: 70, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, gp: 1 });
-        }
-
-        return rotation;
     }
 
     function getWeightedRandomIdx(w) {
@@ -2015,31 +1932,25 @@
     }
 
     // --- SIMULATE SEASON MODULE ---
-    function initSeason() {
-        const abbreviations = ["LAL", "BOS", "GS", "CHI", "PHX", "DEN", "MIA"];
+    function startSeason() {
         const activePool = [];
         
-        abbreviations.forEach(abbr => {
-            const found = ALL_TEAMS.find(t => t.abbreviation === abbr);
-            if (found) activePool.push(found);
-        });
-
-        while (activePool.length < 7 && ALL_TEAMS.length > 0) {
-            const extra = ALL_TEAMS.find(t => t.id !== "CST" && t.id !== "FA" && !activePool.includes(t));
-            if (extra) activePool.push(extra);
-            else break;
+        // Grab 8 Random Teams, ensuring User Team is included if MyNBA Mode
+        let teamsToPick = ALL_TEAMS.filter(t => t.id !== "FA");
+        
+        if (currentMode === "MyNBA" && userTeamId) {
+            let uT = ALL_TEAMS.find(t => t.id === userTeamId);
+            if(uT) activePool.push(uT);
+            teamsToPick = teamsToPick.filter(t => t.id !== userTeamId);
         }
 
-        // Only include custom sandbox team in Simulate Season if MyNBA sandbox is currently active
-        if (currentMode === "MyNBA") {
-            const custom = ALL_TEAMS.find(t => t.id === "CST");
-            if (custom) activePool.push(custom);
-        } else {
-            // Fill 8th team slot with alternative real NBA franchise
-            const extra = ALL_TEAMS.find(t => t.id !== "CST" && t.id !== "FA" && !activePool.includes(t));
-            if (extra) activePool.push(extra);
+        // Shuffle and fill remaining spots up to 8
+        teamsToPick.sort(() => 0.5 - Math.random());
+        while(activePool.length < 8 && teamsToPick.length > 0) {
+            activePool.push(teamsToPick.pop());
         }
 
+        // Auto-fill safety check
         activePool.forEach(t => {
             while (t.players.length < 5) {
                 const faPlayers = PLAYERS.filter(p => p.teamId === "FA");
@@ -2075,6 +1986,7 @@
         document.getElementById("season-champ-card").style.display = "none";
         document.getElementById("sim-day-btn").disabled = false;
         document.getElementById("sim-all-btn").disabled = false;
+        document.getElementById("live-season-scoreboard").style.display = "none";
         document.getElementById("sim-day-btn").textContent = "📅 Simulate Next Game-day";
 
         generateSeasonSchedule(activePool);
@@ -2117,8 +2029,15 @@
         seasonStandings.forEach((t, i) => {
             let pct = t.wins + t.losses > 0 ? (t.wins / (t.wins + t.losses)).toFixed(3) : ".000";
             const row = document.createElement("tr");
+            
+            // Highlight User Team
+            if(currentMode === "MyNBA" && t.id === userTeamId) {
+                row.className = "user-team";
+            }
+            
             row.innerHTML = `
-                <td><strong>#${i+1}</strong> <span style="font-weight:700;">${t.name}</span></td>
+                <td><strong>#${i+1}</strong></td>
+                <td><span style="font-weight:700;">${t.name}</span></td>
                 <td style="text-align: center;">${t.wins}</td>
                 <td style="text-align: center;">${t.losses}</td>
                 <td style="text-align: center; color: var(--text-muted); font-family: monospace;">${pct}</td>
@@ -2152,18 +2071,50 @@
         document.getElementById("sim-all-btn").disabled = true;
 
         const games = seasonSchedule[currentSeasonRound];
+        
+        // Show Live Box
+        const liveBoard = document.getElementById("live-season-scoreboard");
+        const liveGrid = document.getElementById("live-games-grid");
+        liveBoard.style.display = "block";
+        liveGrid.innerHTML = "";
+        
+        let simPromises = [];
 
-        for (let i = 0; i < games.length; i++) {
-            const g = games[i];
+        // Pre-hydrate all teams in parallel before sim loop
+        for (let g of games) {
+            if (!g.away.players || g.away.players.length === 0) try { await loadTeamRosterDynamically(g.away.id); } catch(e){}
+            if (!g.home.players || g.home.players.length === 0) try { await loadTeamRosterDynamically(g.home.id); } catch(e){}
+        }
 
-            if (!g.away.players || g.away.players.length === 0) {
-                try { await loadTeamRosterDynamically(g.away.id); } catch (e) { console.error("Roster failed to load", e); }
-            }
-            if (!g.home.players || g.home.players.length === 0) {
-                try { await loadTeamRosterDynamically(g.home.id); } catch (e) { console.error("Roster failed to load", e); }
-            }
+        // Create UI elements for each game and start simul-simulating
+        games.forEach((g, idx) => {
+            const card = document.createElement("div");
+            card.className = "live-game-card";
+            card.innerHTML = `
+                <div style="flex:1;">${g.away.abbreviation}</div>
+                <div class="live-score" id="live-score-a-${idx}">0</div>
+                <div style="margin:0 15px; color:var(--text-muted); font-size:0.8rem;">VS</div>
+                <div class="live-score" id="live-score-h-${idx}">0</div>
+                <div style="flex:1; text-align:right;">${g.home.abbreviation}</div>
+            `;
+            liveGrid.appendChild(card);
 
-            let box = executeGameRotationSimulation(g.away, g.home, false, () => {});
+            // Execute Live with very fast tick (20ms) for regular games
+            const p = new Promise(resolve => {
+                let box = executeGameRotationSimulation(g.away, g.home, true, (update) => {
+                    document.getElementById(`live-score-a-${idx}`).textContent = update.scoreAway;
+                    document.getElementById(`live-score-h-${idx}`).textContent = update.scoreHome;
+                    if(update.isFinished) resolve(box);
+                }, 15); // Fast 15ms delay per possession
+            });
+            simPromises.push(p);
+        });
+
+        // Wait for all games to finish visually
+        const results = await Promise.all(simPromises);
+
+        results.forEach((box, i) => {
+            let g = games[i];
             g.scoreA = box.statsAway.reduce((sum, p) => sum + p.pts, 0);
             g.scoreH = box.statsHome.reduce((sum, p) => sum + p.pts, 0);
             g.played = true;
@@ -2176,13 +2127,15 @@
 
             if (g.scoreA > g.scoreH) {
                 standAway.wins++; standHome.losses++;
+                if(currentMode === "MyNBA" && g.away.id === userTeamId) addMM(250);
             } else {
                 standHome.wins++; standAway.losses++;
+                if(currentMode === "MyNBA" && g.home.id === userTeamId) addMM(250);
             }
 
             accumulateSeasonStats(box.statsAway);
             accumulateSeasonStats(box.statsHome);
-        }
+        });
 
         currentSeasonRound++;
         saveRostersState();
@@ -2225,16 +2178,12 @@
 
     function renderLeagueLeaders() {
         let arr = Object.values(playerSeasonStats).filter(p => p.gp > 0);
-        if (arr.length === 0) {
-            document.getElementById("leader-pts-list").innerHTML = "Waiting on data...";
-            document.getElementById("leader-reb-list").innerHTML = "Waiting on data...";
-            document.getElementById("leader-ast-list").innerHTML = "Waiting on data...";
-            return;
-        }
+        if (arr.length === 0) return;
 
         const makeList = (elId, sortKey) => {
             let sorted = [...arr].sort((a, b) => (b[sortKey]/b.gp) - (a[sortKey]/a.gp)).slice(0, 3);
             const container = document.getElementById(elId);
+            if(!container) return;
             container.innerHTML = "";
             sorted.forEach((p, i) => {
                 const row = document.createElement("div");
@@ -2253,6 +2202,7 @@
         document.getElementById("playoff-bracket").style.display = "block";
         document.getElementById("sim-day-btn").textContent = "🏆 Run Semifinals";
         document.getElementById("sim-all-btn").disabled = true;
+        document.getElementById("live-season-scoreboard").style.display = "none";
 
         let s1 = ALL_TEAMS.find(t => t.id === seasonStandings[0].id);
         let s2 = ALL_TEAMS.find(t => t.id === seasonStandings[1].id);
@@ -2271,47 +2221,69 @@
         document.getElementById("bracket-s2-t1").textContent = `(2) ${s2.abbreviation}`;
         document.getElementById("bracket-s2-t2").textContent = `(3) ${s3.abbreviation}`;
 
-        document.getElementById("bracket-f-t1").textContent = "TBD";
-        document.getElementById("bracket-f-t2").textContent = "TBD";
-        
         saveRostersState();
         renderStandings();
     }
 
     async function runPlayoffsStep() {
         document.getElementById("sim-day-btn").disabled = true;
+        
+        const liveBoard = document.getElementById("live-season-scoreboard");
+        const liveGrid = document.getElementById("live-games-grid");
+        liveBoard.style.display = "block";
+        liveGrid.innerHTML = "";
 
         if (playoffsState.round === "semis") {
-            if (!playoffsState.semi1.t1.players || playoffsState.semi1.t1.players.length === 0) {
-                try { await loadTeamRosterDynamically(playoffsState.semi1.t1.id); } catch(e){}
-            }
-            if (!playoffsState.semi1.t2.players || playoffsState.semi1.t2.players.length === 0) {
-                try { await loadTeamRosterDynamically(playoffsState.semi1.t2.id); } catch(e){}
-            }
-            if (!playoffsState.semi2.t1.players || playoffsState.semi2.t1.players.length === 0) {
-                try { await loadTeamRosterDynamically(playoffsState.semi2.t1.id); } catch(e){}
-            }
-            if (!playoffsState.semi2.t2.players || playoffsState.semi2.t2.players.length === 0) {
-                try { await loadTeamRosterDynamically(playoffsState.semi2.t2.id); } catch(e){}
-            }
+            // Semi-finals: Moderate speed
+            let simDelay = 40;
 
-            let box1 = executeGameRotationSimulation(playoffsState.semi1.t1, playoffsState.semi1.t2, false, () => {});
-            let score1A = box1.statsAway.reduce((sum, p) => sum + p.pts, 0);
-            let score1H = box1.statsHome.reduce((sum, p) => sum + p.pts, 0);
-            let w1 = score1A > score1H ? playoffsState.semi1.t1 : playoffsState.semi1.t2;
+            if (!playoffsState.semi1.t1.players || playoffsState.semi1.t1.players.length === 0) try{ await loadTeamRosterDynamically(playoffsState.semi1.t1.id); }catch(e){}
+            if (!playoffsState.semi1.t2.players || playoffsState.semi1.t2.players.length === 0) try{ await loadTeamRosterDynamically(playoffsState.semi1.t2.id); }catch(e){}
+            if (!playoffsState.semi2.t1.players || playoffsState.semi2.t1.players.length === 0) try{ await loadTeamRosterDynamically(playoffsState.semi2.t1.id); }catch(e){}
+            if (!playoffsState.semi2.t2.players || playoffsState.semi2.t2.players.length === 0) try{ await loadTeamRosterDynamically(playoffsState.semi2.t2.id); }catch(e){}
+
+            // Build UI
+            liveGrid.innerHTML = `
+                <div class="live-game-card">
+                    <div style="flex:1;">${playoffsState.semi1.t1.abbreviation}</div>
+                    <div class="live-score" id="po-score-1a">0</div> <div style="margin:0 15px; color:var(--text-muted); font-size:0.8rem;">VS</div> <div class="live-score" id="po-score-1b">0</div>
+                    <div style="flex:1; text-align:right;">${playoffsState.semi1.t2.abbreviation}</div>
+                </div>
+                <div class="live-game-card">
+                    <div style="flex:1;">${playoffsState.semi2.t1.abbreviation}</div>
+                    <div class="live-score" id="po-score-2a">0</div> <div style="margin:0 15px; color:var(--text-muted); font-size:0.8rem;">VS</div> <div class="live-score" id="po-score-2b">0</div>
+                    <div style="flex:1; text-align:right;">${playoffsState.semi2.t2.abbreviation}</div>
+                </div>
+            `;
+
+            let p1 = new Promise(res => {
+                let b = executeGameRotationSimulation(playoffsState.semi1.t1, playoffsState.semi1.t2, true, (u) => {
+                    document.getElementById("po-score-1a").textContent = u.scoreAway;
+                    document.getElementById("po-score-1b").textContent = u.scoreHome;
+                    if(u.isFinished) res({box:b, scoreA:u.scoreAway, scoreH:u.scoreHome});
+                }, simDelay);
+            });
+
+            let p2 = new Promise(res => {
+                let b = executeGameRotationSimulation(playoffsState.semi2.t1, playoffsState.semi2.t2, true, (u) => {
+                    document.getElementById("po-score-2a").textContent = u.scoreAway;
+                    document.getElementById("po-score-2b").textContent = u.scoreHome;
+                    if(u.isFinished) res({box:b, scoreA:u.scoreAway, scoreH:u.scoreHome});
+                }, simDelay);
+            });
+
+            let [res1, res2] = await Promise.all([p1, p2]);
+
+            let w1 = res1.scoreA > res1.scoreH ? playoffsState.semi1.t1 : playoffsState.semi1.t2;
+            let w2 = res2.scoreA > res2.scoreH ? playoffsState.semi2.t1 : playoffsState.semi2.t2;
+
             playoffsState.semi1.winner = w1;
-
-            document.getElementById("bracket-s1-t1").innerHTML = `(1) ${playoffsState.semi1.t1.abbreviation} - <strong>${score1A}</strong>`;
-            document.getElementById("bracket-s1-t2").innerHTML = `(4) ${playoffsState.semi1.t2.abbreviation} - <strong>${score1H}</strong>`;
-
-            let box2 = executeGameSimulation(playoffsState.semi2.t1, playoffsState.semi2.t2, false, () => {});
-            let score2A = box2.statsAway.reduce((sum, p) => sum + p.pts, 0);
-            let score2H = box2.statsHome.reduce((sum, p) => sum + p.pts, 0);
-            let w2 = score2A > score2H ? playoffsState.semi2.t1 : playoffsState.semi2.t2;
             playoffsState.semi2.winner = w2;
 
-            document.getElementById("bracket-s2-t1").innerHTML = `(2) ${playoffsState.semi2.t1.abbreviation} - <strong>${score2A}</strong>`;
-            document.getElementById("bracket-s2-t2").innerHTML = `(3) ${playoffsState.semi2.t2.abbreviation} - <strong>${score2H}</strong>`;
+            document.getElementById("bracket-s1-t1").innerHTML = `(1) ${playoffsState.semi1.t1.abbreviation} - <strong>${res1.scoreA}</strong>`;
+            document.getElementById("bracket-s1-t2").innerHTML = `(4) ${playoffsState.semi1.t2.abbreviation} - <strong>${res1.scoreH}</strong>`;
+            document.getElementById("bracket-s2-t1").innerHTML = `(2) ${playoffsState.semi2.t1.abbreviation} - <strong>${res2.scoreA}</strong>`;
+            document.getElementById("bracket-s2-t2").innerHTML = `(3) ${playoffsState.semi2.t2.abbreviation} - <strong>${res2.scoreH}</strong>`;
 
             playoffsState.finals.t1 = w1;
             playoffsState.finals.t2 = w2;
@@ -2320,17 +2292,39 @@
             document.getElementById("bracket-f-t1").textContent = w1.abbreviation;
             document.getElementById("bracket-f-t2").textContent = w2.abbreviation;
 
-            document.getElementById("sim-day-btn").textContent = "🏆 Run Finals";
+            document.getElementById("sim-day-btn").textContent = "🏆 Run Finals (Live)";
             saveRostersState();
 
         } else if (playoffsState.round === "finals") {
-            let box = executeGameRotationSimulation(playoffsState.finals.t1, playoffsState.finals.t2, false, () => {});
-            let scoreA = box.statsAway.reduce((sum, p) => sum + p.pts, 0);
-            let scoreH = box.statsHome.reduce((sum, p) => sum + p.pts, 0);
-            let champ = scoreA > scoreH ? playoffsState.finals.t1 : playoffsState.finals.t2;
+            // Championship Finals: Slow, dramatic speed (250ms)
+            let simDelay = 250; 
 
-            document.getElementById("bracket-f-t1").innerHTML = `${playoffsState.finals.t1.abbreviation} - <strong>${scoreA}</strong>`;
-            document.getElementById("bracket-f-t2").innerHTML = `${playoffsState.finals.t2.abbreviation} - <strong>${scoreH}</strong>`;
+            liveGrid.innerHTML = `
+                <div class="live-game-card" style="border-color:var(--accent-gold); padding:20px;">
+                    <div style="flex:1; font-size:1.3rem;">${playoffsState.finals.t1.abbreviation}</div>
+                    <div class="live-score" style="font-size:2rem;" id="po-score-fa">0</div> 
+                    <div style="margin:0 25px; color:var(--text-muted);">FINALS</div> 
+                    <div class="live-score" style="font-size:2rem;" id="po-score-fb">0</div>
+                    <div style="flex:1; text-align:right; font-size:1.3rem;">${playoffsState.finals.t2.abbreviation}</div>
+                </div>
+            `;
+
+            let resF = await new Promise(res => {
+                let b = executeGameRotationSimulation(playoffsState.finals.t1, playoffsState.finals.t2, true, (u) => {
+                    document.getElementById("po-score-fa").textContent = u.scoreAway;
+                    document.getElementById("po-score-fb").textContent = u.scoreHome;
+                    if(u.isFinished) res({scoreA:u.scoreAway, scoreH:u.scoreHome});
+                }, simDelay);
+            });
+
+            let champ = resF.scoreA > resF.scoreH ? playoffsState.finals.t1 : playoffsState.finals.t2;
+
+            if(currentMode === "MyNBA" && champ.id === userTeamId) {
+                addMM(2000);
+            }
+
+            document.getElementById("bracket-f-t1").innerHTML = `${playoffsState.finals.t1.abbreviation} - <strong>${resF.scoreA}</strong>`;
+            document.getElementById("bracket-f-t2").innerHTML = `${playoffsState.finals.t2.abbreviation} - <strong>${resF.scoreH}</strong>`;
 
             document.getElementById("season-champ-name").textContent = champ.name.toUpperCase();
             document.getElementById("season-champ-card").style.display = "block";
@@ -2340,11 +2334,7 @@
             saveRostersState();
         }
 
-        document.getElementById("sim-day-btn").disabled = false;
-    }
-
-    function resetSeason() {
-        initSeason();
+        if(playoffsState) document.getElementById("sim-day-btn").disabled = false;
     }
 
     // --- RUNTIME BOOTSTRAP GATEWAY ---
