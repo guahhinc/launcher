@@ -24,7 +24,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            transition: none !important; /* Flat sharp instantaneous transitions */
+            transition: none !important; /* Sharp instantaneous UI responses */
         }
 
         body {
@@ -32,7 +32,7 @@
             color: var(--text-main);
             font-family: var(--font-main);
             line-height: 1.5;
-            font-size: 18px; /* Globally enlarged UI base scale */
+            font-size: 18px; /* Enlarged base scale */
             overflow-x: hidden;
         }
 
@@ -56,7 +56,7 @@
         header {
             background-color: var(--bg-card);
             border-bottom: 2px solid var(--border-color);
-            padding: 1.2rem 2.5rem; /* Expanded navigation header */
+            padding: 1.2rem 2.5rem; /* Spacious header targets */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -112,7 +112,7 @@
 
         main {
             flex-grow: 1;
-            padding: 2rem 2.5rem; /* Spacious layout dimensions */
+            padding: 2rem 2.5rem; /* Expanded main targets */
             max-width: 1600px;
             width: 100%;
             margin: 0 auto;
@@ -126,12 +126,12 @@
             display: block;
         }
 
-        /* Scaled Form Fields */
+        /* Scaled Controls */
         .btn {
             background-color: var(--bg-hover);
             color: var(--text-main);
             border: 2px solid var(--border-color);
-            padding: 0.7rem 1.4rem; /* Large robust buttons */
+            padding: 0.7rem 1.4rem; /* Enlarged buttons padding */
             border-radius: 2px;
             font-family: var(--font-main);
             font-weight: 800;
@@ -217,7 +217,7 @@
             text-transform: uppercase;
         }
 
-        /* Trades Split Panel */
+        /* Split-Pane trades design */
         .trades-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -233,7 +233,7 @@
         .roster-pane {
             background-color: var(--bg-card);
             border: 2px solid var(--border-color);
-            height: 680px; /* Expanded layout length */
+            height: 680px; /* Large expanded viewport list */
             overflow-y: auto;
         }
 
@@ -265,7 +265,7 @@
         }
 
         .player-photo-mini {
-            width: 44px; /* Expanded profile thumbnails */
+            width: 44px;
             height: 44px;
             background-color: var(--bg-dark);
             border: 1px solid var(--border-color);
@@ -282,7 +282,7 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Simulation ticker viewport */
+        /* commentary ticker feed box */
         .ticker-box {
             background-color: var(--bg-dark);
             border: 2px solid var(--border-color);
@@ -291,7 +291,7 @@
             padding: 1.2rem;
             font-family: monospace;
             display: flex;
-            flex-direction: column; /* Chronological top-to-bottom layout */
+            flex-direction: column; /* Normal bottom scroll timeline */
             gap: 10px;
             font-size: 1rem;
         }
@@ -301,7 +301,7 @@
             padding-left: 10px;
         }
 
-        /* Loader and Error Modal */
+        /* Loader Overlay */
         .loader-overlay {
             position: fixed;
             top: 0;
@@ -332,7 +332,7 @@
             background-color: var(--accent-blue);
         }
 
-        /* Player database styling */
+        /* Player Database Directory layout */
         .players-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -512,11 +512,13 @@
             </div>
 
             <!-- Active Trade Negotiator -->
-            <div class="trade-negotiator-box" id="trade-center-panel">
-                <div id="trade-negotiator-msg" style="color: var(--text-muted); font-weight: 700;">Select a player on both sides below to begin negotiating.</div>
-                <div id="trade-actions" style="display: none; align-items: center; gap: 20px;">
-                    <div style="font-weight: 700;" id="trade-proposal-text">Trade Offer</div>
-                    <button class="btn btn-success" onclick="processSelectedTrade()">🤝 Execute Trade</button>
+            <div class="trade-center-panel" id="trade-center-panel" style="display:none; margin-bottom: 2rem;">
+                <div class="trade-negotiator-box">
+                    <div id="trade-negotiator-msg" style="color: var(--text-muted); font-weight: 700;">Select a player on both sides below to begin negotiating.</div>
+                    <div id="trade-actions" style="display: none; align-items: center; gap: 20px; width: 100%; justify-content: space-between;">
+                        <div style="font-weight: 700;" id="trade-proposal-text">Trade Offer</div>
+                        <button class="btn btn-success" onclick="processSelectedTrade()">🤝 Execute Trade</button>
+                    </div>
                 </div>
             </div>
 
@@ -528,7 +530,7 @@
                         <select class="select-filter" id="roster-team-a" onchange="renderRosterSide('a')" style="flex: 1; font-weight: 800; font-size: 1.1rem;"></select>
                         <div id="roster-a-strength" style="font-size: 0.95rem; font-weight: 800; color:var(--accent-gold);">OVR --</div>
                     </div>
-                    <!-- Search input container for Free Agency -->
+                    <!-- Search input container -->
                     <div class="roster-search-container" id="roster-search-box-a" style="display:none; padding: 8px; background: var(--bg-card); border: 2px solid var(--border-color); border-bottom: none;">
                         <input type="text" class="search-input" id="roster-query-a" placeholder="Search roster..." oninput="renderRosterSide('a')" style="width: 100%; font-size: 0.9rem;">
                     </div>
@@ -552,7 +554,7 @@
                         <select class="select-filter" id="roster-team-b" onchange="renderRosterSide('b')" style="flex: 1; font-weight: 800; font-size: 1.1rem;"></select>
                         <div id="roster-b-strength" style="font-size: 0.95rem; font-weight: 800; color:var(--accent-gold);">OVR --</div>
                     </div>
-                    <!-- Search input container for Free Agency -->
+                    <!-- Search input container -->
                     <div class="roster-search-container" id="roster-search-box-b" style="display:none; padding: 8px; background: var(--bg-card); border: 2px solid var(--border-color); border-bottom: none;">
                         <input type="text" class="search-input" id="roster-query-b" placeholder="Search roster..." oninput="renderRosterSide('b')" style="width: 100%; font-size: 0.9rem;">
                     </div>
@@ -756,7 +758,7 @@
     let currentSeasonRound = 0;
     let playoffsState = null;
 
-    // Custom lineup keys PG, SG, SF, PF, C mapped to player.id
+    // Custom lineup PG, SG, SF, PF, C mapped to player.id
     let customLineup = { PG: "", SG: "", SF: "", PF: "", C: "" };
 
     // Exhibition simulation values
@@ -771,41 +773,50 @@
     // --- ESPN LIVE ENDPOINTS ---
     const ESPN_TEAMS_API = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams";
 
-    // --- robustFetchJson PROXY FAIL-SAFE FOR LOCAL DOM PROTOCOLS ---
+    // --- robustFetchJson PROXY FAIL-SAFE FOR LOCAL ORIGINS ---
     async function robustFetchJson(url) {
         try {
-            // Attempt direct native fetch
+            // Attempt direct fetch (bypassed if server CORS accepts github.io)
             const res = await fetch(url);
             if (res.ok) return await res.json();
         } catch (e) {
-            console.warn(`Direct fetch failed for: ${url}. Attempting proxy routing fallback...`);
+            console.warn(`Direct fetch blocked for URL: ${url}. Initiating Proxy 1 (CodeTabs)...`);
         }
 
-        // Secondary fallback utilizing corsproxy.io (unrestricted, free CORS endpoint)
+        // Bypasses local CORS checks utilizing codetabs.com (very high availability, uncapped free proxy)
         try {
-            const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(url)}`;
+            const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
             const res = await fetch(proxyUrl);
             if (res.ok) return await res.json();
         } catch (e) {
-            console.warn(`corsproxy.io fallback failed for: ${url}. Attempting allorigins proxy route...`);
+            console.warn(`CodeTabs proxy routing failed. Initiating Proxy 2 (AllOrigins)...`);
         }
 
-        // Final fallback utilizing api.allorigins.win
+        // Bypasses local CORS checks utilizing allorigins.win
         try {
             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
             const res = await fetch(proxyUrl);
             if (res.ok) return await res.json();
         } catch (e) {
-            console.error(`All CORS proxies and native fetch options exhausted for URL: ${url}`);
+            console.warn(`AllOrigins proxy routing failed. Initiating Proxy 3 (Corsproxy.io)...`);
         }
 
-        throw new Error(`Failed to establish connection to: ${url}. Confirm network or browser CORS settings.`);
+        // Bypasses local CORS checks utilizing corsproxy.io as a clean third layout backup
+        try {
+            const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(url)}`;
+            const res = await fetch(proxyUrl);
+            if (res.ok) return await res.json();
+        } catch (e) {
+            console.error(`All CORS proxies and native fetch options failed for URL: ${url}`);
+        }
+
+        throw new Error(`Failed to establish connection to live server roster stream. Confirm internet connectivity.`);
     }
 
     // --- 1. LOCAL STORAGE STATE PERSISTENCE ---
     function saveRostersState() {
-        localStorage.setItem("slam_sim_players_v5", JSON.stringify(PLAYERS));
-        localStorage.setItem("slam_sim_teams_v5", JSON.stringify(ALL_TEAMS));
+        localStorage.setItem("slam_sim_players_v6", JSON.stringify(PLAYERS));
+        localStorage.setItem("slam_sim_teams_v6", JSON.stringify(ALL_TEAMS));
         localStorage.setItem("slam_sim_season_standings", JSON.stringify(seasonStandings));
         localStorage.setItem("slam_sim_season_schedule", JSON.stringify(seasonSchedule));
         localStorage.setItem("slam_sim_season_round", currentSeasonRound.toString());
@@ -820,8 +831,8 @@
     }
 
     function checkRostersState() {
-        const cachedPlayers = localStorage.getItem("slam_sim_players_v5");
-        const cachedTeams = localStorage.getItem("slam_sim_teams_v5");
+        const cachedPlayers = localStorage.getItem("slam_sim_players_v6");
+        const cachedTeams = localStorage.getItem("slam_sim_teams_v6");
         if (cachedPlayers && cachedTeams) {
             PLAYERS = JSON.parse(cachedPlayers);
             ALL_TEAMS = JSON.parse(cachedTeams);
@@ -859,7 +870,7 @@
         return false;
     }
 
-    // --- 2. LIVE ROSTER INTAKE AND PARSING ---
+    // --- 2. LIVE ROSTER INTAKE AND PARSING FROM ./data.json ---
     async function loadNBADataFromAPI() {
         const loader = document.getElementById("api-loader");
         const progress = document.getElementById("loader-progress");
@@ -869,72 +880,28 @@
         progress.style.width = "0%";
         
         try {
-            msg.textContent = "Fetching NBA Teams list...";
+            msg.textContent = "Loading NBA Franchises locally from `./data.json`...";
             progress.style.width = "20%";
             
-            const teamsData = await robustFetchJson(ESPN_TEAMS_API);
+            // Fetch configuration directly from relative local folder
+            const teamsRes = await fetch('./data.json');
+            if (!teamsRes.ok) throw new Error("Could not find or load local data.json. Ensure data.json resides in the same directory as this file.");
+            const teamsData = await teamsRes.json();
             
             if (!teamsData.sports || !teamsData.sports[0] || !teamsData.sports[0].leagues || !teamsData.sports[0].leagues[0]) {
-                throw new Error("ESPN Teams response schema has changed or is structured incorrectly.");
+                throw new Error("Local data.json payload format is invalid.");
             }
             const rawTeams = teamsData.sports[0].leagues[0].teams.map(t => t.team);
             
-            progress.style.width = "40%";
-            msg.textContent = "Processing active rosters from ESPN Live API...";
-            
-            const tempPlayers = [];
-            const tempTeams = [];
-            
-            // Parallel batch fetch rosters
-            const rosterPromises = rawTeams.map(async (team, index) => {
-                try {
-                    const rosterData = await robustFetchJson(`${ESPN_TEAMS_API}/${team.id}/roster`);
-                    const athletes = rosterData.athletes || [];
-                    const teamPlayerIds = [];
-
-                    athletes.forEach(a => {
-                        // Standardize raw positions to core PG, SG, SF, PF, C metrics
-                        let posAbbr = a.position?.abbreviation || "G";
-                        if (posAbbr === "G") posAbbr = "SG";
-                        if (posAbbr === "F") posAbbr = "SF";
-                        if (posAbbr === "F-C" || posAbbr === "C-F") posAbbr = "PF";
-                        if (posAbbr === "G-F" || posAbbr === "F-G") posAbbr = "SF";
-
-                        const playerObj = {
-                            id: a.id.toString(),
-                            name: a.fullName,
-                            pos: posAbbr,
-                            team: team.displayName,
-                            teamId: team.id,
-                            jersey: a.jersey || "00",
-                            photo: a.headshot?.href || `https://cdn.nba.com/headshots/nba/latest/1040x760/${a.id}.png`,
-                            col1: team.color ? `#${team.color}` : "#3b82f6",
-                            col2: team.alternateColor ? `#${team.alternateColor}` : "#ffffff"
-                        };
-                        assignPlayerAttributes(playerObj);
-                        tempPlayers.push(playerObj);
-                        teamPlayerIds.push(playerObj.id);
-                    });
-
-                    tempTeams.push({
-                        id: team.id,
-                        name: team.displayName,
-                        abbreviation: team.abbreviation,
-                        col1: team.color ? `#${team.color}` : "#3b82f6",
-                        col2: team.alternateColor ? `#${team.alternateColor}` : "#ffffff",
-                        logo: team.logos?.[0]?.href || "",
-                        players: teamPlayerIds
-                    });
-                } catch (e) {
-                    console.error(`Failed to map roster payload: ${team.displayName}`, e);
-                }
-            });
-            
-            await Promise.all(rosterPromises);
-            
-            if (tempPlayers.length === 0) {
-                throw new Error("Zero players were successfully retrieved from active ESPN roster streams.");
-            }
+            const tempTeams = rawTeams.map(t => ({
+                id: t.id,
+                name: t.displayName,
+                abbreviation: t.abbreviation,
+                col1: t.color ? `#${t.color}` : "#3b82f6",
+                col2: t.alternateColor ? `#${t.alternateColor}` : "#ffffff",
+                logo: t.logos?.[0]?.href || "",
+                players: [] // Dynamic roster load on-demand
+            }));
 
             // Create Sandbox Free Agency Pool
             tempTeams.push({
@@ -957,9 +924,26 @@
                 logo: "🏀",
                 players: []
             });
-            
-            PLAYERS = tempPlayers;
+
             ALL_TEAMS = tempTeams;
+            PLAYERS = [];
+
+            // Pre-load active season teams to make Season Mode instantly available on first load
+            const abbreviations = ["LAL", "BOS", "GS", "CHI", "PHX", "DEN", "MIA"];
+            const preloads = ALL_TEAMS.filter(t => abbreviations.includes(t.abbreviation));
+
+            for (let i = 0; i < preloads.length; i++) {
+                const team = preloads[i];
+                const pct = Math.round(((i + 1) / preloads.length) * 70) + 20;
+                progress.style.width = `${pct}%`;
+                msg.textContent = `Pre-loading live roster data... (${i + 1}/${preloads.length})`;
+                
+                try {
+                    await loadTeamRosterDynamically(team.id);
+                } catch (err) {
+                    console.warn(`Failed to preload roster for ${team.name}. Roster will lazy load on-demand.`, err);
+                }
+            }
             
             progress.style.width = "100%";
             saveRostersState();
@@ -971,13 +955,55 @@
         }
     }
 
+    async function loadTeamRosterDynamically(teamId) {
+        const team = ALL_TEAMS.find(t => t.id === teamId);
+        if (!team) return;
+
+        const rosterUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/${teamId}/roster`;
+        const rosterData = await robustFetchJson(rosterUrl);
+        const athletes = rosterData.athletes || [];
+        const teamPlayerIds = [];
+
+        athletes.forEach(a => {
+            // Standardize raw positions to PG, SG, SF, PF, C
+            let posAbbr = a.position?.abbreviation || "G";
+            if (posAbbr === "G") posAbbr = "SG";
+            if (posAbbr === "F") posAbbr = "SF";
+            if (posAbbr === "F-C" || posAbbr === "C-F") posAbbr = "PF";
+            if (posAbbr === "G-F" || posAbbr === "F-G") posAbbr = "SF";
+
+            const playerObj = {
+                id: a.id.toString(),
+                name: a.fullName,
+                pos: posAbbr,
+                team: team.name,
+                teamId: team.id,
+                jersey: a.jersey || "00",
+                photo: a.headshot?.href || `https://cdn.nba.com/headshots/nba/latest/1040x760/${a.id}.png`,
+                col1: team.col1,
+                col2: team.col2
+            };
+            assignPlayerAttributes(playerObj);
+            
+            // Clean duplicates
+            if (!PLAYERS.some(p => p.id === playerObj.id)) {
+                PLAYERS.push(playerObj);
+            }
+            teamPlayerIds.push(playerObj.id);
+        });
+
+        team.players = teamPlayerIds;
+        saveRostersState();
+    }
+
     function showLoaderError(errMsg) {
         const msg = document.getElementById("loader-msg");
         const progress = document.getElementById("loader-progress");
         msg.innerHTML = `
-            <span style="color:var(--accent-red); font-weight:800; font-size:1.15rem; display:block; margin-bottom:1rem;">Error: ${errMsg}</span>
-            <span style="font-size:0.9rem; color:var(--text-muted); display:block; line-height:1.4;">
-                SLAM Simulator failed to fetch ESPN live roster feeds. Please confirm your internet connection and cross-origin resource permissions.
+            <span style="color:var(--accent-red); font-weight:800; font-size:1.15rem; display:block; margin-bottom:1rem;">Initialization Failed</span>
+            <span style="font-size:0.9rem; color:var(--text-muted); display:block; line-height:1.4; max-width: 500px; text-align: left;">
+                Description: ${errMsg}<br><br>
+                Ensure <strong>data.json</strong> has been successfully placed in the same directory as this HTML file. Check internet connectivity for live roster streams.
             </span>
         `;
         progress.style.backgroundColor = "var(--accent-red)";
@@ -988,7 +1014,7 @@
             retryBtn.id = retryBtnId;
             retryBtn.className = "btn btn-primary";
             retryBtn.style.marginTop = "1.5rem";
-            retryBtn.textContent = "Retry Connection";
+            retryBtn.textContent = "Retry Initial Connection";
             retryBtn.onclick = () => {
                 retryBtn.remove();
                 loadNBADataFromAPI();
@@ -1154,11 +1180,27 @@
         const team = ALL_TEAMS.find(t => t.id === teamId);
         if (!team) return;
 
+        // Lazy-load live roster if team players list is empty (and not CST / FA pools)
+        if (teamId !== "FA" && teamId !== "CST" && (!team.players || team.players.length === 0)) {
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-muted);">🔄 Loading live roster via proxy...</td></tr>`;
+            searchContainer.style.display = "none";
+            
+            loadTeamRosterDynamically(teamId).then(() => {
+                renderRosterSide(side);
+                renderLineupSelectors();
+            }).catch(err => {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 3rem; color: var(--accent-red);">❌ Failed to load live stream: ${err.message}</td></tr>`;
+            });
+            return;
+        }
+
         // Show/hide search boxes dynamically
         if (teamId === "FA" || teamId === "CST") {
             searchContainer.style.display = "block";
+            document.getElementById("trade-center-panel").style.display = "none"; // Hide trades box for FA pools
         } else {
             searchContainer.style.display = "none";
+            document.getElementById("trade-center-panel").style.display = "block";
         }
 
         const searchQuery = (document.getElementById(`roster-query-${side}`)?.value || "").toLowerCase();
