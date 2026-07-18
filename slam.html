@@ -32,7 +32,7 @@
             color: var(--text-main);
             font-family: var(--font-main);
             line-height: 1.5;
-            font-size: 18px; /* Globally enlarged UI base scale */
+            font-size: 18px;
             overflow-x: hidden;
         }
 
@@ -77,10 +77,6 @@
             letter-spacing: -0.05em;
         }
 
-        .logo-title span {
-            color: var(--accent-blue);
-        }
-
         .mm-badge {
             background-color: rgba(16, 185, 129, 0.15);
             border: 1px solid var(--accent-green);
@@ -97,6 +93,7 @@
         nav {
             display: flex;
             gap: 6px;
+            margin-left: 30px;
         }
 
         .nav-btn {
@@ -238,6 +235,11 @@
             .trades-grid {
                 grid-template-columns: 1fr;
             }
+        }
+
+        /* Prevent Scroll Chaining globally on scroll containers */
+        .roster-pane, .ticker-box, .cd-menu, .team-selection-box, .team-selection-overlay {
+            overscroll-behavior: contain !important;
         }
 
         .roster-pane {
@@ -422,8 +424,8 @@
             padding: 1.5rem;
             margin-bottom: 2rem;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 15px;
             font-size: 1.1rem;
         }
 
@@ -570,6 +572,54 @@
             text-align: center;
             box-shadow: 0 0 30px rgba(234, 179, 8, 0.2);
         }
+
+        /* SYMMETRIC PLAYOFF BRACKET STYLING */
+        #playoff-bracket-board {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1.5fr 1fr 1.2fr;
+            gap: 15px;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .bracket-box {
+            background-color: var(--bg-dark);
+            border: 2px solid var(--border-color);
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .bracket-box.finals-box {
+            border-color: var(--accent-gold);
+            padding: 18px;
+            box-shadow: 0 0 20px rgba(234, 179, 8, 0.15);
+        }
+
+        .bracket-box.semi-box {
+            border-color: var(--accent-blue);
+        }
+
+        .bracket-box-title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+        }
+
+        .bracket-team-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-weight: 700;
+        }
+
+        .bracket-team-line.winner {
+            color: var(--accent-gold);
+        }
     </style>
 </head>
 <body>
@@ -624,7 +674,7 @@
                     </div>
 
                     <div style="background: var(--bg-dark); border: 2px solid var(--border-color); padding: 20px; width: 450px;">
-                        <h4 style="font-size: 0.9rem; color: var(--accent-green); margin-bottom: 10px;">Player Development (Cost: 1,000,000 MM)</h4>
+                        <h4 style="font-size: 0.9rem; color: var(--accent-green); margin-bottom: 10px;">Player Development (Cost: 1,500,000 MM)</h4>
                         <div style="display: flex; gap: 8px;">
                             <div id="cd-wrapper-upgrade" style="flex:1;"></div>
                             <button class="btn btn-success" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="buyPlayerUpgrade()">+1 OVR</button>
@@ -697,7 +747,7 @@
                     <div class="roster-pane">
                         <table class="roster-table">
                             <thead>
-                                <tr><th>Player</th><th style="text-align: center;">OVR</th></tr>
+                                <tr><th>Player</th><th style="text-align: center;">OVR</th><th style="text-align: right;">Roster Actions</th></tr>
                             </thead>
                             <tbody id="roster-table-body-a"></tbody>
                         </table>
@@ -717,7 +767,7 @@
                     <div class="roster-pane">
                         <table class="roster-table">
                             <thead>
-                                <tr><th>Player</th><th style="text-align: center;">OVR</th></tr>
+                                <tr><th>Player</th><th style="text-align: center;">OVR</th><th style="text-align: right;">Roster Actions</th></tr>
                             </thead>
                             <tbody id="roster-table-body-b"></tbody>
                         </table>
@@ -811,42 +861,66 @@
                         </table>
                     </div>
 
+                    <!-- SYMMETRICAL TOURNAMENT KNOCKOUT BRACKET -->
                     <div class="panel" id="playoff-bracket" style="display: none; border-color: var(--accent-gold);">
                         <div class="panel-title" style="color: var(--accent-gold); border-bottom: 2px solid rgba(234, 179, 8, 0.3)">Postseason Bracket</div>
-                        <div style="display: flex; justify-content: space-around; align-items: center; padding: 2rem 0;">
-                            <div style="display: flex; flex-direction: column; gap: 3rem;">
-                                <div style="background-color: var(--bg-dark); border: 2px solid var(--border-color); padding: 12px; font-size: 0.95rem; width: 250px;">
-                                    <div id="bracket-q1-t1" style="padding:4px 0;">--</div>
-                                    <div id="bracket-q1-t2" style="padding:4px 0;">--</div>
+                        
+                        <div id="playoff-bracket-board">
+                            <!-- Column 1: Left Quarterfinals -->
+                            <div style="display: flex; flex-direction: column; gap: 60px;">
+                                <div class="bracket-box">
+                                    <div class="bracket-box-title">Quarterfinal 1</div>
+                                    <div id="bracket-q1-t1" class="bracket-team-line">--</div>
+                                    <div id="bracket-q1-t2" class="bracket-team-line">--</div>
                                 </div>
-                                <div style="background-color: var(--bg-dark); border: 2px solid var(--border-color); padding: 12px; font-size: 0.95rem; width: 250px;">
-                                    <div id="bracket-q2-t1" style="padding:4px 0;">--</div>
-                                    <div id="bracket-q2-t2" style="padding:4px 0;">--</div>
-                                </div>
-                                <div style="background-color: var(--bg-dark); border: 2px solid var(--border-color); padding: 12px; font-size: 0.95rem; width: 250px;">
-                                    <div id="bracket-q3-t1" style="padding:4px 0;">--</div>
-                                    <div id="bracket-q3-t2" style="padding:4px 0;">--</div>
-                                </div>
-                                <div style="background-color: var(--bg-dark); border: 2px solid var(--border-color); padding: 12px; font-size: 0.95rem; width: 250px;">
-                                    <div id="bracket-q4-t1" style="padding:4px 0;">--</div>
-                                    <div id="bracket-q4-t2" style="padding:4px 0;">--</div>
+                                <div class="bracket-box">
+                                    <div class="bracket-box-title">Quarterfinal 2</div>
+                                    <div id="bracket-q2-t1" class="bracket-team-line">--</div>
+                                    <div id="bracket-q2-t2" class="bracket-team-line">--</div>
                                 </div>
                             </div>
-                            <div style="display: flex; flex-direction: column; justify-content: space-around; height: 500px;">
-                                <div style="background-color: var(--bg-dark); border: 2px solid var(--accent-blue); padding: 15px; font-size: 1rem; width: 280px;">
-                                    <div id="bracket-s1-t1" style="padding:4px 0;">--</div>
-                                    <div id="bracket-s1-t2" style="padding:4px 0;">--</div>
-                                </div>
-                                <div style="background-color: var(--bg-dark); border: 2px solid var(--border-color); padding: 15px; font-size: 1rem; width: 280px;">
-                                    <div id="bracket-s2-t1" style="padding:4px 0;">--</div>
-                                    <div id="bracket-s2-t2" style="padding:4px 0;">--</div>
+
+                            <!-- Column 2: Left Semifinals -->
+                            <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+                                <div class="bracket-box semi-box">
+                                    <div class="bracket-box-title">Semifinal 1</div>
+                                    <div id="bracket-s1-t1" class="bracket-team-line">--</div>
+                                    <div id="bracket-s1-t2" class="bracket-team-line">--</div>
                                 </div>
                             </div>
-                            <div style="display: flex; flex-direction: column; justify-content: center; height: 500px;">
-                                <div style="background-color: var(--bg-dark); border: 2px solid var(--accent-gold); padding: 15px; font-size: 1.1rem; width: 300px; box-shadow: 0 0 20px rgba(234,179,8,0.1);">
-                                    <div style="color:var(--text-muted); font-size:0.8rem; text-align:center; margin-bottom:8px;">NBA FINALS</div>
-                                    <div id="bracket-f-t1" style="padding:6px 0;">--</div>
-                                    <div id="bracket-f-t2" style="padding:6px 0;">--</div>
+
+                            <!-- Column 3: Grand Finals Trophy / Winner (Center) -->
+                            <div style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px;">
+                                <svg style="width: 90px; height: 90px; filter: drop-shadow(0 0 15px rgba(234, 179, 8, 0.5));" viewBox="0 0 24 24" fill="var(--accent-gold)">
+                                    <path d="M18 2H6c-1.1 0-2 .9-2 2v1c0 2.21 1.79 4 4 4h1v5c0 2.21 1.79 4 4 4h2c2.21 0 4-1.79 4-4V9h1c2.21 0 4-1.79 4-4V4c0-1.1-.9-2-2-2zm-1 7h-1V5h1v4zm-7-4h4v8c0 1.1-.9 2-2 2s-2-.9-2-2V5zM5 5h1v4H5V5zm14 4h-1V5h1v4zM12 18c-2.21 0-4 1.79-4 4h8c0-2.21-1.79-4-4-4z"/>
+                                </svg>
+                                <div class="bracket-box finals-box" style="width: 100%;">
+                                    <div class="bracket-box-title" style="color:var(--accent-gold); font-size:0.85rem;">Grand Final</div>
+                                    <div id="bracket-f-t1" class="bracket-team-line">--</div>
+                                    <div id="bracket-f-t2" class="bracket-team-line">--</div>
+                                </div>
+                            </div>
+
+                            <!-- Column 4: Right Semifinals -->
+                            <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+                                <div class="bracket-box semi-box">
+                                    <div class="bracket-box-title">Semifinal 2</div>
+                                    <div id="bracket-s2-t1" class="bracket-team-line">--</div>
+                                    <div id="bracket-s2-t2" class="bracket-team-line">--</div>
+                                </div>
+                            </div>
+
+                            <!-- Column 5: Right Quarterfinals -->
+                            <div style="display: flex; flex-direction: column; gap: 60px;">
+                                <div class="bracket-box">
+                                    <div class="bracket-box-title">Quarterfinal 3</div>
+                                    <div id="bracket-q3-t1" class="bracket-team-line">--</div>
+                                    <div id="bracket-q3-t2" class="bracket-team-line">--</div>
+                                </div>
+                                <div class="bracket-box">
+                                    <div class="bracket-box-title">Quarterfinal 4</div>
+                                    <div id="bracket-q4-t1" class="bracket-team-line">--</div>
+                                    <div id="bracket-q4-t2" class="bracket-team-line">--</div>
                                 </div>
                             </div>
                         </div>
@@ -871,7 +945,7 @@
 
                     <div class="panel" id="live-season-scoreboard" style="display: none; border-color: var(--accent-blue);">
                         <div class="panel-title" style="color: var(--accent-blue);">Live Scoreboard</div>
-                        <div id="live-games-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"></div>
+                        <div id="live-games-grid" style="display: grid; grid-template-columns: 1fr; gap: 10px;"></div>
                     </div>
 
                     <div class="panel">
@@ -1031,6 +1105,11 @@
         if (cachedPlayers && cachedTeams) {
             PLAYERS = JSON.parse(cachedPlayers);
             ALL_TEAMS = JSON.parse(cachedTeams);
+            
+            if (REAL_PLAYERS.length === 0) {
+                 REAL_PLAYERS = JSON.parse(cachedPlayers);
+                 REAL_TEAMS = JSON.parse(cachedTeams);
+            }
 
             const sStand = localStorage.getItem("slam_sim_season_standings");
             const sSched = localStorage.getItem("slam_sim_season_schedule");
@@ -1107,13 +1186,12 @@
                 msg.textContent = `Pre-loading live roster data... (${i + 1}/${preloads.length})`;
                 try { await loadTeamRosterDynamically(team.id); } catch (err) {}
             }
-
+            
             progress.style.width = "100%";
             saveRostersState();
             loader.style.display = "none";
             initApp();
         } catch (err) {
-            console.error(err);
             showLoaderError(err.message);
         }
     }
@@ -1127,28 +1205,39 @@
         const athletes = rosterData.athletes || [];
         const teamPlayerIds = [];
 
-        athletes.forEach(a => {
+        athletes.forEach((a, index) => {
             let posAbbr = a.position?.abbreviation || "G";
             if (posAbbr === "G") posAbbr = "SG";
             if (posAbbr === "F") posAbbr = "SF";
             if (posAbbr === "F-C" || posAbbr === "C-F") posAbbr = "PF";
             if (posAbbr === "G-F" || posAbbr === "F-G") posAbbr = "SF";
 
+            // LEGIT FREE AGENCY POOL PARSING: Top 10 stay on franchise, 11-15+ go directly to Free Agency
+            const isFA = index >= 10;
+
             const playerObj = {
                 id: a.id.toString(),
                 name: a.fullName,
                 pos: posAbbr,
-                team: team.name,
-                teamId: team.id,
+                team: isFA ? "Free Agent" : team.name,
+                teamId: isFA ? "FA" : team.id,
                 jersey: a.jersey || "00",
                 photo: a.headshot?.href || `https://cdn.nba.com/headshots/nba/latest/1040x760/${a.id}.png`,
-                col1: team.col1,
-                col2: team.col2
+                col1: isFA ? "#475569" : team.col1,
+                col2: isFA ? "#cbd5e1" : team.col2
             };
             assignPlayerAttributes(playerObj);
             
             if (!PLAYERS.some(p => p.id === playerObj.id)) { PLAYERS.push(playerObj); }
-            teamPlayerIds.push(playerObj.id);
+
+            if (!isFA) {
+                teamPlayerIds.push(playerObj.id);
+            } else {
+                const faTeam = ALL_TEAMS.find(t => t.id === "FA");
+                if (faTeam && !faTeam.players.includes(playerObj.id)) {
+                    faTeam.players.push(playerObj.id);
+                }
+            }
         });
 
         team.players = teamPlayerIds;
@@ -1186,7 +1275,13 @@
 
     window.onRosterPosA = (v) => { renderRosterSide('a'); }
     window.onRosterPosB = (v) => { renderRosterSide('b'); }
-    window.onLineupPos = (v) => { saveRostersState(); }
+
+    // Start 5 Lineup Custom Save callbacks
+    window.onLineupPG = (val) => { customLineup.PG = val; saveRostersState(); }
+    window.onLineupSG = (val) => { customLineup.SG = val; saveRostersState(); }
+    window.onLineupSF = (val) => { customLineup.SF = val; saveRostersState(); }
+    window.onLineupPF = (val) => { customLineup.PF = val; saveRostersState(); }
+    window.onLineupC  = (val) => { customLineup.C  = val; saveRostersState(); }
 
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -1246,7 +1341,7 @@
     }
 
     function addMM(amount) {
-        userMM = Math.max(0, userMM + amount); // Safeguard debt prevention
+        userMM = Math.max(0, userMM + amount); 
         updateMMDisplay();
     }
 
@@ -1316,7 +1411,7 @@
             if(opts.length === 0) opts.push({label: 'No valid players', value: ''});
             
             let def = customLineup[pos] || opts[0].value;
-            createDropdown(pos.toLowerCase(), opts, def, '', 'onLineupPos');
+            createDropdown(pos.toLowerCase(), opts, def, '', `onLineup${pos}`);
             customLineup[pos] = def;
         });
     }
@@ -1366,6 +1461,14 @@
 
             row.onclick = () => toggleTradeSelection(p, side);
 
+            // FREE AGENCY ACTIONS: Only allow direct signings when target side is FA.
+            let rosterActionBtn = "";
+            if (side === 'a') {
+                rosterActionBtn = `<button class="btn btn-danger" style="padding: 2px 6px; font-size: 0.7rem;" title="Release to Free Agency" onclick="transferPlayerDirect('${p.id}', '${userTeamId}', 'FA')">Release</button>`;
+            } else if (side === 'b' && teamId === "FA") {
+                rosterActionBtn = `<button class="btn" style="padding: 2px 6px; font-size: 0.7rem;" title="Sign player from Free Agency" onclick="transferPlayerDirect('${p.id}', 'FA', '${userTeamId}')">➡️ Sign</button>`;
+            }
+
             row.innerHTML = `
                 <td>
                     <div class="player-row-info">
@@ -1377,130 +1480,54 @@
                     </div>
                 </td>
                 <td style="text-align: center; font-weight: 700; color: var(--accent-gold); font-size: 1.1rem;">${p.ovr}</td>
+                <td style="text-align: right;">${rosterActionBtn}</td>
             `;
             tbody.appendChild(row);
         });
     }
 
     // --- TRANSACTION LOGIC ---
-    function toggleTradeSelection(player, side) {
-        let arr = side === 'a' ? tradeA : tradeB;
-        let idx = arr.findIndex(p => p.id === player.id);
-        if(idx > -1) arr.splice(idx, 1);
-        else arr.push(player);
+    function transferPlayerDirect(playerId, fromId, toId) {
+        if (fromId === toId) return;
 
-        renderRosterSide('a');
-        renderRosterSide('b');
-        updateTradeCenterPanel();
-    }
+        const fromTeam = ALL_TEAMS.find(t => t.id === fromId);
+        const toTeam = ALL_TEAMS.find(t => t.id === toId);
+        const player = PLAYERS.find(p => p.id === playerId);
 
-    function calcTradeValue(playersArr) {
-        return playersArr.reduce((sum, p) => sum + Math.pow(p.ovr, 3), 0);
-    }
+        if (!player) return;
 
-    function updateTradeCenterPanel() {
-        const msg = document.getElementById("trade-negotiator-msg");
-        const actions = document.getElementById("trade-actions");
-        const outDiv = document.getElementById("trade-offer-out");
-        const inDiv = document.getElementById("trade-offer-in");
-
-        if (tradeA.length > 0 || tradeB.length > 0) {
-            msg.style.display = "none";
-            actions.style.display = "flex";
-            
-            outDiv.innerHTML = tradeA.length > 0 ? tradeA.map(p => `<span style="background:var(--bg-dark); padding:4px 8px; border:1px solid var(--accent-blue); border-radius:2px; font-size:0.9rem; display:inline-block; margin:2px;">${p.name} (${p.ovr})</span>`).join('') : `<span style="color:var(--text-muted)">None</span>`;
-            inDiv.innerHTML = tradeB.length > 0 ? tradeB.map(p => `<span style="background:var(--bg-dark); padding:4px 8px; border:1px solid var(--accent-gold); border-radius:2px; font-size:0.9rem; display:inline-block; margin:2px;">${p.name} (${p.ovr})</span>`).join('') : `<span style="color:var(--text-muted)">None</span>`;
-
-        } else {
-            msg.style.display = "block";
-            actions.style.display = "none";
-            msg.textContent = "Select players from your team and the target team to begin trade negotiations. (Multiple allowed)";
-        }
-    }
-
-    function processSelectedTrade() {
-        if (tradeA.length === 0 && tradeB.length === 0) return;
-
-        const teamA = ALL_TEAMS.find(t => t.id === userTeamId);
-        const teamB = ALL_TEAMS.find(t => t.id === activeRosterTeamB);
-
-        if (!teamA || !teamB) return;
-
-        // Size limits
-        if (teamB.id !== "FA") {
-            if (teamA.players.length - tradeA.length + tradeB.length < 5) return alert("You must have at least 5 players on your roster.");
-            if (teamB.players.length - tradeB.length + tradeA.length < 5) return alert("The CPU team must have at least 5 players.");
-        }
-
-        let userMax = tradeA.length > 0 ? Math.max(...tradeA.map(p => p.ovr)) : 0;
-        let cpuMax = tradeB.length > 0 ? Math.max(...tradeB.map(p => p.ovr)) : 0;
-
-        let userVal = calcTradeValue(tradeA);
-        let cpuVal = calcTradeValue(tradeB);
-
-        let isFair = true;
-        let rejectReason = "";
-
-        // AI protects star players much better
-        if (teamB.id !== "FA" && cpuMax > userMax + 3) {
-            isFair = false;
-            rejectReason = `The ${teamB.name} GM refuses to part with their best player (${cpuMax} OVR) without receiving an elite star of similar caliber in return.`;
-        } else if (teamB.id !== "FA" && userVal < cpuVal * 0.95) {
-            isFair = false;
-            rejectReason = `The ${teamB.name} GM feels the total trade value is unbalanced in your favor.`;
-        }
-
-        if (!isFair) {
-            let userEquiv = Math.cbrt(userVal);
-            let cpuEquiv = Math.cbrt(cpuVal);
-            let diff = Math.max(0, cpuEquiv - userEquiv);
-            
-            // Scaled bribes that are significantly more expensive
-            let bribeCost = Math.max(500000, Math.round(diff * 250000));
-            if (cpuMax > userMax) {
-                bribeCost += (cpuMax - userMax) * 500000;
-            }
-            
-            if(confirm(`TRADE REJECTED: ${rejectReason} \n\nDo you want to use a Front Office Bribe to force this trade for ${formatMM(bribeCost)} MM?`)) {
-                if (userMM >= bribeCost) {
-                    addMM(-bribeCost);
-                    alert(`Bribe successful. Trade executed.`);
-                } else {
-                    alert(`Transaction failed: You do not have enough MM (${formatMM(userMM)} / ${formatMM(bribeCost)}).`);
-                    return; 
-                }
-            } else {
-                return; 
+        // Minimum roster safeguard
+        if (fromId !== "FA") {
+            const activeCount = PLAYERS.filter(p => p.teamId === fromId).length;
+            if (activeCount <= 5) {
+                alert(`Transaction Rejected: ${fromTeam.name} roster size is currently at 5 players. Minimum rotation required is 5.`);
+                return;
             }
         }
 
-        // Swaps
-        tradeA.forEach(p => {
-            teamA.players = teamA.players.filter(id => id !== p.id);
-            if(teamB.id !== "FA") teamB.players.push(p.id);
-            p.teamId = teamB.id; p.team = teamB.name; p.col1 = teamB.col1; p.col2 = teamB.col2;
-        });
+        // Process transaction
+        if (fromTeam) fromTeam.players = fromTeam.players.filter(id => id !== playerId);
+        if (toTeam) {
+            toTeam.players.push(playerId);
+            player.teamId = toTeam.id;
+            player.team = toTeam.name;
+            player.col1 = toTeam.col1;
+            player.col2 = toTeam.col2;
+        }
 
-        tradeB.forEach(p => {
-            teamB.players = teamB.players.filter(id => id !== p.id);
-            teamA.players.push(p.id);
-            p.teamId = teamA.id; p.team = teamA.name; p.col1 = teamA.col1; p.col2 = teamA.col2;
-        });
-
-        if (isFair) alert(`Trade Accepted!\n\n${teamB.name} agreed to the deal.`);
-
-        tradeA.forEach(p => {
+        // Clean starting lineup configuration if player is released
+        if (fromId === userTeamId) {
             Object.keys(customLineup).forEach(pos => {
-                if (customLineup[pos] === p.id) { customLineup[pos] = ""; activeDropdowns[pos.toLowerCase()] = ""; }
+                if (customLineup[pos] === playerId) customLineup[pos] = "";
             });
-        });
+        }
 
-        tradeA = []; tradeB = [];
+        if (selectedTradePlayerA?.id === playerId) selectedTradePlayerA = null;
+        if (selectedTradePlayerB?.id === playerId) selectedTradePlayerB = null;
 
         saveRostersState();
         renderRosterSide('a');
         renderRosterSide('b');
-        populateUpgradeList();
         renderLineupSelectors();
         updateTradeCenterPanel();
     }
@@ -1551,6 +1578,9 @@
 
         document.getElementById("ticker-feed").innerHTML = "";
 
+        // AUTO SELECT USER BOX VIEW
+        boxScoreView = "away";
+
         const triggerLoadAndSim = async () => {
             if (!teamAway.players || teamAway.players.length === 0) {
                 appendTickerMessage(`🔄 Fetching roster dynamically for ${teamAway.name}...`);
@@ -1571,9 +1601,11 @@
                 
                 if (update.isFinished) {
                     renderBoxScoreStats();
-                    if(update.scoreAway > update.scoreHome && teamAway.id === userTeamId) addMM(50000);
-                    else if(update.scoreHome > update.scoreAway && teamHome.id === userTeamId) addMM(50000);
-                    else addMM(-10000); // 10k Penalty for losing exhibition
+                    if(update.scoreAway > update.scoreHome) {
+                         addMM(150000); // Tripled Exhibition rewards
+                    } else {
+                         addMM(-30000); // Loss penalty
+                    }
                 }
             });
         };
@@ -1984,7 +2016,14 @@
         }
     }
 
+    // FIXED: ASYNC hydration safeguards to automatically load empty rosters before sim
     async function simSeasonDay() {
+        // Prevent progression loop once campaign is completed
+        if (currentSeasonRound >= seasonSchedule.length && !playoffsState) {
+            alert("The Season campaign is completed! Select 'Start Next Season' to start anew.");
+            return;
+        }
+
         if (currentSeasonRound >= seasonSchedule.length) {
             if (!playoffsState) {
                 initPlayoffBracket();
@@ -2057,12 +2096,13 @@
 
                 if (g.scoreA > g.scoreH) {
                     standAway.wins++; standHome.losses++;
-                    if(g.away.id === userTeamId) addMM(150000);
-                    else if(g.home.id === userTeamId) addMM(-20000); // 20k Loss penalty
+                    // TRIPLED WIN EARNINGS & ACCORDING LOSS PENALTIES
+                    if(g.away.id === userTeamId) addMM(450000); 
+                    else if(g.home.id === userTeamId) addMM(-60000);
                 } else {
                     standHome.wins++; standAway.losses++;
-                    if(g.home.id === userTeamId) addMM(150000);
-                    else if(g.away.id === userTeamId) addMM(-20000);
+                    if(g.home.id === userTeamId) addMM(450000);
+                    else if(g.away.id === userTeamId) addMM(-60000);
                 }
 
                 accumulateSeasonStats(box.statsAway);
@@ -2296,7 +2336,7 @@
                 <div class="live-game-card" style="border-color:var(--accent-gold); padding:20px;">
                     <div style="flex:1; font-size:1.3rem;">${playoffsState.finals.t1.abbreviation}</div>
                     <div class="live-score" style="font-size:2rem;" id="po-score-fa">0</div> 
-                    <div style="margin:0 25px; color:var(--text-muted);">FINALS</div> 
+                    <div style="margin:0 25px; color:var(--text-muted); font-size:1rem;">FINALS</div> 
                     <div class="live-score" style="font-size:2rem;" id="po-score-fb">0</div>
                     <div style="flex:1; text-align:right; font-size:1.3rem;">${playoffsState.finals.t2.abbreviation}</div>
                 </div>
@@ -2313,7 +2353,7 @@
             let champ = resF.scoreA > resF.scoreH ? playoffsState.finals.t1 : playoffsState.finals.t2;
 
             if(champ.id === userTeamId) {
-                addMM(10000000);
+                addMM(30000000); // Tripled Finals Winner MM
             }
 
             document.getElementById("bracket-f-t1").innerHTML = `${playoffsState.finals.t1.abbreviation} - <strong>${resF.scoreA}</strong>`;
@@ -2328,60 +2368,6 @@
         }
 
         if(playoffsState) document.getElementById("sim-day-btn").disabled = false;
-    }
-
-    // --- UNIVERSAL STATE INITIALIZER ---
-    function initApp() {
-        const posOpts = [
-            {label:'All Pos', value:'ALL'},{label:'PG', value:'PG'},{label:'SG', value:'SG'},
-            {label:'SF', value:'SF'},{label:'PF', value:'PF'},{label:'C', value:'C'}
-        ];
-        createDropdown('pos-a', posOpts, 'ALL', '', 'onRosterPosA');
-        createDropdown('pos-b', posOpts, 'ALL', '', 'onRosterPosB');
-        
-        updateMMDisplay();
-        
-        if (!userTeamId) {
-            document.body.style.overflow = "hidden"; // Prevent background slide
-            renderStartupTeamSelectors();
-            document.getElementById("team-selection-overlay").style.display = "flex";
-        } else {
-            document.body.style.overflow = "";
-            document.getElementById("team-selection-overlay").style.display = "none";
-            switchTab("tab-rosters");
-            updateUserTeamDisplay();
-            renderRosterSide('a');
-            populateUpgradeList();
-            buildCustomLogoDropdowns();
-            renderLineupSelectors();
-        }
-
-        if(seasonStandings.length === 0 && userTeamId) startSeason();
-    }
-
-    // --- TAB NAVIGATION ENGINE (RE-INDEXED TO REMOVE DIRECTORY CRASH) ---
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        
-        document.getElementById(tabId).classList.add('active');
-        
-        // Re-aligned exact navigation index map
-        const idx = ['tab-rosters', 'tab-exhibition', 'tab-season'].indexOf(tabId);
-        if(document.querySelectorAll('.nav-btn')[idx]) {
-            document.querySelectorAll('.nav-btn')[idx].classList.add('active');
-        }
-
-        if (tabId === 'tab-rosters') {
-            renderRosterSide('a');
-            renderRosterSide('b');
-            renderLineupSelectors();
-        } else if (tabId === 'tab-exhibition') {
-            updateExhibitionVisuals();
-        } else if (tabId === 'tab-season') {
-            renderStandings();
-            renderLeagueLeaders();
-        }
     }
 
     // --- RUNTIME BOOTSTRAP GATEWAY ---
