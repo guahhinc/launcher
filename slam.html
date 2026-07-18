@@ -674,7 +674,7 @@
                     </div>
 
                     <div style="background: var(--bg-dark); border: 2px solid var(--border-color); padding: 20px; width: 450px;">
-                        <h4 style="font-size: 0.9rem; color: var(--accent-green); margin-bottom: 10px;">Player Development (Cost: 1,500,000 MM)</h4>
+                        <h4 style="font-size: 0.9rem; color: var(--accent-green); margin-bottom: 10px;">Player Development (Cost: 1,000,000 MM)</h4>
                         <div style="display: flex; gap: 8px;">
                             <div id="cd-wrapper-upgrade" style="flex:1;"></div>
                             <button class="btn btn-success" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="buyPlayerUpgrade()">+1 OVR</button>
@@ -945,7 +945,7 @@
 
                     <div class="panel" id="live-season-scoreboard" style="display: none; border-color: var(--accent-blue);">
                         <div class="panel-title" style="color: var(--accent-blue);">Live Scoreboard</div>
-                        <div id="live-games-grid" style="display: grid; grid-template-columns: 1fr; gap: 10px;"></div>
+                        <div id="live-games-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"></div>
                     </div>
 
                     <div class="panel">
@@ -1105,11 +1105,6 @@
         if (cachedPlayers && cachedTeams) {
             PLAYERS = JSON.parse(cachedPlayers);
             ALL_TEAMS = JSON.parse(cachedTeams);
-            
-            if (REAL_PLAYERS.length === 0) {
-                 REAL_PLAYERS = JSON.parse(cachedPlayers);
-                 REAL_TEAMS = JSON.parse(cachedTeams);
-            }
 
             const sStand = localStorage.getItem("slam_sim_season_standings");
             const sSched = localStorage.getItem("slam_sim_season_schedule");
@@ -1289,6 +1284,7 @@
         
         document.getElementById(tabId).classList.add('active');
         
+        // Re-aligned exact navigation index map
         const idx = ['tab-rosters', 'tab-exhibition', 'tab-season'].indexOf(tabId);
         if(document.querySelectorAll('.nav-btn')[idx]) {
             document.querySelectorAll('.nav-btn')[idx].classList.add('active');
@@ -1528,6 +1524,128 @@
         saveRostersState();
         renderRosterSide('a');
         renderRosterSide('b');
+        renderLineupSelectors();
+        updateTradeCenterPanel();
+    }
+
+    function toggleTradeSelection(player, side) {
+        let arr = side === 'a' ? tradeA : tradeB;
+        let idx = arr.findIndex(p => p.id === player.id);
+        if(idx > -1) arr.splice(idx, 1);
+        else arr.push(player);
+
+        renderRosterSide('a');
+        renderRosterSide('b');
+        updateTradeCenterPanel();
+    }
+
+    function calcTradeValue(playersArr) {
+        return playersArr.reduce((sum, p) => sum + Math.pow(p.ovr, 3), 0);
+    }
+
+    function updateTradeCenterPanel() {
+        const msg = document.getElementById("trade-negotiator-msg");
+        const actions = document.getElementById("trade-actions");
+        const outDiv = document.getElementById("trade-offer-out");
+        const inDiv = document.getElementById("trade-offer-in");
+
+        if (tradeA.length > 0 || tradeB.length > 0) {
+            msg.style.display = "none";
+            actions.style.display = "flex";
+            
+            outDiv.innerHTML = tradeA.length > 0 ? tradeA.map(p => `<span style="background:var(--bg-dark); padding:4px 8px; border:1px solid var(--accent-blue); border-radius:2px; font-size:0.9rem; display:inline-block; margin:2px;">${p.name} (${p.ovr})</span>`).join('') : `<span style="color:var(--text-muted)">None</span>`;
+            inDiv.innerHTML = tradeB.length > 0 ? tradeB.map(p => `<span style="background:var(--bg-dark); padding:4px 8px; border:1px solid var(--accent-gold); border-radius:2px; font-size:0.9rem; display:inline-block; margin:2px;">${p.name} (${p.ovr})</span>`).join('') : `<span style="color:var(--text-muted)">None</span>`;
+
+        } else {
+            msg.style.display = "block";
+            actions.style.display = "none";
+            msg.textContent = "Select players from your team and the target team to begin trade negotiations. (Multiple allowed)";
+        }
+    }
+
+    function processSelectedTrade() {
+        if (tradeA.length === 0 && tradeB.length === 0) return;
+
+        const teamA = ALL_TEAMS.find(t => t.id === userTeamId);
+        const teamB = ALL_TEAMS.find(t => t.id === activeRosterTeamB);
+
+        if (!teamA || !teamB) return;
+
+        // Size limits
+        if (teamB.id !== "FA") {
+            if (teamA.players.length - tradeA.length + tradeB.length < 5) return alert("You must have at least 5 players on your roster.");
+            if (teamB.players.length - tradeB.length + tradeA.length < 5) return alert("The CPU team must have at least 5 players.");
+        }
+
+        let userMax = tradeA.length > 0 ? Math.max(...tradeA.map(p => p.ovr)) : 0;
+        let cpuMax = tradeB.length > 0 ? Math.max(...tradeB.map(p => p.ovr)) : 0;
+
+        let userVal = calcTradeValue(tradeA);
+        let cpuVal = calcTradeValue(tradeB);
+
+        let isFair = true;
+        let rejectReason = "";
+
+        // AI protects star players much better
+        if (teamB.id !== "FA" && cpuMax > userMax + 3) {
+            isFair = false;
+            rejectReason = `The ${teamB.name} GM refuses to part with their best player (${cpuMax} OVR) without receiving an elite star of similar caliber in return.`;
+        } else if (teamB.id !== "FA" && userVal < cpuVal * 0.95) {
+            isFair = false;
+            rejectReason = `The ${teamB.name} GM feels the total trade value is unbalanced in your favor.`;
+        }
+
+        if (!isFair) {
+            let userEquiv = Math.cbrt(userVal);
+            let cpuEquiv = Math.cbrt(cpuVal);
+            let diff = Math.max(0, cpuEquiv - userEquiv);
+            
+            // Scaled bribes that are significantly more expensive
+            let bribeCost = Math.max(500000, Math.round(diff * 250000));
+            if (cpuMax > userMax) {
+                bribeCost += (cpuMax - userMax) * 500000;
+            }
+            
+            if(confirm(`TRADE REJECTED: ${rejectReason} \n\nDo you want to use a Front Office Bribe to force this trade for ${formatMM(bribeCost)} MM?`)) {
+                if (userMM >= bribeCost) {
+                    addMM(-bribeCost);
+                    alert(`Bribe successful. Trade executed.`);
+                } else {
+                    alert(`Transaction failed: You do not have enough MM (${formatMM(userMM)} / ${formatMM(bribeCost)}).`);
+                    return; 
+                }
+            } else {
+                return; 
+            }
+        }
+
+        // Swaps
+        tradeA.forEach(p => {
+            teamA.players = teamA.players.filter(id => id !== p.id);
+            if(teamB.id !== "FA") teamB.players.push(p.id);
+            p.teamId = teamB.id; p.team = teamB.name; p.col1 = teamB.col1; p.col2 = teamB.col2;
+        });
+
+        tradeB.forEach(p => {
+            teamB.players = teamB.players.filter(id => id !== p.id);
+            teamA.players.push(p.id);
+            p.teamId = teamA.id; p.team = teamA.name; p.col1 = teamA.col1; p.col2 = teamA.col2;
+        });
+
+        if (isFair) alert(`Trade Accepted!\n\n${teamB.name} agreed to the deal.`);
+
+        tradeA.forEach(p => {
+            Object.keys(customLineup).forEach(pos => {
+                if (customLineup[pos] === p.id) { customLineup[pos] = ""; activeDropdowns[pos.toLowerCase()] = ""; }
+            });
+        });
+
+        tradeA = []; tradeB = [];
+
+        saveRostersState();
+        renderRosterSide('a');
+        renderRosterSide('b');
+        populateUpgradeList();
         renderLineupSelectors();
         updateTradeCenterPanel();
     }
@@ -2018,7 +2136,6 @@
 
     // FIXED: ASYNC hydration safeguards to automatically load empty rosters before sim
     async function simSeasonDay() {
-        // Prevent progression loop once campaign is completed
         if (currentSeasonRound >= seasonSchedule.length && !playoffsState) {
             alert("The Season campaign is completed! Select 'Start Next Season' to start anew.");
             return;
