@@ -36,16 +36,9 @@
             overflow-x: hidden;
         }
 
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-dark);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); }
 
         .app-container {
             display: flex;
@@ -76,10 +69,7 @@
             font-weight: 900;
             letter-spacing: -0.05em;
         }
-
-        .logo-title span {
-            color: var(--accent-blue);
-        }
+        .logo-title span { color: var(--accent-blue); }
 
         .mm-badge {
             background-color: rgba(16, 185, 129, 0.15);
@@ -92,10 +82,7 @@
             display: none; 
         }
 
-        nav {
-            display: flex;
-            gap: 6px;
-        }
+        nav { display: flex; gap: 6px; }
 
         .nav-btn {
             background: transparent;
@@ -107,6 +94,7 @@
             font-size: 1.1rem;
             cursor: pointer;
             border-radius: 2px;
+            text-transform: uppercase;
         }
 
         .nav-btn:hover {
@@ -127,13 +115,8 @@
             margin: 0 auto;
         }
 
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
         .btn {
             background-color: var(--bg-hover);
@@ -149,48 +132,19 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            text-transform: uppercase;
         }
 
-        .btn:hover:not(:disabled) {
-            background-color: var(--border-color);
-        }
+        .btn:hover:not(:disabled) { background-color: var(--border-color); }
+        .btn-primary { background-color: var(--accent-blue); border-color: var(--accent-blue); color: white; }
+        .btn-primary:hover:not(:disabled) { background-color: #1d4ed8; }
+        .btn-success { background-color: var(--accent-green); border-color: var(--accent-green); color: white; }
+        .btn-success:hover:not(:disabled) { background-color: #059669; }
+        .btn-danger { background-color: var(--accent-red); border-color: var(--accent-red); color: white; }
+        .btn-danger:hover:not(:disabled) { background-color: #b91c1c; }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        .btn-primary {
-            background-color: var(--accent-blue);
-            border-color: var(--accent-blue);
-            color: white;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background-color: #1d4ed8;
-        }
-
-        .btn-success {
-            background-color: var(--accent-green);
-            border-color: var(--accent-green);
-            color: white;
-        }
-
-        .btn-success:hover:not(:disabled) {
-            background-color: #059669;
-        }
-
-        .btn-danger {
-            background-color: var(--accent-red);
-            border-color: var(--accent-red);
-            color: white;
-        }
-
-        .btn-danger:hover:not(:disabled) {
-            background-color: #b91c1c;
-        }
-
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .search-input, .select-filter {
+        .search-input {
             background-color: var(--bg-card);
             border: 2px solid var(--border-color);
             color: var(--text-main);
@@ -199,10 +153,7 @@
             font-family: var(--font-main);
             font-size: 1rem;
         }
-
-        .search-input:focus, .select-filter:focus {
-            outline: 1px solid var(--accent-blue);
-        }
+        .search-input:focus { outline: 1px solid var(--accent-blue); }
 
         .panel {
             background-color: var(--bg-card);
@@ -230,11 +181,7 @@
             gap: 2rem;
         }
 
-        @media (max-width: 1024px) {
-            .trades-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        @media (max-width: 1024px) { .trades-grid { grid-template-columns: 1fr; } }
 
         .roster-pane {
             background-color: var(--bg-card);
@@ -261,13 +208,11 @@
         }
 
         .roster-table tr.selected {
-            background-color: rgba(37, 99, 235, 0.2);
+            background-color: rgba(37, 99, 235, 0.3);
             outline: 1px solid var(--accent-blue);
         }
 
-        .roster-table tr:hover:not(.selected) {
-            background-color: var(--bg-hover);
-        }
+        .roster-table tr:hover:not(.selected) { background-color: var(--bg-hover); }
 
         .player-row-info {
             display: flex;
@@ -276,8 +221,7 @@
         }
 
         .player-photo-mini {
-            width: 44px;
-            height: 44px;
+            width: 44px; height: 44px;
             background-color: var(--bg-dark);
             border: 1px solid var(--border-color);
             object-fit: cover;
@@ -306,257 +250,98 @@
             font-size: 1rem;
         }
 
-        .ticker-entry {
-            border-left: 3px solid var(--border-color);
-            padding-left: 10px;
-        }
+        .ticker-entry { border-left: 3px solid var(--border-color); padding-left: 10px; }
 
         .loader-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--bg-dark);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 1.5rem;
-            padding: 2rem;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--bg-dark); z-index: 1000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1.5rem; padding: 2rem;
         }
 
-        .loader-bar-outer {
-            width: 400px;
-            height: 6px;
-            background-color: var(--border-color);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .loader-bar-inner {
-            height: 100%;
-            width: 0%;
-            background-color: var(--accent-blue);
-        }
+        .loader-bar-outer { width: 400px; height: 6px; background-color: var(--border-color); border-radius: 2px; overflow: hidden; }
+        .loader-bar-inner { height: 100%; width: 0%; background-color: var(--accent-blue); }
 
         .players-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;
         }
 
         .player-card {
-            background-color: var(--bg-card);
-            border: 2px solid var(--border-color);
-            padding: 1.5rem;
-            position: relative;
+            background-color: var(--bg-card); border: 2px solid var(--border-color); padding: 1.5rem; position: relative;
         }
 
         .player-headshot-large {
-            width: 100%;
-            height: 200px;
-            object-fit: contain;
+            width: 100%; height: 200px; object-fit: contain;
             background: radial-gradient(circle, var(--bg-hover) 10%, var(--bg-card) 100%);
-            border-bottom: 2px solid var(--border-color);
-            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color); margin-bottom: 1rem;
         }
 
         .ovr-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: #000;
-            border: 1px solid var(--accent-gold);
-            color: var(--accent-gold);
-            font-weight: 900;
-            font-size: 1.1rem;
-            padding: 4px 10px;
+            position: absolute; top: 20px; right: 20px; background-color: #000;
+            border: 1px solid var(--accent-gold); color: var(--accent-gold); font-weight: 900; font-size: 1.1rem; padding: 4px 10px;
         }
 
-        .grid-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            gap: 2rem;
-        }
+        .grid-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 2rem; }
 
         .scoreboard-panel {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            background-color: var(--bg-card);
-            border: 2px solid var(--border-color);
-            padding: 2.5rem;
-            text-align: center;
+            display: flex; justify-content: space-around; align-items: center;
+            background-color: var(--bg-card); border: 2px solid var(--border-color); padding: 2.5rem; text-align: center;
         }
 
-        .scoreboard-score {
-            font-size: 4rem;
-            font-weight: 900;
-            font-variant-numeric: tabular-nums;
-        }
+        .scoreboard-score { font-size: 4rem; font-weight: 900; font-variant-numeric: tabular-nums; }
 
-        .simulator-split {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        @media (max-width: 1024px) {
-            .simulator-split {
-                grid-template-columns: 1fr;
-            }
-        }
+        .simulator-split { display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; margin-top: 2rem; }
+        @media (max-width: 1024px) { .simulator-split { grid-template-columns: 1fr; } }
 
         .trade-negotiator-box {
-            background-color: var(--bg-hover);
-            border: 2px solid var(--border-color);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 1.1rem;
+            background-color: var(--bg-hover); border: 2px solid var(--border-color); padding: 1.5rem; margin-bottom: 2rem;
+            display: flex; flex-direction: column; gap: 15px; font-size: 1.1rem;
         }
 
-        .team-logo-img {
-            width: 64px;
-            height: 64px;
-            object-fit: contain;
-        }
+        .trade-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
-        .custom-dropdown-container {
-            position: relative;
-            width: 100%;
-            text-align: left;
-        }
+        .team-logo-img { width: 80px; height: 80px; object-fit: contain; }
 
-        .dropdown-trigger {
-            width: 100%;
-            background-color: var(--bg-card);
-            border: 2px solid var(--border-color);
-            color: var(--text-main);
-            padding: 0.8rem 1.2rem;
-            font-size: 1.1rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            border-radius: 2px;
+        /* UNIVERSAL CUSTOM DROPDOWNS */
+        .cd-container { position: relative; width: 100%; user-select: none; }
+        .cd-trigger {
+            background: var(--bg-card); border: 2px solid var(--border-color); padding: 0.7rem 1.2rem;
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 2px;
+            font-weight: 800; color: var(--text-main); font-size: 1rem; height: 100%;
         }
-
-        .dropdown-trigger:focus {
-            outline: 1px solid var(--accent-blue);
+        .cd-trigger:hover, .cd-trigger:focus { border-color: var(--accent-blue); }
+        .cd-menu {
+            position: absolute; top: 100%; left: 0; width: 100%; background: var(--bg-card);
+            border: 2px solid var(--accent-blue); border-top: none; max-height: 350px; overflow-y: auto; display: none; z-index: 999;
         }
+        .cd-item { padding: 0.8rem 1.2rem; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid var(--border-color); font-weight: 700; font-size: 0.95rem; }
+        .cd-item:hover { background: var(--bg-hover); }
+        .cd-item.selected { background: rgba(37, 99, 235, 0.2); border-left: 3px solid var(--accent-blue); }
+        .dropdown-logo-mini { width: 28px; height: 28px; object-fit: contain; }
 
-        .dropdown-menu-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background-color: var(--bg-card);
-            border: 2px solid var(--border-color);
-            border-top: none;
-            max-height: 380px;
-            overflow-y: auto;
-            display: none;
-            z-index: 100;
-        }
-
-        .dropdown-item {
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 700;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .dropdown-item:hover {
-            background-color: var(--bg-hover);
-        }
-
-        .dropdown-logo-mini {
-            width: 32px;
-            height: 32px;
-            object-fit: contain;
-        }
-
+        /* Live Scores */
         .live-game-card {
-            background-color: var(--bg-dark);
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 800;
+            background-color: var(--bg-dark); border: 1px solid var(--border-color); padding: 12px;
+            display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 1.1rem;
         }
+        .live-score { font-size: 1.4rem; font-variant-numeric: tabular-nums; color: var(--accent-blue); }
 
-        .live-score {
-            font-size: 1.3rem;
-            font-variant-numeric: tabular-nums;
-            color: var(--accent-blue);
-        }
+        .lineup-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 1rem; }
+        @media (max-width: 768px) { .lineup-grid { grid-template-columns: 1fr; } }
+        .lineup-slot { background-color: var(--bg-hover); border: 1px solid var(--border-color); padding: 15px 10px; text-align: center; }
 
-        .lineup-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-top: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .lineup-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .lineup-slot {
-            background-color: var(--bg-hover);
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            text-align: center;
-        }
-
-        /* Overlay for Team Selection */
         .team-selection-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(7, 10, 19, 0.95);
-            z-index: 2000;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(7, 10, 19, 0.95); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 2rem;
         }
-
         .team-selection-box {
-            background-color: var(--bg-card);
-            border: 2px solid var(--accent-gold);
-            border-radius: 4px;
-            padding: 3rem;
-            width: 100%;
-            max-width: 700px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(234, 179, 8, 0.2);
+            background-color: var(--bg-card); border: 2px solid var(--accent-gold); border-radius: 4px; padding: 3rem; width: 100%; max-width: 700px; text-align: center; box-shadow: 0 0 30px rgba(234, 179, 8, 0.2);
         }
     </style>
 </head>
 <body>
 
 <div class="loader-overlay" id="api-loader" style="display: none;">
-    <h2 style="font-weight: 900; letter-spacing: -0.05em; font-size: 2rem;">SLAM</h2>
+    <h2 style="font-weight: 900; letter-spacing: -0.05em; font-size: 2.5rem;">SLAM</h2>
     <div id="loader-msg" style="color: var(--text-muted); font-size: 1.1rem; text-align: center; margin-bottom: 1rem;">Starting live NBA data streams...</div>
     <div class="loader-bar-outer">
         <div class="loader-bar-inner" id="loader-progress"></div>
@@ -567,15 +352,9 @@
 <div class="team-selection-overlay" id="team-selection-overlay">
     <div class="team-selection-box">
         <h2 style="font-weight: 900; font-size: 2.2rem; color: var(--accent-gold); text-transform: uppercase; margin-bottom: 1rem;">Welcome to MyNBA</h2>
-        <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2rem;">Choose your franchise. You will manage their roster, execute trades, and lead them to the Finals. <br><strong style="color:var(--text-main);">This decision is permanent for this save.</strong></p>
+        <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2rem;">Take ownership of a real NBA franchise. You will manage their roster, execute trades, and push for a Championship. <br><strong style="color:var(--text-main);">This decision is permanent for your save.</strong></p>
         
-        <div class="custom-dropdown-container" id="container-startup-team" style="margin-bottom: 2rem; text-align: left;">
-            <button class="dropdown-trigger" onclick="toggleCustomDropdown('startup-team')" style="padding: 1rem; font-size: 1.2rem;">
-                <span id="trigger-startup-team-text" style="display:flex; align-items:center; gap:10px;">Select Franchise</span>
-                <span>▼</span>
-            </button>
-            <div class="dropdown-menu-list" id="trigger-startup-team-menu" style="max-height: 400px;"></div>
-        </div>
+        <div style="margin-bottom: 2rem; text-align: left;" id="cd-wrapper-startup"></div>
 
         <button class="btn btn-primary" style="font-size: 1.2rem; padding: 1rem 3rem;" onclick="lockInMyNBATeam()">Lock In Franchise</button>
     </div>
@@ -595,8 +374,8 @@
             <nav style="margin-left: 30px;">
                 <button class="nav-btn active" id="tab-btn-rosters" onclick="switchTab('tab-rosters')">Rosters & Trades</button>
                 <button class="nav-btn" onclick="switchTab('tab-directory')">Directory</button>
-                <button class="nav-btn" onclick="switchTab('tab-exhibition')">Game</button>
-                <button class="nav-btn" onclick="switchTab('tab-season')">Season</button>
+                <button class="nav-btn" id="tab-btn-game" onclick="switchTab('tab-exhibition')">Play Game</button>
+                <button class="nav-btn" id="tab-btn-season" onclick="switchTab('tab-season')">MyNBA Season</button>
             </nav>
         </div>
     </header>
@@ -609,47 +388,43 @@
                     <div>
                         <h3 style="font-weight: 800; font-size: 1.4rem; color: var(--accent-gold);">MyNBA Franchise Management</h3>
                         <p style="font-size:0.95rem; color:var(--text-muted); margin-top: 5px;">Manage your locked-in roster. Propose trades and spend MM to develop your players.</p>
-                        
                         <div style="margin-top: 15px; display: flex; align-items: center; gap: 12px;">
                             <span style="font-weight: 700; font-size: 1rem;">Your Franchise:</span>
-                            <div id="locked-team-display" style="font-size: 1.2rem; font-weight: 900; display:flex; align-items:center; gap: 10px; background: var(--bg-hover); padding: 8px 16px; border: 1px solid var(--border-color);">
-                                <!-- Filled by JS -->
-                            </div>
+                            <div id="locked-team-display" style="font-size: 1.2rem; font-weight: 900; display:flex; align-items:center; gap: 10px; background: var(--bg-hover); padding: 8px 16px; border: 1px solid var(--border-color);"></div>
                         </div>
                     </div>
 
-                    <div style="background: var(--bg-dark); border: 2px solid var(--border-color); padding: 20px; width: 420px;">
-                        <h4 style="font-size: 0.9rem; color: var(--accent-green); margin-bottom: 10px;">Player Development (Cost: 500,000 MM)</h4>
+                    <div style="background: var(--bg-dark); border: 2px solid var(--border-color); padding: 20px; width: 450px;">
+                        <h4 style="font-size: 0.9rem; color: var(--accent-green); margin-bottom: 10px;">Player Development (Cost: 1,000,000 MM)</h4>
                         <div style="display: flex; gap: 8px;">
-                            <select class="select-filter" id="upgrade-player-select" style="flex: 1; font-size: 0.9rem; padding: 0.5rem;"></select>
+                            <div id="cd-wrapper-upgrade" style="flex:1;"></div>
                             <button class="btn btn-success" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="buyPlayerUpgrade()">+1 OVR</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Position Lineup Builder -->
                 <div id="lineup-builder-container" style="margin-bottom: 1.5rem;">
                     <h4 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 10px;">Your Starting 5 Lineup</h4>
                     <div class="lineup-grid">
                         <div class="lineup-slot">
-                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-blue);">POINT GUARD (PG)</div>
-                            <select class="select-filter" id="lineup-PG" onchange="saveLineupChoice('PG')" style="width: 100%; font-size: 0.9rem; margin-top: 5px;"></select>
+                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-blue); margin-bottom: 8px;">PG</div>
+                            <div id="cd-wrapper-pg"></div>
                         </div>
                         <div class="lineup-slot">
-                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-blue);">SHOOTING GUARD (SG)</div>
-                            <select class="select-filter" id="lineup-SG" onchange="saveLineupChoice('SG')" style="width: 100%; font-size: 0.9rem; margin-top: 5px;"></select>
+                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-blue); margin-bottom: 8px;">SG</div>
+                            <div id="cd-wrapper-sg"></div>
                         </div>
                         <div class="lineup-slot">
-                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-blue);">SMALL FORWARD (SF)</div>
-                            <select class="select-filter" id="lineup-SF" onchange="saveLineupChoice('SF')" style="width: 100%; font-size: 0.9rem; margin-top: 5px;"></select>
+                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-blue); margin-bottom: 8px;">SF</div>
+                            <div id="cd-wrapper-sf"></div>
                         </div>
                         <div class="lineup-slot">
-                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-blue);">POWER FORWARD (PF)</div>
-                            <select class="select-filter" id="lineup-PF" onchange="saveLineupChoice('PF')" style="width: 100%; font-size: 0.9rem; margin-top: 5px;"></select>
+                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-blue); margin-bottom: 8px;">PF</div>
+                            <div id="cd-wrapper-pf"></div>
                         </div>
                         <div class="lineup-slot">
-                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-blue);">CENTER (C)</div>
-                            <select class="select-filter" id="lineup-C" onchange="saveLineupChoice('C')" style="width: 100%; font-size: 0.9rem; margin-top: 5px;"></select>
+                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-blue); margin-bottom: 8px;">C</div>
+                            <div id="cd-wrapper-c"></div>
                         </div>
                     </div>
                 </div>
@@ -659,20 +434,27 @@
                 </div>
             </div>
 
-            <!-- Active Trade Negotiator -->
             <div class="trade-center-panel" id="trade-center-panel" style="margin-bottom: 2rem;">
                 <div class="trade-negotiator-box">
-                    <div id="trade-negotiator-msg" style="color: var(--text-muted); font-weight: 700;">Select a player on both sides below to begin negotiating.</div>
-                    <div id="trade-actions" style="display: none; align-items: center; gap: 20px; width: 100%; justify-content: space-between;">
-                        <div style="font-weight: 700; font-size: 1.2rem;" id="trade-proposal-text">Trade Offer</div>
-                        <button class="btn btn-primary" onclick="processSelectedTrade()" style="font-size: 1rem; padding: 0.8rem 2rem;">📥 Propose Trade</button>
+                    <div id="trade-negotiator-msg" style="color: var(--text-muted); font-weight: 700;">Select players from your team and the target team to begin trade negotiations. (Multiple allowed)</div>
+                    <div id="trade-actions" style="display: none; width: 100%;">
+                        <div style="flex:1;">
+                            <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:4px;">You are trading away:</div>
+                            <div id="trade-offer-out" class="trade-row"></div>
+                        </div>
+                        <div style="padding: 0 30px; font-size: 1.5rem;">🔄</div>
+                        <div style="flex:1;">
+                            <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:4px;">You are receiving:</div>
+                            <div id="trade-offer-in" class="trade-row"></div>
+                        </div>
+                        <div style="margin-left: 20px;">
+                            <button class="btn btn-primary" onclick="processSelectedTrade()" style="font-size: 1.1rem; padding: 1rem 2rem;">Propose Trade</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Side-by-side Roster Explorer -->
             <div class="trades-grid">
-                <!-- Side A (Locked to User Team) -->
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 10px;">
                         <div style="flex: 1; font-weight: 900; font-size: 1.3rem; background: var(--bg-card); padding: 0.8rem 1.2rem; border: 2px solid var(--border-color); color: var(--accent-gold);" id="roster-a-title">Your Team</div>
@@ -680,58 +462,31 @@
                     </div>
                     <div class="roster-search-container" style="display:flex; gap: 8px; padding: 10px; background: var(--bg-card); border: 2px solid var(--border-color); border-bottom: none;">
                         <input type="text" class="search-input" id="roster-query-a" placeholder="Search your roster..." oninput="renderRosterSide('a')" style="flex: 1;">
-                        <select class="select-filter" id="roster-pos-a" onchange="renderRosterSide('a')">
-                            <option value="ALL">All Pos</option>
-                            <option value="PG">PG</option>
-                            <option value="SG">SG</option>
-                            <option value="SF">SF</option>
-                            <option value="PF">PF</option>
-                            <option value="C">C</option>
-                        </select>
+                        <div id="cd-wrapper-pos-a" style="width: 150px;"></div>
                     </div>
                     <div class="roster-pane">
                         <table class="roster-table">
                             <thead>
-                                <tr>
-                                    <th>Player</th>
-                                    <th style="text-align: center;">OVR</th>
-                                </tr>
+                                <tr><th>Player</th><th style="text-align: center;">OVR</th></tr>
                             </thead>
                             <tbody id="roster-table-body-a"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Side B (Other Teams / FA) -->
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 10px;">
-                        <div class="custom-dropdown-container" id="container-roster-b" style="flex:1;">
-                            <button class="dropdown-trigger" onclick="toggleCustomDropdown('roster-b')">
-                                <span id="trigger-roster-b-text" style="display:flex; align-items:center; gap:8px;">Select Target Team</span>
-                                <span>▼</span>
-                            </button>
-                            <div class="dropdown-menu-list" id="trigger-roster-b-menu"></div>
-                        </div>
+                        <div id="cd-wrapper-roster-b" style="flex:1;"></div>
                         <div id="roster-b-strength" style="font-size: 1rem; font-weight: 800; color:var(--text-muted); white-space:nowrap;">OVR --</div>
                     </div>
                     <div class="roster-search-container" style="display:flex; gap: 8px; padding: 10px; background: var(--bg-card); border: 2px solid var(--border-color); border-bottom: none;">
                         <input type="text" class="search-input" id="roster-query-b" placeholder="Search target roster..." oninput="renderRosterSide('b')" style="flex: 1;">
-                        <select class="select-filter" id="roster-pos-b" onchange="renderRosterSide('b')">
-                            <option value="ALL">All Pos</option>
-                            <option value="PG">PG</option>
-                            <option value="SG">SG</option>
-                            <option value="SF">SF</option>
-                            <option value="PF">PF</option>
-                            <option value="C">C</option>
-                        </select>
+                        <div id="cd-wrapper-pos-b" style="width: 150px;"></div>
                     </div>
                     <div class="roster-pane">
                         <table class="roster-table">
                             <thead>
-                                <tr>
-                                    <th>Player</th>
-                                    <th style="text-align: center;">OVR</th>
-                                </tr>
+                                <tr><th>Player</th><th style="text-align: center;">OVR</th></tr>
                             </thead>
                             <tbody id="roster-table-body-b"></tbody>
                         </table>
@@ -740,20 +495,13 @@
             </div>
         </section>
 
-        <!-- TAB 2: PLAYER DIRECTORY -->
+        <!-- TAB 2: DIRECTORY -->
         <section id="tab-directory" class="tab-content">
             <div class="grid-header">
-                <h2 style="font-weight: 900;">Player Directory</h2>
+                <h2 style="font-weight: 900; text-transform: uppercase;">Player Directory</h2>
                 <div style="display: flex; gap: 12px;">
                     <input type="text" class="search-input" id="directory-search" placeholder="Search roster database..." oninput="onDirectorySearchInput()" style="width: 350px;">
-                    <select class="select-filter" id="directory-pos-filter" onchange="onDirectorySearchInput()">
-                        <option value="ALL">All Positions</option>
-                        <option value="PG">PG</option>
-                        <option value="SG">SG</option>
-                        <option value="SF">SF</option>
-                        <option value="PF">PF</option>
-                        <option value="C">C</option>
-                    </select>
+                    <div id="cd-wrapper-dir-pos" style="width: 180px;"></div>
                 </div>
             </div>
             <div class="players-grid" id="directory-grid"></div>
@@ -770,13 +518,7 @@
             <div class="scoreboard-panel" style="position: relative; z-index: 10;">
                 <div style="width: 35%;">
                     <div id="ex-logo-away" style="margin-bottom: 1rem;"></div>
-                    <div class="custom-dropdown-container" id="container-away">
-                        <button class="dropdown-trigger" onclick="toggleCustomDropdown('away')">
-                            <span id="trigger-away-text" style="display:flex; align-items:center; gap:8px;">Select Team 1</span>
-                            <span>▼</span>
-                        </button>
-                        <div class="dropdown-menu-list" id="trigger-away-menu"></div>
-                    </div>
+                    <div id="cd-wrapper-ex-away"></div>
                     <div class="scoreboard-score" id="score-away-val" style="margin-top: 1rem;">0</div>
                 </div>
 
@@ -784,20 +526,14 @@
                     <div style="background-color: var(--bg-hover); border: 2px solid var(--border-color); padding: 8px 20px; font-weight: 800; font-size: 1rem;" id="game-status">NOT STARTED</div>
                     <div id="simulation-clock" style="font-size: 1.4rem; font-weight: 700; color: var(--text-muted); margin-top: 15px;">Q1 - 12:00</div>
                     <div style="margin-top: 1.8rem; display: flex; gap: 15px; justify-content: center;">
-                        <button class="btn btn-primary" onclick="triggerExhibitionSim(false)">Instant</button>
+                        <button class="btn btn-primary" id="btn-instant-sim" onclick="triggerExhibitionSim(false)">Instant</button>
                         <button class="btn btn-success" onclick="triggerExhibitionSim(true)">Live</button>
                     </div>
                 </div>
 
                 <div style="width: 35%;">
                     <div id="ex-logo-home" style="margin-bottom: 1rem;"></div>
-                    <div class="custom-dropdown-container" id="container-home">
-                        <button class="dropdown-trigger" onclick="toggleCustomDropdown('home')">
-                            <span id="trigger-home-text" style="display:flex; align-items:center; gap:8px;">Select Team 2</span>
-                            <span>▼</span>
-                        </button>
-                        <div class="dropdown-menu-list" id="trigger-home-menu"></div>
-                    </div>
+                    <div id="cd-wrapper-ex-home"></div>
                     <div class="scoreboard-score" id="score-home-val" style="margin-top: 1rem;">0</div>
                 </div>
             </div>
@@ -806,7 +542,7 @@
                 <div class="panel" style="margin-bottom: 0;">
                     <div class="panel-title">Live Ticker</div>
                     <div class="ticker-box" id="ticker-feed">
-                        <div class="ticker-entry" style="color: var(--text-muted)">Configure rosters or click Instant/Live to start.</div>
+                        <div class="ticker-entry" style="color: var(--text-muted)">Configure match or click play to start.</div>
                     </div>
                 </div>
 
@@ -978,17 +714,86 @@
     let directoryPage = 1;
     const directoryPageSize = 40;
 
-    let selectedTradePlayerA = null;
-    let selectedTradePlayerB = null;
+    let tradeA = [];
+    let tradeB = [];
 
     let customLineup = { PG: "", SG: "", SF: "", PF: "", C: "" };
 
     const ESPN_TEAMS_API = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams";
 
     function formatMM(val) {
-        return val.toLocaleString() + " MM";
+        return val.toLocaleString();
     }
 
+    // --- UNIVERSAL CUSTOM DROPDOWN ENGINE ---
+    const activeDropdowns = {}; // Store values
+    function createDropdown(id, options, defaultVal, placeholder, onSelect) {
+        const wrapper = document.getElementById(`cd-wrapper-${id}`);
+        if(!wrapper) return;
+        
+        let selValue = activeDropdowns[id] !== undefined ? activeDropdowns[id] : defaultVal;
+        let selectedOpt = options.find(o => o.value === selValue);
+        
+        if(!selectedOpt && options.length > 0) {
+             selectedOpt = options[0];
+             selValue = selectedOpt.value;
+        }
+
+        activeDropdowns[id] = selValue;
+        
+        let displayLabel = selectedOpt ? selectedOpt.label : placeholder;
+        let displayLogo = (selectedOpt && selectedOpt.logo) ? `<img src="${selectedOpt.logo}" class="dropdown-logo-mini">` : '';
+
+        let html = `
+            <div class="cd-container" id="cd-${id}">
+                <div class="cd-trigger" onclick="toggleDropdown('${id}')">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        ${displayLogo}<span>${displayLabel}</span>
+                    </div>
+                    <span>▼</span>
+                </div>
+                <div class="cd-menu" id="cd-menu-${id}">
+                    ${options.map(o => `
+                        <div class="cd-item ${o.value === selValue ? 'selected' : ''}" onclick="selectDropdown('${id}', '${o.value}')">
+                            ${o.logo ? `<img src="${o.logo}" class="dropdown-logo-mini">` : ''}
+                            <span>${o.label}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        wrapper.innerHTML = html;
+        wrapper.dataset.onSelect = onSelect;
+        wrapper.dataset.options = JSON.stringify(options);
+    }
+
+    function toggleDropdown(id) {
+        document.querySelectorAll('.cd-menu').forEach(m => {
+            if(m.id !== `cd-menu-${id}`) m.style.display = 'none';
+        });
+        const menu = document.getElementById(`cd-menu-${id}`);
+        if(menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    window.selectDropdown = function(id, value) {
+        activeDropdowns[id] = value;
+        const wrapper = document.getElementById(`cd-wrapper-${id}`);
+        const opts = JSON.parse(wrapper.dataset.options);
+        const onSelectStr = wrapper.dataset.onSelect;
+        
+        createDropdown(id, opts, value, '', onSelectStr);
+        if(onSelectStr && typeof window[onSelectStr] === 'function') {
+            window[onSelectStr](value);
+        }
+    };
+
+    document.addEventListener('click', e => {
+        if(!e.target.closest('.cd-container')) {
+            document.querySelectorAll('.cd-menu').forEach(m => m.style.display = 'none');
+        }
+    });
+
+    // --- PROXY FAIL-SAFE FOR LOCAL ORIGINS ---
     async function robustFetchJson(url) {
         try {
             const res = await fetch(url);
@@ -1014,9 +819,10 @@
         throw new Error(`Failed to establish connection.`);
     }
 
+    // --- LOCAL STORAGE STATE PERSISTENCE ---
     function saveRostersState() {
-        localStorage.setItem("slam_sim_players_v8", JSON.stringify(PLAYERS));
-        localStorage.setItem("slam_sim_teams_v8", JSON.stringify(ALL_TEAMS));
+        localStorage.setItem("slam_sim_players_v9", JSON.stringify(PLAYERS));
+        localStorage.setItem("slam_sim_teams_v9", JSON.stringify(ALL_TEAMS));
         localStorage.setItem("slam_sim_season_standings", JSON.stringify(seasonStandings));
         localStorage.setItem("slam_sim_season_schedule", JSON.stringify(seasonSchedule));
         localStorage.setItem("slam_sim_season_round", currentSeasonRound.toString());
@@ -1029,8 +835,8 @@
     }
 
     function checkRostersState() {
-        const cachedPlayers = localStorage.getItem("slam_sim_players_v8");
-        const cachedTeams = localStorage.getItem("slam_sim_teams_v8");
+        const cachedPlayers = localStorage.getItem("slam_sim_players_v9");
+        const cachedTeams = localStorage.getItem("slam_sim_teams_v9");
         if (cachedPlayers && cachedTeams) {
             PLAYERS = JSON.parse(cachedPlayers);
             ALL_TEAMS = JSON.parse(cachedTeams);
@@ -1065,6 +871,7 @@
         return false;
     }
 
+    // --- DATA INTAKE ---
     async function loadNBADataFromAPI() {
         const loader = document.getElementById("api-loader");
         const progress = document.getElementById("loader-progress");
@@ -1105,13 +912,13 @@
 
             ALL_TEAMS = tempTeams;
             PLAYERS = [];
-            
+
             const preloads = ALL_TEAMS.filter(t => t.id !== "FA");
-            for (let i = 0; i < Math.min(preloads.length, 12); i++) {
+            for (let i = 0; i < Math.min(preloads.length, 30); i++) {
                 const team = preloads[i];
-                const pct = Math.round(((i + 1) / 12) * 70) + 20;
+                const pct = Math.round(((i + 1) / preloads.length) * 70) + 20;
                 progress.style.width = `${pct}%`;
-                msg.textContent = `Pre-loading live roster data... (${i + 1}/12)`;
+                msg.textContent = `Pre-loading live roster data... (${i + 1}/${preloads.length})`;
                 try { await loadTeamRosterDynamically(team.id); } catch (err) {}
             }
             
@@ -1197,6 +1004,7 @@
         p.ovr = Math.round((p.off + p.def + p.reb + p.ast) / 4);
     }
 
+    // --- MODE SWITCHER (NBA VS MyNBA) ---
     function setSimulationMode(mode) {
         currentMode = mode;
         document.getElementById("mode-btn-nba").className = `btn ${mode === 'NBA' ? 'btn-primary' : ''}`;
@@ -1204,58 +1012,70 @@
 
         const rostersNavBtn = document.getElementById("tab-btn-rosters");
         const mmDisplay = document.getElementById("mm-display");
+        
+        document.getElementById("tab-btn-game").textContent = mode === 'MyNBA' ? "Play Game" : "Quick Play";
+        document.getElementById("tab-btn-season").textContent = mode === 'MyNBA' ? "MyNBA Season" : "Simulate Season";
 
         if (mode === "NBA") {
             rostersNavBtn.style.display = "none";
             mmDisplay.style.display = "none";
-            switchTab("tab-directory");
+            document.getElementById("btn-instant-sim").style.display = "inline-flex";
+            document.getElementById("sim-all-btn").style.display = "inline-flex";
             
             PLAYERS = JSON.parse(JSON.stringify(REAL_PLAYERS));
             ALL_TEAMS = JSON.parse(JSON.stringify(REAL_TEAMS));
+            switchTab("tab-directory");
+            buildCustomLogoDropdowns();
+            startSeason();
         } else {
             rostersNavBtn.style.display = "block";
             mmDisplay.style.display = "block";
-            updateMMDisplay();
+            document.getElementById("btn-instant-sim").style.display = "none";
+            document.getElementById("sim-all-btn").style.display = "none";
             
-            const cachedP = localStorage.getItem("slam_sim_players_v8");
-            const cachedT = localStorage.getItem("slam_sim_teams_v8");
+            const cachedP = localStorage.getItem("slam_sim_players_v9");
+            const cachedT = localStorage.getItem("slam_sim_teams_v9");
             if (cachedP && cachedT) {
                 PLAYERS = JSON.parse(cachedP);
                 ALL_TEAMS = JSON.parse(cachedT);
             }
-            switchTab("tab-rosters");
             
             if (!userTeamId) {
                 renderStartupTeamSelectors();
                 document.getElementById("team-selection-overlay").style.display = "flex";
             } else {
+                switchTab("tab-rosters");
                 updateUserTeamDisplay();
                 renderRosterSide('a');
                 populateUpgradeList();
+                buildCustomLogoDropdowns();
             }
+            updateMMDisplay();
         }
 
-        renderRosterSide('b');
-        buildCustomLogoDropdowns();
-        
         const valid = ALL_TEAMS.filter(t => t.id !== "FA");
-        activeExhibitionAway = valid[0]?.id || "";
-        activeExhibitionHome = valid[1]?.id || "";
+        activeExhibitionAway = mode === "MyNBA" ? userTeamId : (valid[0]?.id || "");
+        activeExhibitionHome = mode === "MyNBA" ? (valid[1]?.id || "") : (valid[1]?.id || "");
         updateExhibitionVisuals();
-        
-        if(seasonStandings.length === 0) startSeason();
     }
 
     function initApp() {
-        if (!activeExhibitionAway || !activeExhibitionHome) {
-            const valid = ALL_TEAMS.filter(t => t.id !== "FA");
-            activeExhibitionAway = valid[0]?.id || "";
-            activeExhibitionHome = valid[1]?.id || "";
-        }
-        buildCustomLogoDropdowns();
-        updateExhibitionVisuals();
-        setSimulationMode("MyNBA"); // Auto-start in MyNBA
+        // Universal Dropdowns init
+        const posOpts = [
+            {label:'All Pos', value:'ALL'},{label:'PG', value:'PG'},{label:'SG', value:'SG'},
+            {label:'SF', value:'SF'},{label:'PF', value:'PF'},{label:'C', value:'C'}
+        ];
+        createDropdown('pos-a', posOpts, 'ALL', '', 'onRosterPosA');
+        createDropdown('pos-b', posOpts, 'ALL', '', 'onRosterPosB');
+        createDropdown('dir-pos', posOpts, 'ALL', '', 'onDirectoryPos');
+        
+        setSimulationMode("MyNBA"); 
     }
+
+    window.onRosterPosA = (v) => { renderRosterSide('a'); }
+    window.onRosterPosB = (v) => { renderRosterSide('b'); }
+    window.onDirectoryPos = (v) => { onDirectorySearchInput(); }
+    window.onLineupPos = (v) => { saveRostersState(); }
 
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -1283,46 +1103,30 @@
     }
 
     // --- MYNBA MANAGEMENT ---
-    let tempStartupTeamId = "";
-    
     function renderStartupTeamSelectors() {
-        const select = document.getElementById("trigger-startup-team-menu");
-        if (!select) return;
-        select.innerHTML = "";
-
-        const activeTeams = ALL_TEAMS.filter(t => t.id !== "FA");
-        activeTeams.forEach(t => {
-            const item = document.createElement("div");
-            item.className = "dropdown-item";
-            item.onclick = () => {
-                tempStartupTeamId = t.id;
-                const logoTrigger = t.logo ? `<img src="${t.logo}" class="dropdown-logo-mini">` : `🏀`;
-                document.getElementById("trigger-startup-team-text").innerHTML = `${logoTrigger} <span style="margin-left:8px;">${t.name}</span>`;
-                document.getElementById("trigger-startup-team-menu").style.display = "none";
-            };
-
-            const logoHTML = t.logo ? `<img src="${t.logo}" class="dropdown-logo-mini">` : `<span style="font-size:1.3rem;">🏀</span>`;
-            item.innerHTML = `${logoHTML} <span>${t.name}</span>`;
-            select.appendChild(item);
-        });
+        let opts = ALL_TEAMS.filter(t => t.id !== "FA").map(t => ({label: t.name, value: t.id, logo: t.logo}));
+        createDropdown('startup', opts, opts[0].value, 'Select Franchise', 'onStartupSelect');
+        tempStartupTeamId = opts[0].value;
     }
+
+    window.onStartupSelect = (v) => { tempStartupTeamId = v; }
 
     function lockInMyNBATeam() {
         if(!tempStartupTeamId) {
             alert("Please select a franchise from the dropdown first.");
             return;
         }
-        
         const team = ALL_TEAMS.find(t => t.id === tempStartupTeamId);
         if(confirm(`Lock in ${team.name} as your franchise? You cannot change this later.`)) {
             userTeamId = tempStartupTeamId;
             saveRostersState();
             document.getElementById("team-selection-overlay").style.display = "none";
             updateUserTeamDisplay();
+            buildCustomLogoDropdowns();
             renderRosterSide('a');
             populateUpgradeList();
             renderLineupSelectors();
-            startSeason(); // Restart season to include user team
+            startSeason(); 
         }
     }
 
@@ -1344,6 +1148,7 @@
             userTeamId = "";
             userMM = 0;
             customLineup = { PG: "", SG: "", SF: "", PF: "", C: "" };
+            tradeA = []; tradeB = [];
             saveRostersState();
             location.reload();
         }
@@ -1359,28 +1164,21 @@
     }
 
     function populateUpgradeList() {
-        const select = document.getElementById("upgrade-player-select");
-        if(!select) return;
-        select.innerHTML = "";
-        
         const roster = PLAYERS.filter(p => p.teamId === userTeamId);
         roster.sort((a, b) => b.ovr - a.ovr);
-        
-        roster.forEach(p => {
-            const opt = document.createElement("option");
-            opt.value = p.id;
-            opt.textContent = `${p.name} (OVR ${p.ovr})`;
-            select.appendChild(opt);
-        });
+        let opts = roster.map(p => ({label: `${p.name} (${p.ovr})`, value: p.id}));
+        if(opts.length > 0) {
+            createDropdown('upgrade', opts, opts[0].value, '', '');
+        }
     }
 
     function buyPlayerUpgrade() {
-        const pId = document.getElementById("upgrade-player-select").value;
+        const pId = activeDropdowns['upgrade'];
         const player = PLAYERS.find(p => p.id === pId);
         
         if (!player) return;
-        if (userMM < 500000) {
-            alert("Not enough MM! You need 500,000 MM to upgrade a player.");
+        if (userMM < 1000000) {
+            alert(`Not enough MM! You need 1,000,000 MM to upgrade a player. You have ${formatMM(userMM)}.`);
             return;
         }
         if (player.ovr >= 99) {
@@ -1388,7 +1186,7 @@
             return;
         }
 
-        userMM -= 500000;
+        userMM -= 1000000;
         player.off = Math.min(99, player.off + 1);
         player.def = Math.min(99, player.def + 1);
         player.reb = Math.min(99, player.reb + 1);
@@ -1407,30 +1205,14 @@
         const customPlayers = PLAYERS.filter(p => p.teamId === userTeamId);
 
         positions.forEach(pos => {
-            const select = document.getElementById(`lineup-${pos}`);
-            if (!select) return;
-            select.innerHTML = "";
-
-            const defaultOpt = document.createElement("option");
-            defaultOpt.value = "";
-            defaultOpt.textContent = customPlayers.length === 0 ? "Sign players first!" : "-- Select Starter --";
-            select.appendChild(defaultOpt);
-
             const candidates = customPlayers.filter(p => p.pos === pos);
-            candidates.forEach(p => {
-                const opt = document.createElement("option");
-                opt.value = p.id;
-                opt.textContent = `${p.name} (OVR ${p.ovr})`;
-                if (customLineup[pos] === p.id) opt.selected = true;
-                select.appendChild(opt);
-            });
+            let opts = candidates.map(p => ({label: `${p.name} (${p.ovr})`, value: p.id, logo: p.photo}));
+            if(opts.length === 0) opts.push({label: 'No valid players', value: ''});
+            
+            let def = customLineup[pos] || opts[0].value;
+            createDropdown(pos.toLowerCase(), opts, def, '', 'onLineupPos');
+            customLineup[pos] = def;
         });
-    }
-
-    function saveLineupChoice(pos) {
-        const val = document.getElementById(`lineup-${pos}`).value;
-        customLineup[pos] = val;
-        saveRostersState();
     }
 
     function renderRosterSide(side) {
@@ -1449,7 +1231,7 @@
         }
 
         const searchQuery = (document.getElementById(`roster-query-${side}`)?.value || "").toLowerCase();
-        const posFilter = document.getElementById(`roster-pos-${side}`)?.value || "ALL";
+        const posFilter = activeDropdowns[`pos-${side}`] || "ALL";
 
         let rosterPlayers = PLAYERS.filter(p => p.teamId === teamId);
 
@@ -1473,7 +1255,7 @@
             const row = document.createElement("tr");
             row.id = `player-row-${p.id}`;
             
-            const isSel = (side === 'a' && selectedTradePlayerA?.id === p.id) || (side === 'b' && selectedTradePlayerB?.id === p.id);
+            let isSel = (side==='a' && tradeA.some(x=>x.id===p.id)) || (side==='b' && tradeB.some(x=>x.id===p.id));
             if (isSel) row.classList.add('selected');
 
             row.onclick = () => toggleTradeSelection(p, side);
@@ -1494,55 +1276,68 @@
         });
     }
 
+    // --- TRANSACTION LOGIC ---
     function toggleTradeSelection(player, side) {
-        if (side === 'a') {
-            if (selectedTradePlayerA?.id === player.id) selectedTradePlayerA = null;
-            else selectedTradePlayerA = player;
-        } else {
-            if (selectedTradePlayerB?.id === player.id) selectedTradePlayerB = null;
-            else selectedTradePlayerB = player;
-        }
+        let arr = side === 'a' ? tradeA : tradeB;
+        let idx = arr.findIndex(p => p.id === player.id);
+        if(idx > -1) arr.splice(idx, 1);
+        else arr.push(player);
+
         renderRosterSide('a');
         renderRosterSide('b');
         updateTradeCenterPanel();
     }
 
+    function calcTradeValue(playersArr) {
+        return playersArr.reduce((sum, p) => sum + Math.pow(p.ovr, 3), 0);
+    }
+
     function updateTradeCenterPanel() {
         const msg = document.getElementById("trade-negotiator-msg");
         const actions = document.getElementById("trade-actions");
-        const proposal = document.getElementById("trade-proposal-text");
+        const outDiv = document.getElementById("trade-offer-out");
+        const inDiv = document.getElementById("trade-offer-in");
 
-        if (selectedTradePlayerA && selectedTradePlayerB) {
+        if (tradeA.length > 0 || tradeB.length > 0) {
             msg.style.display = "none";
             actions.style.display = "flex";
-            proposal.innerHTML = `Offer: <span style="color: var(--accent-blue);">${selectedTradePlayerA.name}</span> (${selectedTradePlayerA.ovr}) 🔄 Receive: <span style="color: var(--accent-gold);">${selectedTradePlayerB.name}</span> (${selectedTradePlayerB.ovr})`;
+            
+            outDiv.innerHTML = tradeA.length > 0 ? tradeA.map(p => `<span style="background:var(--bg-dark); padding:4px 8px; border:1px solid var(--accent-blue); border-radius:2px; font-size:0.9rem;">${p.name} (${p.ovr})</span>`).join('') : "<span style="color:var(--text-muted)">None</span>";
+            inDiv.innerHTML = tradeB.length > 0 ? tradeB.map(p => `<span style="background:var(--bg-dark); padding:4px 8px; border:1px solid var(--accent-gold); border-radius:2px; font-size:0.9rem;">${p.name} (${p.ovr})</span>`).join('') : "<span style="color:var(--text-muted)">None</span>";
+
         } else {
             msg.style.display = "block";
             actions.style.display = "none";
-            let b = "Negotiation: ";
-            if (selectedTradePlayerA) b += `Trading Away: ${selectedTradePlayerA.name}. `;
-            if (selectedTradePlayerB) b += `Trading For: ${selectedTradePlayerB.name}. `;
-            if (!selectedTradePlayerA && !selectedTradePlayerB) b = "Select a player from your team and the target team to begin trade negotiations.";
-            msg.textContent = b;
+            msg.textContent = "Select players from your team and the target team to begin trade negotiations. (Multiple allowed)";
         }
     }
 
     function processSelectedTrade() {
-        if (!selectedTradePlayerA || !selectedTradePlayerB) return;
+        if (tradeA.length === 0 && tradeB.length === 0) return;
 
-        const teamA = ALL_TEAMS.find(t => t.id === selectedTradePlayerA.teamId);
-        const teamB = ALL_TEAMS.find(t => t.id === selectedTradePlayerB.teamId);
+        const teamA = ALL_TEAMS.find(t => t.id === userTeamId);
+        const teamB = ALL_TEAMS.find(t => t.id === activeRosterTeamB);
 
         if (!teamA || !teamB) return;
 
-        let userOvr = selectedTradePlayerA.ovr;
-        let cpuOvr = selectedTradePlayerB.ovr;
+        // Size limits
+        if (teamB.id !== "FA") {
+            if (teamA.players.length - tradeA.length + tradeB.length < 5) return alert("You must have at least 5 players on your roster.");
+            if (teamB.players.length - tradeB.length + tradeA.length < 5) return alert("The CPU team must have at least 5 players.");
+        }
 
-        if (teamB.id !== "FA" && userOvr < cpuOvr) {
-            let diff = cpuOvr - userOvr;
-            let bribeCost = diff * 250000;
+        let userVal = calcTradeValue(tradeA);
+        let cpuVal = calcTradeValue(tradeB);
+
+        if (teamB.id !== "FA" && userVal < cpuVal) {
+            // Calculate equivalent OVR diff
+            let userEquiv = Math.cbrt(userVal);
+            let cpuEquiv = Math.cbrt(cpuVal);
+            let diff = cpuEquiv - userEquiv;
             
-            if(confirm(`TRADE REJECTED: The ${teamB.name} GM feels they are giving up too much value (${cpuOvr} OVR for ${userOvr} OVR). \n\nDo you want to use a Front Office Bribe to force this trade for ${formatMM(bribeCost)}?`)) {
+            let bribeCost = Math.round(diff * 250000);
+            
+            if(confirm(`TRADE REJECTED: The ${teamB.name} GM feels they are giving up too much value. \n\nDo you want to use a Front Office Bribe to force this trade for ${formatMM(bribeCost)}?`)) {
                 if (userMM >= bribeCost) {
                     userMM -= bribeCost;
                     updateMMDisplay();
@@ -1556,37 +1351,28 @@
             }
         }
 
-        teamA.players = teamA.players.filter(id => id !== selectedTradePlayerA.id);
-        teamB.players = teamB.players.filter(id => id !== selectedTradePlayerB.id);
-
-        teamA.players.push(selectedTradePlayerB.id);
-        teamB.players.push(selectedTradePlayerA.id);
-
-        const tempA_teamId = selectedTradePlayerA.teamId;
-        const tempA_team = selectedTradePlayerA.team;
-        const tempA_col1 = selectedTradePlayerA.col1;
-        const tempA_col2 = selectedTradePlayerA.col2;
-
-        selectedTradePlayerA.teamId = selectedTradePlayerB.teamId;
-        selectedTradePlayerA.team = selectedTradePlayerB.team;
-        selectedTradePlayerA.col1 = selectedTradePlayerB.col1;
-        selectedTradePlayerA.col2 = selectedTradePlayerB.col2;
-
-        selectedTradePlayerB.teamId = tempA_teamId;
-        selectedTradePlayerB.team = tempA_team;
-        selectedTradePlayerB.col1 = tempA_col1;
-        selectedTradePlayerB.col2 = tempA_col2;
-
-        if (userOvr >= cpuOvr) {
-             alert(`Trade Accepted!\n\n${teamB.name} agreed to the deal.`);
-        }
-
-        Object.keys(customLineup).forEach(pos => {
-            if (customLineup[pos] === selectedTradePlayerA.id) customLineup[pos] = "";
+        // Swaps
+        tradeA.forEach(p => {
+            teamA.players = teamA.players.filter(id => id !== p.id);
+            if(teamB.id !== "FA") teamB.players.push(p.id);
+            p.teamId = teamB.id; p.team = teamB.name; p.col1 = teamB.col1; p.col2 = teamB.col2;
         });
 
-        selectedTradePlayerA = null;
-        selectedTradePlayerB = null;
+        tradeB.forEach(p => {
+            teamB.players = teamB.players.filter(id => id !== p.id);
+            teamA.players.push(p.id);
+            p.teamId = teamA.id; p.team = teamA.name; p.col1 = teamA.col1; p.col2 = teamA.col2;
+        });
+
+        if (userVal >= cpuVal) alert(`Trade Accepted!\n\n${teamB.name} agreed to the deal.`);
+
+        tradeA.forEach(p => {
+            Object.keys(customLineup).forEach(pos => {
+                if (customLineup[pos] === p.id) { customLineup[pos] = ""; activeDropdowns[pos.toLowerCase()] = ""; }
+            });
+        });
+
+        tradeA = []; tradeB = [];
 
         saveRostersState();
         renderRosterSide('a');
@@ -1596,7 +1382,7 @@
         updateTradeCenterPanel();
     }
 
-    // --- DIRECTORY ---
+    // --- DIRECTORY AND SEARCH ---
     function renderPlayerDirectory(filterQuery = "", filterPos = "ALL") {
         const grid = document.getElementById("directory-grid");
         grid.innerHTML = "";
@@ -1643,133 +1429,55 @@
     function onDirectorySearchInput() {
         directoryPage = 1;
         const query = document.getElementById("directory-search").value;
-        const pos = document.getElementById("directory-pos-filter").value;
+        const pos = activeDropdowns['dir-pos'] || "ALL";
         renderPlayerDirectory(query, pos);
     }
 
     function changeDirectoryPage(direction) {
         directoryPage += direction;
-        const query = document.getElementById("directory-search").value;
-        const pos = document.getElementById("directory-pos-filter").value;
-        renderPlayerDirectory(query, pos);
+        onDirectorySearchInput();
     }
 
     // --- BRANDING AND LOGO CUSTOM DROPDOWNS ---
     function buildCustomLogoDropdowns() {
-        const createMenu = (side) => {
-            const menu = document.getElementById(`trigger-${side}-menu`);
-            if (!menu) return;
-            menu.innerHTML = "";
-
-            const activeTeams = ALL_TEAMS.filter(t => t.id !== "FA");
-            activeTeams.forEach(t => {
-                const item = document.createElement("div");
-                item.className = "dropdown-item";
-                item.onclick = () => selectTeamCustomDropdown(side, t.id);
-
-                const logoHTML = t.logo ? `<img src="${t.logo}" class="dropdown-logo-mini">` : `<span style="font-size:1.3rem;">🏀</span>`;
-                item.innerHTML = `${logoHTML}<span>${t.name}</span>`;
-                menu.appendChild(item);
-            });
-        };
-
-        const createRostersMenu = (side) => {
-            const menu = document.getElementById(`trigger-roster-${side}-menu`);
-            if (!menu) return;
-            menu.innerHTML = "";
-
-            ALL_TEAMS.forEach(t => {
-                const item = document.createElement("div");
-                item.className = "dropdown-item";
-                item.onclick = () => selectRosterTeamCustom(side, t.id);
-
-                const logoHTML = t.logo ? `<img src="${t.logo}" class="dropdown-logo-mini">` : `<span style="font-size:1.3rem;">🏀</span>`;
-                item.innerHTML = `${logoHTML}<span>${t.name}</span>`;
-                menu.appendChild(item);
-            });
-        };
-
-        createMenu("away");
-        createMenu("home");
-        createRostersMenu("b"); 
-    }
-
-    function toggleCustomDropdown(id) {
-        const menus = document.querySelectorAll(".dropdown-menu-list");
-        const target = document.getElementById(`trigger-${id}-menu`);
+        let opts = ALL_TEAMS.filter(t => t.id !== "FA").map(t => ({label: t.name, value: t.id, logo: t.logo}));
         
-        menus.forEach(m => {
-            if(m !== target) m.style.display = "none";
-        });
-
-        if (target.style.display === "block") {
-            target.style.display = "none";
+        if (currentMode === "MyNBA") {
+            const uT = ALL_TEAMS.find(t => t.id === userTeamId);
+            createDropdown('ex-away', [{label: uT.name, value: uT.id, logo: uT.logo}], uT.id, '', 'onExAwaySelect');
+            activeExhibitionAway = uT.id;
         } else {
-            target.style.display = "block";
+            createDropdown('ex-away', opts, activeExhibitionAway, 'Select Team 1', 'onExAwaySelect');
         }
+        
+        createDropdown('ex-home', opts, activeExhibitionHome, 'Select Team 2', 'onExHomeSelect');
+        
+        let rosterOpts = ALL_TEAMS.map(t => ({label: t.name, value: t.id, logo: t.logo}));
+        createDropdown('roster-b', rosterOpts, activeRosterTeamB, 'Select Target Team', 'onRosterBSelect');
     }
 
-    document.addEventListener("click", function(event) {
-        if (!event.target.closest(".custom-dropdown-container")) {
-            const menus = document.querySelectorAll(".dropdown-menu-list");
-            menus.forEach(m => m.style.display = "none");
-        }
-    });
-
-    function selectTeamCustomDropdown(side, teamId) {
-        if (side === "away") activeExhibitionAway = teamId;
-        else activeExhibitionHome = teamId;
-        
-        document.getElementById(`trigger-${side}-menu`).style.display = "none";
-        updateExhibitionVisuals();
-    }
-
-    function selectRosterTeamCustom(side, teamId) {
-        activeRosterTeamB = teamId;
-        document.getElementById(`trigger-roster-${side}-menu`).style.display = "none";
-        
-        selectedTradePlayerA = null;
-        selectedTradePlayerB = null;
-
-        renderRosterSide(side);
-        updateRostersSelectorLabels();
+    window.onExAwaySelect = (v) => { activeExhibitionAway = v; updateExhibitionVisuals(); }
+    window.onExHomeSelect = (v) => { activeExhibitionHome = v; updateExhibitionVisuals(); }
+    
+    window.onRosterBSelect = (v) => { 
+        activeRosterTeamB = v; 
+        tradeA = []; tradeB = [];
+        renderRosterSide('b'); 
         updateTradeCenterPanel();
-    }
-
-    function updateRostersSelectorLabels() {
-        const tB = ALL_TEAMS.find(t => t.id === activeRosterTeamB);
-        const lblB = document.getElementById("trigger-roster-b-text");
-
-        if (tB && lblB) {
-            const logo = tB.logo ? `<img src="${tB.logo}" class="dropdown-logo-mini">` : `🏀`;
-            lblB.innerHTML = `${logo} <span style="margin-left:8px;">${tB.name}</span>`;
-        }
     }
 
     function updateExhibitionVisuals() {
         const teamAway = ALL_TEAMS.find(t => t.id === activeExhibitionAway);
         const teamHome = ALL_TEAMS.find(t => t.id === activeExhibitionHome);
 
-        const logoAway = document.getElementById("ex-logo-away");
-        const logoHome = document.getElementById("ex-logo-home");
-
-        const triggerAway = document.getElementById("trigger-away-text");
-        const triggerHome = document.getElementById("trigger-home-text");
-
-        if (teamAway && triggerAway) {
-            logoAway.innerHTML = teamAway.logo ? `<img src="${teamAway.logo}" class="team-logo-img">` : `🏀`;
-            const logoTrigger = teamAway.logo ? `<img src="${teamAway.logo}" class="dropdown-logo-mini">` : `🏀`;
-            triggerAway.innerHTML = `${logoTrigger} <span style="margin-left:8px;">${teamAway.name}</span>`;
-            document.getElementById("box-tab-away").textContent = teamAway.abbreviation;
+        if (teamAway) {
+            document.getElementById("ex-logo-away").innerHTML = teamAway.logo ? `<img src="${teamAway.logo}" class="team-logo-img">` : `🏀`;
+            document.getElementById("box-tab-away").textContent = teamAway.name;
         }
-        if (teamHome && triggerHome) {
-            logoHome.innerHTML = teamHome.logo ? `<img src="${teamHome.logo}" class="team-logo-img">` : `🏀`;
-            const logoTrigger = teamHome.logo ? `<img src="${teamHome.logo}" class="dropdown-logo-mini">` : `🏀`;
-            triggerHome.innerHTML = `${logoTrigger} <span style="margin-left:8px;">${teamHome.name}</span>`;
-            document.getElementById("box-tab-home").textContent = teamHome.abbreviation;
+        if (teamHome) {
+            document.getElementById("ex-logo-home").innerHTML = teamHome.logo ? `<img src="${teamHome.logo}" class="team-logo-img">` : `🏀`;
+            document.getElementById("box-tab-home").textContent = teamHome.name;
         }
-
-        updateRostersSelectorLabels();
     }
 
     function triggerExhibitionSim(isLive) {
@@ -1808,6 +1516,7 @@
                     if(currentMode === "MyNBA") {
                          if(update.scoreAway > update.scoreHome && teamAway.id === userTeamId) addMM(50000);
                          else if(update.scoreHome > update.scoreAway && teamHome.id === userTeamId) addMM(50000);
+                         else addMM(-10000); // Loss penalty
                     }
                 }
             });
@@ -1920,6 +1629,8 @@
             let fullOffRoster = isAwayPoss ? fullRosterAway : fullRosterHome;
             let fullDefRoster = isAwayPoss ? fullRosterHome : fullRosterAway;
 
+            if (offSquad.length === 0) return { scoreAway, scoreHome, quarter: 4, time: "0:00", tickerMessage: "", isFinished: true };
+
             fullOffRoster.forEach(p => {
                 if (offSquad.some(ox => ox.id === p.id)) {
                     p.min += 0.5; p.fatigue = Math.max(40, p.fatigue - 1.5);
@@ -1961,8 +1672,9 @@
             });
 
             let shooterIdx = getWeightedRandomIdx(usage);
+            if(shooterIdx === -1) shooterIdx = 0;
             let shooter = offSquad[shooterIdx];
-            let defender = defSquad[shooterIdx] || defSquad[Math.floor(Math.random() * defSquad.length)];
+            let defender = defSquad[shooterIdx] || defSquad[Math.floor(Math.random() * defSquad.length)] || shooter;
 
             let successCap = 46 + (shooter.off - defender.def) * 0.45;
             let dice = Math.random() * 100;
@@ -1979,7 +1691,7 @@
                 if (assist) {
                     let astWeights = offSquad.map((p, idx) => idx === shooterIdx ? 0 : p.ast);
                     assister = offSquad[getWeightedRandomIdx(astWeights)];
-                    assister.ast += 1;
+                    if(assister) assister.ast += 1;
                 }
                 
                 if(isLive && loopDelay > 50) {
@@ -1998,23 +1710,30 @@
                     let rebOff = offSquad.map(p => p.reb);
                     let rebDef = defSquad.map(p => p.reb * 1.5);
                     let totalRebSum = rebOff.reduce((a, b) => a + b, 0) + rebDef.reduce((a, b) => a + b, 0);
+                    if(totalRebSum === 0) totalRebSum = 1;
 
                     if (Math.random() < (rebOff.reduce((a, b) => a + b, 0) / totalRebSum)) {
                         let reber = offSquad[getWeightedRandomIdx(rebOff)];
-                        reber.reb += 1;
-                        if(isLive && loopDelay > 50) msg += `🗑️ Offensive board secured by <strong>${reber.name}</strong>.`;
+                        if(reber) {
+                            reber.reb += 1;
+                            if(isLive && loopDelay > 50) msg += `🗑️ Offensive board secured by <strong>${reber.name}</strong>.`;
+                        }
                     } else {
                         let reber = defSquad[getWeightedRandomIdx(rebDef)];
-                        reber.reb += 1;
-                        if(isLive && loopDelay > 50) msg += `🛡️ Defensive board secured by <strong>${reber.name}</strong>.`;
+                        if(reber) {
+                            reber.reb += 1;
+                            if(isLive && loopDelay > 50) msg += `🛡️ Defensive board secured by <strong>${reber.name}</strong>.`;
+                        }
                     }
                 }
             }
 
             if (Math.random() < 0.08) {
                 let stealer = defSquad[getWeightedRandomIdx(defSquad.map(p => p.def))];
-                stealer.stl += 1;
-                if(isLive && loopDelay > 50) msg += `<br>⚡ Turnover! <strong>${stealer.name}</strong> intercepts the pass cleanly.`;
+                if(stealer) {
+                    stealer.stl += 1;
+                    if(isLive && loopDelay > 50) msg += `<br>⚡ Turnover! <strong>${stealer.name}</strong> intercepts the pass cleanly.`;
+                }
             }
 
             let q = Math.min(4, Math.floor((currentPoss / totalPossessions) * 4) + 1);
@@ -2030,17 +1749,22 @@
         if (isLive) {
             if(loopDelay > 50) appendTickerMessage("🏀 Tip-off! The match has begun.");
             currentSimInterval = setInterval(() => {
-                let state = runNextPossession();
-                onUpdate(state);
-                if (state.isFinished) {
+                try {
+                    let state = runNextPossession();
+                    onUpdate(state);
+                    if (state.isFinished) {
+                        clearInterval(currentSimInterval);
+                        currentSimInterval = null;
+                    }
+                } catch(e) {
                     clearInterval(currentSimInterval);
-                    currentSimInterval = null;
+                    onUpdate({ scoreAway, scoreHome, quarter: 4, time: "0:00", tickerMessage: "Error computing play.", isFinished: true });
                 }
             }, loopDelay);
         } else {
             let finalState = {};
             for (let p = 0; p < totalPossessions; p++) {
-                finalState = runNextPossession();
+                try { finalState = runNextPossession(); } catch(e){}
             }
             finalState.tickerMessage = "⚡ Game simulated instantly. Box score populated.";
             onUpdate(finalState);
@@ -2051,6 +1775,7 @@
 
     function getWeightedRandomIdx(w) {
         let sum = w.reduce((a, b) => a + b, 0);
+        if(sum === 0) return 0;
         let rand = Math.random() * sum;
         let accum = 0;
         for (let i = 0; i < w.length; i++) {
@@ -2060,9 +1785,10 @@
         return w.length - 1;
     }
 
-    // --- FULL 30 TEAM SIMULATE SEASON MODULE ---
+    // --- SIMULATE SEASON MODULE (30 TEAMS) ---
     function startSeason() {
-        const activePool = ALL_TEAMS.filter(t => t.id !== "FA");
+        // Season contains ALL 30 NBA TEAMS
+        const activePool = ALL_TEAMS.filter(t => t.id !== "FA" && t.id !== "CST");
         
         activePool.forEach(t => {
             while (t.players.length < 5) {
@@ -2071,8 +1797,6 @@
                     const randomFA = faPlayers[Math.floor(Math.random() * faPlayers.length)];
                     randomFA.teamId = t.id;
                     randomFA.team = t.name;
-                    randomFA.col1 = t.col1;
-                    randomFA.col2 = t.col2;
                     t.players.push(randomFA.id);
                     
                     const faTeam = ALL_TEAMS.find(team => team.id === "FA");
@@ -2111,9 +1835,9 @@
     function generateSeasonSchedule(teams) {
         seasonSchedule = [];
         let list = [...teams];
-        let n = list.length;
-        
-        // Single Round Robin (Every team plays every other team once = 29 games)
+        let n = list.length; // 30
+
+        // Round Robin
         for (let r = 0; r < n - 1; r++) {
             let roundGames = [];
             for (let i = 0; i < n / 2; i++) {
@@ -2184,7 +1908,6 @@
         
         let simPromises = [];
 
-        // Pre-hydrate
         for (let g of games) {
             if (!g.away.players || g.away.players.length === 0) try { await loadTeamRosterDynamically(g.away.id); } catch(e){}
             if (!g.home.players || g.home.players.length === 0) try { await loadTeamRosterDynamically(g.home.id); } catch(e){}
@@ -2214,48 +1937,52 @@
                     document.getElementById(`live-score-a-${idx}`).textContent = update.scoreAway;
                     document.getElementById(`live-score-h-${idx}`).textContent = update.scoreHome;
                     if(update.isFinished) resolve(box);
-                }, 10); // Very Fast parallel tick (10ms)
+                }, 10); 
             });
             simPromises.push(p);
         });
 
-        const results = await Promise.all(simPromises);
+        try {
+            const results = await Promise.all(simPromises);
 
-        results.forEach((box, i) => {
-            let g = games[i];
-            g.scoreA = box.statsAway.reduce((sum, p) => sum + p.pts, 0);
-            g.scoreH = box.statsHome.reduce((sum, p) => sum + p.pts, 0);
-            g.played = true;
+            results.forEach((box, i) => {
+                let g = games[i];
+                g.scoreA = box.statsAway.reduce((sum, p) => sum + p.pts, 0);
+                g.scoreH = box.statsHome.reduce((sum, p) => sum + p.pts, 0);
+                g.played = true;
 
-            let standAway = seasonStandings.find(t => t.id === g.away.id);
-            let standHome = seasonStandings.find(t => t.id === g.home.id);
+                let standAway = seasonStandings.find(t => t.id === g.away.id);
+                let standHome = seasonStandings.find(t => t.id === g.home.id);
 
-            standAway.ptsFor += g.scoreA; standAway.ptsAgainst += g.scoreH;
-            standHome.ptsFor += g.scoreH; standHome.ptsAgainst += g.scoreA;
+                standAway.ptsFor += g.scoreA; standAway.ptsAgainst += g.scoreH;
+                standHome.ptsFor += g.scoreH; standHome.ptsAgainst += g.scoreA;
 
-            if (g.scoreA > g.scoreH) {
-                standAway.wins++; standHome.losses++;
-                if(currentMode === "MyNBA" && g.away.id === userTeamId) addMM(100000);
-            } else {
-                standHome.wins++; standAway.losses++;
-                if(currentMode === "MyNBA" && g.home.id === userTeamId) addMM(100000);
+                if (g.scoreA > g.scoreH) {
+                    standAway.wins++; standHome.losses++;
+                    if(currentMode === "MyNBA" && g.away.id === userTeamId) addMM(100000);
+                    else if(currentMode === "MyNBA" && g.home.id === userTeamId) addMM(-20000);
+                } else {
+                    standHome.wins++; standAway.losses++;
+                    if(currentMode === "MyNBA" && g.home.id === userTeamId) addMM(100000);
+                    else if(currentMode === "MyNBA" && g.away.id === userTeamId) addMM(-20000);
+                }
+
+                accumulateSeasonStats(box.statsAway);
+                accumulateSeasonStats(box.statsHome);
+            });
+
+            currentSeasonRound++;
+            saveRostersState();
+            renderStandings();
+            renderLeagueLeaders();
+
+            if (currentSeasonRound >= seasonSchedule.length) {
+                initPlayoffBracket();
             }
-
-            accumulateSeasonStats(box.statsAway);
-            accumulateSeasonStats(box.statsHome);
-        });
-
-        currentSeasonRound++;
-        saveRostersState();
-        renderStandings();
-        renderLeagueLeaders();
+        } catch(e) {}
 
         document.getElementById("sim-day-btn").disabled = false;
-        document.getElementById("sim-all-btn").disabled = false;
-
-        if (currentSeasonRound >= seasonSchedule.length) {
-            initPlayoffBracket();
-        }
+        if(currentMode !== "MyNBA") document.getElementById("sim-all-btn").disabled = false;
     }
 
     async function simWholeSeason() {
@@ -2267,7 +1994,7 @@
         }
 
         document.getElementById("sim-day-btn").disabled = false;
-        document.getElementById("sim-all-btn").disabled = false;
+        if(currentMode !== "MyNBA") document.getElementById("sim-all-btn").disabled = false;
     }
 
     function accumulateSeasonStats(boxRoster) {
@@ -2312,7 +2039,6 @@
         document.getElementById("sim-all-btn").disabled = true;
         document.getElementById("live-season-scoreboard").style.display = "none";
 
-        // Top 8 make playoffs
         let top8 = [];
         for(let i=0; i<8; i++){
             let teamObj = ALL_TEAMS.find(t => t.id === seasonStandings[i].id);
@@ -2416,12 +2142,12 @@
             liveGrid.innerHTML = `
                 <div class="live-game-card">
                     <div style="flex:1;">${playoffsState.semi1.t1.abbreviation}</div>
-                    <div class="live-score" id="po-score-s1a">0</div> <div style="margin:0 15px; color:var(--text-muted); font-size:0.8rem;">VS</div> <div class="live-score" id="po-score-s1b">0</div>
+                    <div class="live-score" id="po-score-s1a">0</div> <div style="margin:0 15px; font-size:0.8rem;">VS</div> <div class="live-score" id="po-score-s1b">0</div>
                     <div style="flex:1; text-align:right;">${playoffsState.semi1.t2.abbreviation}</div>
                 </div>
                 <div class="live-game-card">
                     <div style="flex:1;">${playoffsState.semi2.t1.abbreviation}</div>
-                    <div class="live-score" id="po-score-s2a">0</div> <div style="margin:0 15px; color:var(--text-muted); font-size:0.8rem;">VS</div> <div class="live-score" id="po-score-s2b">0</div>
+                    <div class="live-score" id="po-score-s2a">0</div> <div style="margin:0 15px; font-size:0.8rem;">VS</div> <div class="live-score" id="po-score-s2b">0</div>
                     <div style="flex:1; text-align:right;">${playoffsState.semi2.t2.abbreviation}</div>
                 </div>
             `;
@@ -2466,7 +2192,7 @@
             saveRostersState();
 
         } else if (playoffsState.round === "finals") {
-            // Championship Finals: Slow, dramatic speed (250ms)
+            // FINALS: 250ms per possession (Slow & Dramatic)
             let simDelay = 250; 
 
             liveGrid.innerHTML = `
