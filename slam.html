@@ -24,7 +24,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            transition: none !important; /* Zero transition delay for snappy response */
+            transition: none !important; /* Flat sharp instantaneous transitions */
         }
 
         body {
@@ -72,7 +72,7 @@
         }
 
         .logo-title {
-            font-size: 1.5rem; /* Bold title branding */
+            font-size: 1.5rem;
             font-weight: 900;
             letter-spacing: -0.05em;
             text-transform: uppercase;
@@ -91,7 +91,7 @@
             background: transparent;
             border: none;
             color: var(--text-muted);
-            padding: 0.7rem 1.4rem; /* Enlarged touch elements */
+            padding: 0.7rem 1.4rem;
             font-family: var(--font-main);
             font-weight: 800;
             font-size: 1rem;
@@ -771,10 +771,41 @@
     // --- ESPN LIVE ENDPOINTS ---
     const ESPN_TEAMS_API = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams";
 
+    // --- robustFetchJson PROXY FAIL-SAFE FOR LOCAL DOM PROTOCOLS ---
+    async function robustFetchJson(url) {
+        try {
+            // Attempt direct native fetch
+            const res = await fetch(url);
+            if (res.ok) return await res.json();
+        } catch (e) {
+            console.warn(`Direct fetch failed for: ${url}. Attempting proxy routing fallback...`);
+        }
+
+        // Secondary fallback utilizing corsproxy.io (unrestricted, free CORS endpoint)
+        try {
+            const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(url)}`;
+            const res = await fetch(proxyUrl);
+            if (res.ok) return await res.json();
+        } catch (e) {
+            console.warn(`corsproxy.io fallback failed for: ${url}. Attempting allorigins proxy route...`);
+        }
+
+        // Final fallback utilizing api.allorigins.win
+        try {
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+            const res = await fetch(proxyUrl);
+            if (res.ok) return await res.json();
+        } catch (e) {
+            console.error(`All CORS proxies and native fetch options exhausted for URL: ${url}`);
+        }
+
+        throw new Error(`Failed to establish connection to: ${url}. Confirm network or browser CORS settings.`);
+    }
+
     // --- 1. LOCAL STORAGE STATE PERSISTENCE ---
     function saveRostersState() {
-        localStorage.setItem("slam_sim_players_v4", JSON.stringify(PLAYERS));
-        localStorage.setItem("slam_sim_teams_v4", JSON.stringify(ALL_TEAMS));
+        localStorage.setItem("slam_sim_players_v5", JSON.stringify(PLAYERS));
+        localStorage.setItem("slam_sim_teams_v5", JSON.stringify(ALL_TEAMS));
         localStorage.setItem("slam_sim_season_standings", JSON.stringify(seasonStandings));
         localStorage.setItem("slam_sim_season_schedule", JSON.stringify(seasonSchedule));
         localStorage.setItem("slam_sim_season_round", currentSeasonRound.toString());
@@ -789,8 +820,8 @@
     }
 
     function checkRostersState() {
-        const cachedPlayers = localStorage.getItem("slam_sim_players_v4");
-        const cachedTeams = localStorage.getItem("slam_sim_teams_v4");
+        const cachedPlayers = localStorage.getItem("slam_sim_players_v5");
+        const cachedTeams = localStorage.getItem("slam_sim_teams_v5");
         if (cachedPlayers && cachedTeams) {
             PLAYERS = JSON.parse(cachedPlayers);
             ALL_TEAMS = JSON.parse(cachedTeams);
@@ -828,7 +859,7 @@
         return false;
     }
 
-    // --- 2. MULTI-API ROSTER INTAKE AND PARSING ---
+    // --- 2. LIVE ROSTER INTAKE AND PARSING ---
     async function loadNBADataFromAPI() {
         const loader = document.getElementById("api-loader");
         const progress = document.getElementById("loader-progress");
@@ -841,9 +872,7 @@
             msg.textContent = "Fetching NBA Teams list...";
             progress.style.width = "20%";
             
-            const teamsRes = await fetch(ESPN_TEAMS_API);
-            if (!teamsRes.ok) throw new Error(`HTTP Error Status: ${teamsRes.status} on ESPN Team catalog request.`);
-            const teamsData = await teamsRes.json();
+            const teamsData = await robustFetchJson(ESPN_TEAMS_API);
             
             if (!teamsData.sports || !teamsData.sports[0] || !teamsData.sports[0].leagues || !teamsData.sports[0].leagues[0]) {
                 throw new Error("ESPN Teams response schema has changed or is structured incorrectly.");
@@ -857,11 +886,9 @@
             const tempTeams = [];
             
             // Parallel batch fetch rosters
-            const rosterPromises = rawTeams.map(async (team) => {
+            const rosterPromises = rawTeams.map(async (team, index) => {
                 try {
-                    const rosterRes = await fetch(`${ESPN_TEAMS_API}/${team.id}/roster`);
-                    if (!rosterRes.ok) throw new Error(`Roster load issue for ${team.displayName}`);
-                    const rosterData = await rosterRes.json();
+                    const rosterData = await robustFetchJson(`${ESPN_TEAMS_API}/${team.id}/roster`);
                     const athletes = rosterData.athletes || [];
                     const teamPlayerIds = [];
 
@@ -1127,7 +1154,7 @@
         const team = ALL_TEAMS.find(t => t.id === teamId);
         if (!team) return;
 
-        // Show/hide Free Agents search box dynamically
+        // Show/hide search boxes dynamically
         if (teamId === "FA" || teamId === "CST") {
             searchContainer.style.display = "block";
         } else {
@@ -1618,10 +1645,23 @@
             });
         }
 
-        // If lineup lacks PG, SG, etc or not custom team, pull first available
+        // If lineup lacks PG, SG, etc or not custom team, pull first available by position
         if (rotation.length < 5) {
             let teamPlayers = PLAYERS.filter(p => p.teamId === team.id);
-            // Append missing players avoiding duplicates
+            const positions = ["PG", "SG", "SF", "PF", "C"];
+            
+            positions.forEach(pos => {
+                // If this position slot is not yet filled in our rotation
+                if (rotation.length < 5 && !rotation.some(rx => rx.pos === pos)) {
+                    let candidates = teamPlayers.filter(p => p.pos === pos && !rotation.some(rx => rx.id === p.id));
+                    if (candidates.length > 0) {
+                        candidates.sort((a, b) => b.ovr - a.ovr);
+                        rotation.push({ ...candidates[0], pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, gp: 1 });
+                    }
+                }
+            });
+
+            // Append missing players avoiding duplicates if some positions were missing
             teamPlayers.forEach(p => {
                 if (rotation.length < 5 && !rotation.some(rx => rx.id === p.id)) {
                     rotation.push({ ...p, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, gp: 1 });
@@ -1650,7 +1690,25 @@
 
     // --- 10. SEASON MODE MODULE ---
     function initSeason() {
-        const activePool = ALL_TEAMS.filter(t => t.id !== "FA").slice(0, 8);
+        // Aligned abbreviation query to target 7 historical franchises + 1 custom team
+        const abbreviations = ["LAL", "BOS", "GS", "CHI", "PHX", "DEN", "MIA"];
+        const activePool = [];
+        
+        abbreviations.forEach(abbr => {
+            const found = ALL_TEAMS.find(t => t.abbreviation === abbr);
+            if (found) activePool.push(found);
+        });
+
+        // Safe fill-up
+        while (activePool.length < 7 && ALL_TEAMS.length > 0) {
+            const extra = ALL_TEAMS.find(t => t.id !== "CST" && t.id !== "FA" && !activePool.includes(t));
+            if (extra) activePool.push(extra);
+            else break;
+        }
+
+        // Always include Seattle Custom Team as the 8th team
+        const custom = ALL_TEAMS.find(t => t.id === "CST");
+        if (custom) activePool.push(custom);
 
         // Autofill safety rotation check
         activePool.forEach(t => {
