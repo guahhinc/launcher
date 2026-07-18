@@ -1,32 +1,3 @@
-The errors you encountered are caused by two security and asset routing
-behaviors in web browsers when deploying to a production environment like GitHub
-Pages:
-
-1.  The 404 Error (i, line 0): This happens because <img src=""> is defined
-    inside the Upgrades tab. When src is empty, modern browsers interpret it as
-    a relative path and attempt to fetch the current folder/page as an image,
-    resulting in a startup 404 load error on GitHub Pages.
-2.  CORS Errors (Access-Control-Allow-Origin & TypeError: Load failed): ESPN's
-    server (site.api.espn.com) does not allow direct cross-origin browser
-    requests from hosting platforms like GitHub Pages. When the direct fetch
-    fails, your raw fallback CORS proxies (corsproxy.io and raw allorigins) are
-    being blocked by the browser's security cascade, causing a TypeError: Load
-    failed crash.
-
-The Fix:
-
-  - JSON Wrap Fallback: Switched the primary fallback proxy to AllOrigins' JSON
-    Wrapper (api.allorigins.win/get). Instead of sending a raw HTTP request
-    (which browsers block), AllOrigins wraps ESPN's API response inside a safe
-    JSON payload ({ "contents": "{...}" }) that browsers accept from any origin.
-    We then programmatically unpack and parse the contents.
-  - Asset 404 Prevention: Replaced src="" with a default ESPN profile
-    placeholder to prevent the browser from attempting relative startup
-    requests.
-
-Here is the updated, production-ready code. You can copy and replace your
-current file:
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
