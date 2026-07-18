@@ -1,3 +1,32 @@
+The errors you encountered are caused by two security and asset routing
+behaviors in web browsers when deploying to a production environment like GitHub
+Pages:
+
+1.  The 404 Error (i, line 0): This happens because <img src=""> is defined
+    inside the Upgrades tab. When src is empty, modern browsers interpret it as
+    a relative path and attempt to fetch the current folder/page as an image,
+    resulting in a startup 404 load error on GitHub Pages.
+2.  CORS Errors (Access-Control-Allow-Origin & TypeError: Load failed): ESPN's
+    server (site.api.espn.com) does not allow direct cross-origin browser
+    requests from hosting platforms like GitHub Pages. When the direct fetch
+    fails, your raw fallback CORS proxies (corsproxy.io and raw allorigins) are
+    being blocked by the browser's security cascade, causing a TypeError: Load
+    failed crash.
+
+The Fix:
+
+  - JSON Wrap Fallback: Switched the primary fallback proxy to AllOrigins' JSON
+    Wrapper (api.allorigins.win/get). Instead of sending a raw HTTP request
+    (which browsers block), AllOrigins wraps ESPN's API response inside a safe
+    JSON payload ({ "contents": "{...}" }) that browsers accept from any origin.
+    We then programmatically unpack and parse the contents.
+  - Asset 404 Prevention: Replaced src="" with a default ESPN profile
+    placeholder to prevent the browser from attempting relative startup
+    requests.
+
+Here is the updated, production-ready code. You can copy and replace your
+current file:
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1002,7 +1031,7 @@
                         </div>
                         <div id="upgrade-player-card" class="player-card" style="display:none; text-align: center;">
                             <div class="ovr-badge" id="upgrade-player-ovr-badge">99</div>
-                            <img id="upgrade-player-img" class="player-headshot-large" src="" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">
+                            <img id="upgrade-player-img" class="player-headshot-large" src="https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">
                             <h3 id="upgrade-player-name" style="font-weight: 900; margin-top: 10px;">Player Name</h3>
                             <div id="upgrade-player-pos" class="pos-badge" style="display: inline-block; margin-top: 8px;">PG</div>
                         </div>
@@ -1080,7 +1109,7 @@
     let upgradeProposedStats = { off: 0, def: 0, reb: 0, ast: 0 };
     let upgradeOriginalStats = { off: 0, def: 0, reb: 0, ast: 0 };
 
-    // --- FALLBACK NBA FRANCHISES (Completely protects system against rate limits) ---
+    // --- FALLBACK NBA FRANCHISES (Completely protects system against CORS proxy failures) ---
     const FALLBACK_TEAMS = [
         { id: "1", name: "Atlanta Hawks", abbreviation: "ATL", color: "e31837", alternateColor: "c1d32f", logos: [{ href: "https://a.espncdn.com/i/teamlogos/nba/500/atl.png" }] },
         { id: "2", name: "Boston Celtics", abbreviation: "BOS", color: "007a33", alternateColor: "ba9653", logos: [{ href: "https://a.espncdn.com/i/teamlogos/nba/500/bos.png" }] },
@@ -1222,24 +1251,41 @@
         }
     });
 
-    // --- PROXY FAIL-SAFE API PARSER (ESPN supports direct requests!) ---
+    // --- PROXY FAIL-SAFE API PARSER ---
     async function robustFetchJson(url) {
-        // Direct fetch first to avoid hitting rate-limited proxies
+        // 1. Direct fetch (fastest, no daily rate limit)
         try {
             const res = await fetch(url);
             if (res.ok) return await res.json();
         } catch (e) {
-            console.warn("Direct fetch bypassed, attempting fallback proxy server pipelines...", e);
+            console.warn("Direct fetch bypassed due to CORS policy. Attempting AllOrigins JSON Wrapper fallback...", e);
         }
         
-        // Proxies act as back-ups
-        const proxies = [
-            `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        // 2. AllOrigins Wrapper - highly reliable and bypasses CORS policies on GitHub Pages
+        try {
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+            const res = await fetch(proxyUrl);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.contents) {
+                    try {
+                        return JSON.parse(data.contents);
+                    } catch (err) {
+                        if (typeof data.contents === 'object') return data.contents;
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn("AllOrigins proxy wrapper failed. Trying raw fallback proxies...", e);
+        }
+
+        // 3. Raw fallbacks
+        const rawProxies = [
             `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
             `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
         ];
 
-        for (let proxyUrl of proxies) {
+        for (let proxyUrl of rawProxies) {
             try {
                 const res = await fetch(proxyUrl);
                 if (res.ok) return await res.json();
@@ -1378,8 +1424,7 @@
             ALL_TEAMS = tempTeams;
             PLAYERS = [];
 
-            // Upfront dynamic load loop removed to eliminate CORS rate limits completely.
-            // Roster elements are now fetched dynamically on-demand when selected or scheduled.
+            // Preload sequences bypassed on start-up. Roster payloads are loaded on demand.
             
             progress.style.width = "100%";
             saveRostersState();
@@ -1412,7 +1457,7 @@
                 if (posAbbr === "F-C" || posAbbr === "C-F") posAbbr = "PF";
                 if (posAbbr === "G-F" || posAbbr === "F-G") posAbbr = "SF";
 
-                const isFA = index >= 12; // Starters + key rotation players stay, others enter Free Agency
+                const isFA = index >= 12;
 
                 const playerObj = {
                     id: a.id.toString(),
@@ -1443,8 +1488,7 @@
 
             team.players = teamPlayerIds;
         } catch (err) {
-            console.error(`Offline or roster payload fetch failed for ${team.name}. Generating realistic fallbacks...`, err);
-            // Dynamic fallback generator to let you play completely offline
+            console.error(`Offline or roster payload fetch failed for ${team.name}. Generating fallbacks...`, err);
             const positions = ["PG", "SG", "SF", "PF", "C", "PG", "SG", "SF", "PF", "C"];
             const teamPlayerIds = [];
             positions.forEach((pos, idx) => {
@@ -1601,7 +1645,7 @@
         activeExhibitionAway = userTeamId;
     }
 
-    // Dynamic Starting Lineup saving configuration
+    // Starting lineup browser save fix
     function renderLineupSelectors() {
         const positions = ["PG", "SG", "SF", "PF", "C"];
         const customPlayers = PLAYERS.filter(p => p.teamId === userTeamId);
@@ -2009,7 +2053,6 @@
         activeRosterTeamB = v; 
         tradeA = []; tradeB = [];
         
-        // Dynamically load target roster on selection to save API hits
         const team = ALL_TEAMS.find(t => t.id === v);
         if (team && v !== "FA" && (!team.players || team.players.length === 0)) {
             document.getElementById("roster-table-body-b").innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-muted);">🔄 Loading live roster via proxy...</td></tr>`;
@@ -2041,7 +2084,6 @@
                 document.getElementById("play-live-btn").disabled = false;
                 document.getElementById("instant-sim-btn").disabled = false;
             } else {
-                // User was eliminated before postseason or during playoffs
                 document.getElementById("play-live-btn").disabled = true;
                 document.getElementById("instant-sim-btn").disabled = true;
                 document.getElementById("game-status").textContent = "SEASON OVER";
@@ -2630,7 +2672,6 @@
                     player = activeRoster.find(p => !starters.includes(p));
                 }
                 if (!player) {
-                    // Substitutes dynamically generated with authentic names to eliminate placeholder naming issues
                     player = {
                         id: `filler-starter-${pos}`,
                         name: generateRealisticSubstituteName(),
@@ -2666,7 +2707,7 @@
             }
         });
 
-        // Ensure sufficient bench roster is present
+        // Ensure sufficient bench roster depth
         while (bench.length < 3) {
             const benchPos = positions[bench.length % positions.length];
             bench.push({
@@ -2734,7 +2775,7 @@
 
             const getOffensivePlayerIndex = () => {
                 const r = Math.random();
-                if (r < 0.3) return 0; // PG gets higher possession usage
+                if (r < 0.3) return 0; // PG gets higher usage
                 if (r < 0.55) return 1; // SG
                 if (r < 0.75) return 2; // SF
                 if (r < 0.9) return 3; // PF
