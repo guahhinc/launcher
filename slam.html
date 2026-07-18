@@ -685,11 +685,10 @@
             <span class="logo-title">SLAM</span>
         </div>
         <div style="display: flex; align-items: center;">
-            <div class="mm-badge" id="mm-display">💰 0 MM</div>
+            <div class="mm-badge" id="mm-display">💰 0 MC</div>
             <nav style="margin-left: 30px;">
                 <button class="nav-btn active" id="tab-btn-rosters" onclick="switchTab('tab-rosters')">Rosters & Trades</button>
-                <button class="nav-btn" id="tab-btn-game" onclick="switchTab('tab-exhibition')">Play Game</button>
-                <button class="nav-btn" id="tab-btn-season" onclick="switchTab('tab-season')">Season</button>
+                <button class="nav-btn" id="tab-btn-play" onclick="switchTab('tab-play')">Play</button>
                 <button class="nav-btn" id="tab-btn-upgrades" onclick="switchTab('tab-upgrades')">Upgrades</button>
                 <button class="nav-btn" id="tab-btn-news" onclick="switchTab('tab-news')">News</button>
             </nav>
@@ -806,78 +805,16 @@
             </div>
         </section>
 
-        <!-- TAB 2: PLAY GAME -->
-        <section id="tab-exhibition" class="tab-content">
-            <div class="scoreboard-panel" style="position: relative; z-index: 10;">
-                <div style="width: 35%;">
-                    <div id="ex-logo-away" style="margin-bottom: 1rem;"></div>
-                    <div style="font-weight: 900; font-size: 1.3rem; background: var(--bg-dark); padding: 0.8rem; border: 2px solid var(--border-color); color: var(--accent-gold);" id="ex-name-away">Your Team</div>
-                    <div class="scoreboard-score" id="score-away-val" style="margin-top: 1rem;">0</div>
-                </div>
-
-                <div style="width: 30%; text-align: center;">
-                    <div style="background-color: var(--bg-hover); border: 2px solid var(--border-color); padding: 8px 20px; font-weight: 800; font-size: 1rem;" id="game-status">NOT STARTED</div>
-                    <div id="simulation-clock" style="font-size: 1.4rem; font-weight: 700; color: var(--text-muted); margin-top: 15px;">Q1 - 12:00</div>
-                    <div style="margin-top: 1.8rem; display: flex; gap: 15px; justify-content: center;">
-                        <button class="btn btn-success" onclick="triggerExhibitionSim(true)" style="padding: 1rem 3rem; font-size: 1.2rem;">Play Game</button>
-                    </div>
-                </div>
-
-                <div style="width: 35%;">
-                    <div id="ex-logo-home" style="margin-bottom: 1rem;"></div>
-                    <div id="cd-wrapper-ex-home"></div>
-                    <div class="scoreboard-score" id="score-home-val" style="margin-top: 1rem;">0</div>
-                </div>
-            </div>
-
-            <div class="simulator-split" style="position: relative; z-index: 1;">
-                <div class="panel" style="margin-bottom: 0;">
-                    <div class="panel-title">Live Ticker</div>
-                    <div class="ticker-box" id="ticker-feed">
-                        <div class="ticker-entry" style="color: var(--text-muted)">Select opponent and click Play Game to start.</div>
-                    </div>
-                </div>
-
-                <div class="panel" style="margin-bottom: 0;">
-                    <div class="panel-title">
-                        <span>Box Score</span>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn" style="padding: 6px 16px; font-size: 0.85rem;" id="box-tab-away" onclick="switchBoxView('away')">Your Team</button>
-                            <button class="btn" style="padding: 6px 16px; font-size: 0.85rem;" id="box-tab-home" onclick="switchBoxView('home')">Opponent</button>
-                        </div>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table class="roster-table" style="font-size: 0.95rem;">
-                            <thead>
-                                <tr>
-                                    <th>Player</th>
-                                    <th>MIN</th>
-                                    <th>PTS</th>
-                                    <th>REB</th>
-                                    <th>AST</th>
-                                    <th>STL</th>
-                                    <th>BLK</th>
-                                </tr>
-                            </thead>
-                            <tbody id="box-score-rows">
-                                <tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted)">No active simulation loaded.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 3: SEASON -->
-        <section id="tab-season" class="tab-content">
-            <!-- Symmetrical Tournament Bracket & Trophy Panel sits on TOP of both columns -->
-            <div class="panel" id="season-champ-card" style="display: none; text-align: center; border-color: var(--accent-green); background: linear-gradient(180deg, rgba(16,185,129,0.1) 0%, rgba(15,21,36,1) 100%); padding: 3rem;">
+        <!-- TAB 2: PLAY -->
+        <section id="tab-play" class="tab-content">
+            <!-- Playoffs Symmetrical Tree & Trophy Dashboard (Visible on top when Postseason triggers) -->
+            <div class="panel" id="season-champ-card" style="display: none; text-align: center; border-color: var(--accent-green); background: linear-gradient(180deg, rgba(16,185,129,0.1) 0%, rgba(15,21,36,1) 100%); padding: 3rem; margin-bottom: 1.8rem;">
                 <h2 style="color: var(--accent-green); font-weight: 900; font-size: 2rem;">🏆 LEAGUE CHAMPION CROWNED</h2>
                 <h1 id="season-champ-name" style="font-weight: 900; margin-top: 1rem; font-size: 3rem;">--</h1>
                 <button class="btn btn-success" style="margin-top: 2rem; font-size: 1.2rem; padding: 1rem 2.5rem;" onclick="startSeason()">Start Next Season</button>
             </div>
 
-            <div class="panel" id="playoff-bracket" style="display: none; border-color: var(--accent-gold);">
+            <div class="panel" id="playoff-bracket" style="display: none; border-color: var(--accent-gold); margin-bottom: 1.8rem;">
                 <div class="panel-title" style="color: var(--accent-gold); border-bottom: 2px solid rgba(234, 179, 8, 0.3)">Postseason Bracket</div>
                 <div id="playoff-bracket-board">
                     <!-- Column 1: Left Quarterfinals -->
@@ -940,57 +877,109 @@
                 </div>
             </div>
 
-            <!-- Standard Split for Standings and Controls -->
-            <div class="trades-grid" style="margin-top: 1.8rem;">
-                <div>
-                    <div class="panel">
-                        <div class="panel-title">
-                            <span>Season Standings</span>
-                            <span style="background-color: var(--bg-hover); padding: 6px 14px; font-size: 0.9rem; color: var(--accent-gold);" id="season-stage">Regular Season</span>
+            <div class="simulator-split" style="grid-template-columns: 1.4fr 1fr; gap: 2rem;">
+                <!-- LEFT SIDE: Game execution area (live ticking matchups) -->
+                <div style="display: flex; flex-direction: column; gap: 1.8rem;">
+                    <div class="scoreboard-panel" style="position: relative; z-index: 10; padding: 1.5rem;">
+                        <div style="width: 35%;">
+                            <div id="ex-logo-away" style="margin-bottom: 0.5rem; height: 60px; display:flex; align-items:center; justify-content:center;"></div>
+                            <div style="font-weight: 900; font-size: 1.1rem; background: var(--bg-dark); padding: 0.5rem; border: 2px solid var(--border-color); color: var(--accent-gold); text-align: center;" id="ex-name-away">Your Team</div>
+                            <div class="scoreboard-score" id="score-away-val" style="margin-top: 0.5rem; font-size: 3rem;">0</div>
                         </div>
-                        <table class="roster-table" style="font-size: 1rem;">
-                            <thead>
-                                <tr>
-                                    <th style="width: 50px;">Rnk</th>
-                                    <th>Team</th>
-                                    <th style="text-align: center;">W</th>
-                                    <th style="text-align: center;">L</th>
-                                    <th style="text-align: center;">PCT</th>
-                                </tr>
-                            </thead>
-                            <tbody id="season-standings-body"></tbody>
-                        </table>
+
+                        <div style="width: 30%; text-align: center;">
+                            <div style="background-color: var(--bg-hover); border: 2px solid var(--border-color); padding: 4px 12px; font-weight: 800; font-size: 0.85rem;" id="game-status">NOT STARTED</div>
+                            <div id="simulation-clock" style="font-size: 1.1rem; font-weight: 700; color: var(--text-muted); margin-top: 8px;">Round - 12:00</div>
+                            <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                                <button class="btn btn-success" id="play-live-btn" onclick="triggerExhibitionSim(true)" style="padding: 0.5rem 1.5rem; font-size: 1rem; width: 100%;">⚡ Play Live Game</button>
+                                <button class="btn" id="instant-sim-btn" onclick="triggerExhibitionSim(false)" style="padding: 0.5rem 1.5rem; font-size: 1rem; width: 100%;">⏩ Fast Sim Game</button>
+                            </div>
+                        </div>
+
+                        <div style="width: 35%;">
+                            <div id="ex-logo-home" style="margin-bottom: 0.5rem; height: 60px; display:flex; align-items:center; justify-content:center;"></div>
+                            <div style="font-weight: 900; font-size: 1.1rem; background: var(--bg-dark); padding: 0.5rem; border: 2px solid var(--border-color); color: var(--accent-gold); text-align: center;" id="ex-name-home">Opponent</div>
+                            <div class="scoreboard-score" id="score-home-val" style="margin-top: 0.5rem; font-size: 3rem;">0</div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="margin-bottom: 0; flex-grow: 1;">
+                        <div class="panel-title">Game Ticker Feed</div>
+                        <div class="ticker-box" id="ticker-feed" style="height: 250px;">
+                            <div class="ticker-entry" style="color: var(--text-muted)">Your upcoming scheduled franchise game is ready. Select 'Play Live' or 'Fast Sim' to proceed.</div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="margin-bottom: 0;">
+                        <div class="panel-title">
+                            <span>Game Box Score</span>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn" style="padding: 4px 12px; font-size: 0.8rem;" id="box-tab-away" onclick="switchBoxView('away')">Your Team</button>
+                                <button class="btn" style="padding: 4px 12px; font-size: 0.8rem;" id="box-tab-home" onclick="switchBoxView('home')">Opponent</button>
+                            </div>
+                        </div>
+                        <div style="overflow-x: auto; max-height: 280px;">
+                            <table class="roster-table" style="font-size: 0.85rem;">
+                                <thead>
+                                    <tr>
+                                        <th>Player</th>
+                                        <th>MIN</th>
+                                        <th>PTS</th>
+                                        <th>REB</th>
+                                        <th>AST</th>
+                                        <th>STL</th>
+                                        <th>BLK</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="box-score-rows">
+                                    <tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted)">No active match stats loaded.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <div class="panel">
-                        <div class="panel-title">Season Controls</div>
-                        <div style="display: flex; flex-direction: column; gap: 15px;">
-                            <button class="btn btn-primary" id="sim-day-btn" onclick="simSeasonDay()" style="font-size:1.1rem; padding:1rem;">📅 Play Next Game-day</button>
-                            <button class="btn btn-success" id="sim-all-btn" onclick="simWholeSeason()" style="font-size:1.1rem; padding:1rem;">⏩ Auto-Complete Regular Season</button>
-                            <button class="btn btn-danger" onclick="startSeason()">🔄 Force Restart Season</button>
+                <!-- RIGHT SIDE: Controls, standings overview, statistics & scoreboard -->
+                <div style="display: flex; flex-direction: column; gap: 1.8rem;">
+                    <div class="panel" style="margin-bottom: 0;">
+                        <div class="panel-title">
+                            <span>Season Standings</span>
+                            <span style="background-color: var(--bg-hover); padding: 4px 10px; font-size: 0.8rem; color: var(--accent-gold);" id="season-stage">Regular Season</span>
+                        </div>
+                        <div style="max-height: 380px; overflow-y: auto;">
+                            <table class="roster-table" style="font-size: 0.85rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;">Rnk</th>
+                                        <th>Team</th>
+                                        <th style="text-align: center;">W</th>
+                                        <th style="text-align: center;">L</th>
+                                        <th style="text-align: center;">PCT</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="season-standings-body"></tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <div class="panel" id="live-season-scoreboard" style="display: none; border-color: var(--accent-blue);">
-                        <div class="panel-title" style="color: var(--accent-blue);">Today's Match Results</div>
-                        <div id="live-games-grid" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                    <div class="panel" id="live-season-scoreboard" style="display: none; border-color: var(--accent-blue); margin-bottom: 0;">
+                        <div class="panel-title" style="color: var(--accent-blue); font-size: 1rem;">Today's League Results</div>
+                        <div id="live-games-grid" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 4px;"></div>
                     </div>
 
-                    <div class="panel">
+                    <div class="panel" style="margin-bottom: 0;">
                         <div class="panel-title">League Stat Leaders</div>
-                        <div style="display: flex; flex-direction: column; gap: 1.8rem; font-size: 1rem;">
+                        <div style="display: flex; flex-direction: column; gap: 1.2rem; font-size: 0.85rem;">
                             <div>
-                                <h4 style="color: var(--accent-blue); margin-bottom: 8px;">Points Per Game</h4>
+                                <h4 style="color: var(--accent-blue); margin-bottom: 4px; font-weight: 800;">Points Per Game</h4>
                                 <div id="leader-pts-list"></div>
                             </div>
                             <div>
-                                <h4 style="color: var(--accent-green); margin-bottom: 8px;">Rebounds Per Game</h4>
+                                <h4 style="color: var(--accent-green); margin-bottom: 4px; font-weight: 800;">Rebounds Per Game</h4>
                                 <div id="leader-reb-list"></div>
                             </div>
                             <div>
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">Assists Per Game</h4>
+                                <h4 style="color: var(--accent-gold); margin-bottom: 4px; font-weight: 800;">Assists Per Game</h4>
                                 <div id="leader-ast-list"></div>
                             </div>
                         </div>
@@ -999,12 +988,11 @@
             </div>
         </section>
 
-        <!-- TAB 4: UPGRADES -->
+        <!-- TAB 3: UPGRADES -->
         <section id="tab-upgrades" class="tab-content">
             <div class="panel">
                 <div class="panel-title">
                     <span>Player Skill Lab</span>
-                    <span style="color: var(--accent-gold); font-size: 0.95rem;">Fine-tune Attributes • Dynamic Refund Processing</span>
                 </div>
                 <div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 2.5rem; align-items: start;">
                     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
@@ -1024,13 +1012,13 @@
                         <h4 style="font-weight: 800; text-transform: uppercase; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: 1.5rem;">Attributes Configurator</h4>
                         
                         <div style="display: flex; flex-direction: column; gap: 1.5rem;" id="upgrade-modifiers-container">
-                            <!-- Injected Sliders -->
+                            <!-- Sliders Configured In JavaScript -->
                         </div>
                         
                         <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 700;">TOTAL ESTIMATED COST:</div>
-                                <div id="upgrade-total-cost" style="font-size: 1.8rem; font-weight: 900; color: var(--accent-gold);">0 MM</div>
+                                <div id="upgrade-total-cost" style="font-size: 1.8rem; font-weight: 900; color: var(--accent-gold);">0 MC</div>
                             </div>
                             <button class="btn btn-primary" id="btn-upgrade-purchase" onclick="processUpgradePurchase()" style="font-size: 1.1rem; padding: 1rem 2.5rem;">Confirm Transaction</button>
                         </div>
@@ -1039,7 +1027,7 @@
             </div>
         </section>
 
-        <!-- TAB 5: NEWS -->
+        <!-- TAB 4: NEWS -->
         <section id="tab-news" class="tab-content">
             <div class="panel">
                 <div class="panel-title">SLAM News & Transaction Wire</div>
@@ -1070,7 +1058,7 @@
     let playoffsState = null;
     
     let userTeamId = ""; 
-    let userMM = 0;
+    let userMC = 0;
 
     let activeExhibitionAway = "";
     let activeExhibitionHome = "";
@@ -1085,15 +1073,24 @@
 
     let customLineup = { PG: "", SG: "", SF: "", PF: "", C: "" };
 
-    // Player Upgrades Cache
+    const REGULAR_SEASON_LENGTH = 10;
+
+    // Upgrades modifiers cache
     let activeUpgradePlayerId = "";
     let upgradeProposedStats = { off: 0, def: 0, reb: 0, ast: 0 };
     let upgradeOriginalStats = { off: 0, def: 0, reb: 0, ast: 0 };
 
     const ESPN_TEAMS_API = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams";
 
-    function formatMM(val) {
+    function formatMC(val) {
         return val.toLocaleString();
+    }
+
+    // --- REALISTIC BENCH SUBSTITUTE NAME GENERATOR ---
+    function generateRealisticSubstituteName() {
+        const firstNames = ["James", "Marcus", "Andre", "Tyler", "Brandon", "Derrick", "Malik", "Devin", "Jordan", "Christian", "DeAndre", "Reggie", "Zach", "Xavier", "Lamelo", "Anthony", "Donovan"];
+        const lastNames = ["Carter", "Jackson", "Miller", "Williams", "Smith", "Johnson", "Davis", "Robinson", "Harris", "Thompson", "Dixon", "Jefferson", "Porter", "Allen", "Young"];
+        return firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)];
     }
 
     // --- ASSIGN PLAYER ATTRIBUTES HELPER ---
@@ -1241,7 +1238,7 @@
         localStorage.setItem("slam_sim_player_season_stats", JSON.stringify(playerSeasonStats));
         
         localStorage.setItem("slam_sim_user_team", userTeamId);
-        localStorage.setItem("slam_sim_user_mm", userMM.toString());
+        localStorage.setItem("slam_sim_user_mc", userMC.toString());
         localStorage.setItem("slam_sim_custom_lineup", JSON.stringify(customLineup));
         localStorage.setItem("slam_sim_news_feed", JSON.stringify(NEWS));
     }
@@ -1261,7 +1258,7 @@
             const sNews = localStorage.getItem("slam_sim_news_feed");
             
             const sTeam = localStorage.getItem("slam_sim_user_team");
-            const sMM = localStorage.getItem("slam_sim_user_mm");
+            const sMC = localStorage.getItem("slam_sim_user_mc");
             const sLine = localStorage.getItem("slam_sim_custom_lineup");
 
             if (sStand) seasonStandings = JSON.parse(sStand);
@@ -1272,7 +1269,7 @@
             if (sNews) NEWS = JSON.parse(sNews);
             
             if (sTeam) userTeamId = sTeam;
-            if (sMM) userMM = parseInt(sMM, 10);
+            if (sMC) userMC = parseInt(sMC, 10);
             if (sLine) customLineup = JSON.parse(sLine);
 
             return true;
@@ -1399,7 +1396,7 @@
         createDropdown('pos-a', posOpts, 'ALL', '', 'onRosterPosA');
         createDropdown('pos-b', posOpts, 'ALL', '', 'onRosterPosB');
         
-        updateMMDisplay();
+        updateMCDisplay();
         
         if (!userTeamId) {
             document.body.style.overflow = "hidden";
@@ -1434,7 +1431,7 @@
         
         document.getElementById(tabId).classList.add('active');
         
-        const idx = ['tab-rosters', 'tab-exhibition', 'tab-season', 'tab-upgrades', 'tab-news'].indexOf(tabId);
+        const idx = ['tab-rosters', 'tab-play', 'tab-upgrades', 'tab-news'].indexOf(tabId);
         if(document.querySelectorAll('.nav-btn')[idx]) {
             document.querySelectorAll('.nav-btn')[idx].classList.add('active');
         }
@@ -1443,9 +1440,8 @@
             renderRosterSide('a');
             renderRosterSide('b');
             renderLineupSelectors();
-        } else if (tabId === 'tab-exhibition') {
-            updateExhibitionVisuals();
-        } else if (tabId === 'tab-season') {
+        } else if (tabId === 'tab-play') {
+            updateMatchupPreview();
             renderStandings();
             renderLeagueLeaders();
         } else if (tabId === 'tab-upgrades') {
@@ -1455,42 +1451,15 @@
         }
     }
 
-    // --- MYNBA MANAGEMENT ---
-    function renderStartupTeamSelectors() {
-        let opts = ALL_TEAMS.filter(t => t.id !== "FA").map(t => ({label: t.name, value: t.id, logo: t.logo}));
-        createDropdown('startup', opts, opts[0].value, 'Select Franchise', 'onStartupSelect');
-        tempStartupTeamId = opts[0].value;
-    }
-
-    window.onStartupSelect = (v) => { tempStartupTeamId = v; }
-
-    function lockInMyNBATeam() {
-        if(!tempStartupTeamId) {
-            alert("Please select a franchise first.");
-            return;
-        }
-        const team = ALL_TEAMS.find(t => t.id === tempStartupTeamId);
-        if(confirm(`Lock in ${team.name} as your franchise?`)) {
-            userTeamId = tempStartupTeamId;
-            saveRostersState();
-            document.body.style.overflow = "";
-            document.getElementById("team-selection-overlay").style.display = "none";
-            updateUserTeamDisplay();
-            buildCustomLogoDropdowns();
-            renderRosterSide('a');
-            renderLineupSelectors();
-            startSeason(); 
-        }
-    }
-
-    function updateMMDisplay() {
-        document.getElementById("mm-display").innerHTML = `💰 ${formatMM(userMM)} MM`;
+    // --- MYCASH INDICATOR AND DATA CONTROLLER ---
+    function updateMCDisplay() {
+        document.getElementById("mm-display").innerHTML = `💰 ${formatMC(userMC)} MC`;
         saveRostersState();
     }
 
-    function addMM(amount) {
-        userMM = Math.max(0, userMM + amount); 
-        updateMMDisplay();
+    function addMC(amount) {
+        userMC = Math.max(0, userMC + amount); 
+        updateMCDisplay();
     }
 
     function resetMyNBAMode() {
@@ -1513,6 +1482,7 @@
         activeExhibitionAway = userTeamId;
     }
 
+    // Starting lineup browser save fix & autocorrect
     function renderLineupSelectors() {
         const positions = ["PG", "SG", "SF", "PF", "C"];
         const customPlayers = PLAYERS.filter(p => p.teamId === userTeamId);
@@ -1524,12 +1494,21 @@
                 value: p.id, 
                 logo: p.photo
             }));
-            if(opts.length === 0) opts.push({label: 'No valid players', value: ''});
+            if(opts.length === 0) {
+                opts.push({label: 'No valid players', value: ''});
+            }
             
-            let def = customLineup[pos] || opts[0].value;
+            let def = customLineup[pos];
+            if (!def || !candidates.some(c => c.id === def)) {
+                // Autocorrect: Match best active healthy candidate
+                const healthy = candidates.find(c => c.injuryDays === 0);
+                def = healthy ? healthy.id : (candidates[0] ? candidates[0].id : "");
+                customLineup[pos] = def;
+            }
+            
             createDropdown(pos.toLowerCase(), opts, def, '', `onLineup${pos}`);
-            customLineup[pos] = def;
         });
+        saveRostersState();
     }
 
     function renderRosterSide(side) {
@@ -1727,11 +1706,11 @@
                 bribeCost += (cpuMax - userMax) * 500000;
             }
             
-            if(confirm(`TRADE REJECTED: ${rejectReason} \n\nDo you want to use a Front Office Bribe to force this trade for ${formatMM(bribeCost)} MM?`)) {
-                if (userMM >= bribeCost) {
-                    addMM(-bribeCost);
+            if(confirm(`TRADE REJECTED: ${rejectReason} \n\nDo you want to use a Front Office Bribe to force this trade for ${formatMC(bribeCost)} MC?`)) {
+                if (userMC >= bribeCost) {
+                    addMC(-bribeCost);
                 } else {
-                    alert(`Transaction failed: You do not have enough MM (${formatMM(userMM)} / ${formatMM(bribeCost)}).`);
+                    alert(`Transaction failed: You do not have enough MC (${formatMC(userMC)} / ${formatMC(bribeCost)}).`);
                     return; 
                 }
             } else {
@@ -1768,7 +1747,7 @@
         updateTradeCenterPanel();
     }
 
-    // --- CPU TRADING SYSTEM ---
+    // --- CPU TRADING & ACTIVE WAIVER ENGINE ---
     function simulateCPUTrades() {
         if (Math.random() > 0.15) return; 
 
@@ -1801,6 +1780,60 @@
 
             addNewsItem('trade', `🤝 <strong>CPU Trade Deal</strong>: The <strong>${tA.name}</strong> and <strong>${tB.name}</strong> have finalized a swap. <strong>${playerA.name}</strong> (${playerA.ovr} OVR) moves to ${tB.name} while <strong>${playerB.name}</strong> (${playerB.ovr} OVR) heads to ${tA.name}.`);
         }
+    }
+
+    function simulateCPUWaivers() {
+        if (Math.random() > 0.15) return; // Rare waivers (15% chance per day)
+        
+        const cpuTeams = ALL_TEAMS.filter(t => t.id !== "FA" && t.id !== userTeamId);
+        if (cpuTeams.length === 0) return;
+        
+        const cpuTeam = cpuTeams[Math.floor(Math.random() * cpuTeams.length)];
+        if (cpuTeam.players.length <= 6) return;
+        
+        const cpuPlayers = PLAYERS.filter(p => p.teamId === cpuTeam.id);
+        if (cpuPlayers.length === 0) return;
+        
+        cpuPlayers.sort((a, b) => a.ovr - b.ovr);
+        const released = cpuPlayers[0]; // Drop lowest-rated player
+        
+        cpuTeam.players = cpuTeam.players.filter(id => id !== released.id);
+        released.teamId = "FA";
+        released.team = "Free Agent";
+        released.col1 = "#475569";
+        released.col2 = "#cbd5e1";
+        
+        const faTeam = ALL_TEAMS.find(t => t.id === "FA");
+        if (faTeam) faTeam.players.push(released.id);
+        
+        addNewsItem('trade', `📋 <strong>Waiver Wire</strong>: The <strong>${cpuTeam.name}</strong> have waived <strong>${released.name}</strong> (${released.pos}, ${released.ovr} OVR). He is now a Free Agent.`);
+    }
+
+    function simulateCPUSignings() {
+        if (Math.random() > 0.15) return; // Rare pickups (15% chance per day)
+        
+        const cpuTeams = ALL_TEAMS.filter(t => t.id !== "FA" && t.id !== userTeamId);
+        if (cpuTeams.length === 0) return;
+        
+        const faPlayers = PLAYERS.filter(p => p.teamId === "FA" && p.injuryDays === 0);
+        if (faPlayers.length === 0) return;
+        
+        faPlayers.sort((a, b) => b.ovr - a.ovr);
+        const selectedFA = faPlayers[0]; // CPU claims top free agent
+        
+        cpuTeams.sort((a, b) => a.players.length - b.players.length);
+        const targetTeam = cpuTeams[0]; // Direct to team with fewest players
+        
+        const faTeam = ALL_TEAMS.find(t => t.id === "FA");
+        if (faTeam) faTeam.players = faTeam.players.filter(id => id !== selectedFA.id);
+        
+        targetTeam.players.push(selectedFA.id);
+        selectedFA.teamId = targetTeam.id;
+        selectedFA.team = targetTeam.name;
+        selectedFA.col1 = targetTeam.col1;
+        selectedFA.col2 = targetTeam.col2;
+        
+        addNewsItem('trade', `✍️ <strong>Waiver Claim</strong>: The <strong>${targetTeam.name}</strong> have claimed <strong>${selectedFA.name}</strong> (${selectedFA.pos}, OVR ${selectedFA.ovr}) from the FA Pool.`);
     }
 
     // --- INJURY SYSTEM ---
@@ -1845,17 +1878,11 @@
         });
     }
 
-    // --- BRANDING AND LOGO CUSTOM DROPDOWNS ---
+    // --- BRANDING AND LOGO CONFIGURATION ---
     function buildCustomLogoDropdowns() {
         let rosterOpts = ALL_TEAMS.map(t => ({label: t.name, value: t.id, logo: t.logo}));
         createDropdown('roster-b', rosterOpts, activeRosterTeamB, 'Select Target Team', 'onRosterBSelect');
-
-        let oppOpts = ALL_TEAMS.filter(t => t.id !== "FA" && t.id !== userTeamId).map(t => ({label: t.name, value: t.id, logo: t.logo}));
-        if(oppOpts.length > 0 && !activeExhibitionHome) activeExhibitionHome = oppOpts[0].value;
-        createDropdown('ex-home', oppOpts, activeExhibitionHome, 'Select Opponent', 'onExHomeSelect');
     }
-
-    window.onExHomeSelect = (v) => { activeExhibitionHome = v; updateExhibitionVisuals(); }
     
     window.onRosterBSelect = (v) => { 
         activeRosterTeamB = v; 
@@ -1864,43 +1891,96 @@
         updateTradeCenterPanel();
     }
 
-    function updateExhibitionVisuals() {
-        activeExhibitionAway = userTeamId; 
-        
-        const teamAway = ALL_TEAMS.find(t => t.id === activeExhibitionAway);
-        const teamHome = ALL_TEAMS.find(t => t.id === activeExhibitionHome);
-
-        if (teamAway) {
-            document.getElementById("ex-logo-away").innerHTML = teamAway.logo ? `<img src="${teamAway.logo}" class="team-logo-img">` : `🏀`;
-            document.getElementById("ex-name-away").innerHTML = teamAway.name;
-            document.getElementById("box-tab-away").textContent = teamAway.name;
+    function updateMatchupPreview() {
+        if (playoffsState) {
+            const userMatch = findActiveUserPlayoffMatch();
+            if (userMatch) {
+                const awayTeam = userMatch.t1;
+                const homeTeam = userMatch.t2;
+                
+                document.getElementById("ex-logo-away").innerHTML = awayTeam.logo ? `<img src="${awayTeam.logo}" class="team-logo-img">` : `🏀`;
+                document.getElementById("ex-name-away").textContent = awayTeam.name;
+                document.getElementById("box-tab-away").textContent = awayTeam.name;
+                
+                document.getElementById("ex-logo-home").innerHTML = homeTeam.logo ? `<img src="${homeTeam.logo}" class="team-logo-img">` : `🏀`;
+                document.getElementById("ex-name-home").textContent = homeTeam.name;
+                document.getElementById("box-tab-home").textContent = homeTeam.name;
+                
+                document.getElementById("game-status").textContent = `PLAYOFFS - ${playoffsState.round.toUpperCase()}`;
+                document.getElementById("simulation-clock").textContent = "Knockout Series";
+                
+                document.getElementById("play-live-btn").disabled = false;
+                document.getElementById("instant-sim-btn").disabled = false;
+            } else {
+                // User was eliminated
+                document.getElementById("play-live-btn").disabled = true;
+                document.getElementById("instant-sim-btn").disabled = true;
+                document.getElementById("game-status").textContent = "SEASON OVER";
+                document.getElementById("simulation-clock").textContent = "Eliminated";
+            }
+            return;
         }
-        if (teamHome) {
-            document.getElementById("ex-logo-home").innerHTML = teamHome.logo ? `<img src="${teamHome.logo}" class="team-logo-img">` : `🏀`;
-            document.getElementById("box-tab-home").textContent = teamHome.name;
+
+        if (currentSeasonRound < REGULAR_SEASON_LENGTH) {
+            const games = seasonSchedule[currentSeasonRound];
+            if (!games) return;
+            
+            const userGame = games.find(g => g.away.id === userTeamId || g.home.id === userTeamId);
+            if (userGame) {
+                const awayTeam = userGame.away;
+                const homeTeam = userGame.home;
+                
+                document.getElementById("ex-logo-away").innerHTML = awayTeam.logo ? `<img src="${awayTeam.logo}" class="team-logo-img">` : `🏀`;
+                document.getElementById("ex-name-away").textContent = awayTeam.name;
+                document.getElementById("box-tab-away").textContent = awayTeam.name;
+                
+                document.getElementById("ex-logo-home").innerHTML = homeTeam.logo ? `<img src="${homeTeam.logo}" class="team-logo-img">` : `🏀`;
+                document.getElementById("ex-name-home").textContent = homeTeam.name;
+                document.getElementById("box-tab-home").textContent = homeTeam.name;
+                
+                document.getElementById("game-status").textContent = `ROUND ${currentSeasonRound + 1} / ${REGULAR_SEASON_LENGTH}`;
+                document.getElementById("simulation-clock").textContent = "Match Ready";
+                
+                document.getElementById("play-live-btn").disabled = false;
+                document.getElementById("instant-sim-btn").disabled = false;
+            }
+        } else {
+            document.getElementById("play-live-btn").disabled = true;
+            document.getElementById("instant-sim-btn").disabled = true;
+            document.getElementById("game-status").textContent = "SEASON OVER";
+            document.getElementById("simulation-clock").textContent = "Calculating";
         }
     }
 
     function triggerExhibitionSim(isLive) {
         if (currentSimInterval) clearInterval(currentSimInterval);
 
-        const teamAway = ALL_TEAMS.find(t => t.id === activeExhibitionAway);
-        const teamHome = ALL_TEAMS.find(t => t.id === activeExhibitionHome);
+        let teamAway = null;
+        let teamHome = null;
+        let activeMatchRef = null;
 
-        if (!teamAway || !teamHome) return;
+        if (playoffsState) {
+            activeMatchRef = findActiveUserPlayoffMatch();
+            if (!activeMatchRef) return;
+            teamAway = activeMatchRef.t1;
+            teamHome = activeMatchRef.t2;
+        } else {
+            const currentRoundGames = seasonSchedule[currentSeasonRound];
+            activeMatchRef = currentRoundGames.find(g => g.away.id === userTeamId || g.home.id === userTeamId);
+            if (!activeMatchRef) return;
+            teamAway = activeMatchRef.away;
+            teamHome = activeMatchRef.home;
+        }
 
         document.getElementById("ticker-feed").innerHTML = "";
         boxScoreView = "away";
 
-        const triggerLoadAndSim = async () => {
-            if (!teamAway.players || teamAway.players.length === 0) {
-                appendTickerMessage(`🔄 Fetching roster dynamically for ${teamAway.name}...`);
-                await loadTeamRosterDynamically(teamAway.id);
-            }
-            if (!teamHome.players || teamHome.players.length === 0) {
-                appendTickerMessage(`🔄 Fetching roster dynamically for ${teamHome.name}...`);
-                await loadTeamRosterDynamically(teamHome.id);
-            }
+        document.getElementById("play-live-btn").disabled = true;
+        document.getElementById("instant-sim-btn").disabled = true;
+
+        const executeMergedScheduleStep = async () => {
+            if (!teamAway.players || teamAway.players.length === 0) await loadTeamRosterDynamically(teamAway.id);
+            if (!teamHome.players || teamHome.players.length === 0) await loadTeamRosterDynamically(teamHome.id);
 
             exhibitionBox = executeGameRotationSimulation(teamAway, teamHome, isLive, (update) => {
                 document.getElementById("score-away-val").textContent = update.scoreAway;
@@ -1910,23 +1990,124 @@
 
                 if (update.tickerMessage) appendTickerMessage(update.tickerMessage);
                 
-                // Keep box score dynamically updating in real-time
                 exhibitionBox = { statsAway: update.statsAway, statsHome: update.statsHome };
                 renderBoxScoreStats();
                 
                 if (update.isFinished) {
-                    if(update.scoreAway > update.scoreHome) {
-                         addMM(150000);
-                    } else {
-                         addMM(-30000);
-                    }
+                    processPostgameResolution(update.scoreAway, update.scoreHome, activeMatchRef);
                 }
             });
         };
 
-        triggerLoadAndSim().catch(err => {
-            appendTickerMessage(`❌ Simulation Failed: ${err.message}`);
+        executeMergedScheduleStep().catch(err => {
+            appendTickerMessage(`❌ Execution Interrupted: ${err.message}`);
+            document.getElementById("play-live-btn").disabled = false;
+            document.getElementById("instant-sim-btn").disabled = false;
         });
+    }
+
+    function processPostgameResolution(scoreAway, scoreHome, activeMatchRef) {
+        if (playoffsState) {
+            // Process Playoff match outcome
+            activeMatchRef.scoreA = scoreAway;
+            activeMatchRef.scoreH = scoreHome;
+            activeMatchRef.played = true;
+
+            runPlayoffsStepResolution(scoreAway, scoreHome);
+            return;
+        }
+
+        // Process regular season matchup
+        activeMatchRef.scoreA = scoreAway;
+        activeMatchRef.scoreH = scoreHome;
+        activeMatchRef.played = true;
+
+        let standAway = seasonStandings.find(t => t.id === activeMatchRef.away.id);
+        let standHome = seasonStandings.find(t => t.id === activeMatchRef.home.id);
+
+        standAway.ptsFor += scoreAway; standAway.ptsAgainst += scoreHome;
+        standHome.ptsFor += scoreHome; standHome.ptsAgainst += scoreAway;
+
+        if (scoreAway > scoreHome) {
+            standAway.wins++; standHome.losses++;
+        } else {
+            standHome.wins++; standAway.losses++;
+        }
+
+        // Auto-Sim remainder of league matches for this game-day
+        const games = seasonSchedule[currentSeasonRound];
+        const liveBoard = document.getElementById("live-season-scoreboard");
+        const liveGrid = document.getElementById("live-games-grid");
+        
+        liveBoard.style.display = "block";
+        liveGrid.innerHTML = "";
+
+        games.forEach((g) => {
+            if (g.away.id === userTeamId || g.home.id === userTeamId) {
+                // Render user team's game result
+                const card = document.createElement("div");
+                card.className = "live-game-card";
+                card.style = "border-color: var(--accent-gold); box-shadow: 0 0 10px rgba(234, 179, 8, 0.15);";
+                card.innerHTML = `
+                    <div style="flex:1;">${g.away.abbreviation}</div>
+                    <div class="live-score">${scoreAway}</div>
+                    <div style="margin:0 15px; color:var(--text-muted); font-size:0.8rem;">VS</div>
+                    <div class="live-score">${scoreHome}</div>
+                    <div style="flex:1; text-align:right;">${g.home.abbreviation}</div>
+                `;
+                liveGrid.appendChild(card);
+                return;
+            }
+
+            // Sim other matches instantly in background
+            let box = executeGameRotationSimulation(g.away, g.home, false, () => {});
+            g.scoreA = box.statsAway.reduce((sum, p) => sum + p.pts, 0);
+            g.scoreH = box.statsHome.reduce((sum, p) => sum + p.pts, 0);
+            g.played = true;
+
+            let sAway = seasonStandings.find(t => t.id === g.away.id);
+            let sHome = seasonStandings.find(t => t.id === g.home.id);
+
+            sAway.ptsFor += g.scoreA; sAway.ptsAgainst += g.scoreH;
+            sHome.ptsFor += g.scoreH; sHome.ptsAgainst += g.scoreA;
+
+            if (g.scoreA > g.scoreH) {
+                sAway.wins++; sHome.losses++;
+            } else {
+                sHome.wins++; sAway.losses++;
+            }
+
+            accumulateSeasonStats(box.statsAway);
+            accumulateSeasonStats(box.statsHome);
+
+            const card = document.createElement("div");
+            card.className = "live-game-card";
+            card.innerHTML = `
+                <div style="flex:1;">${g.away.abbreviation}</div>
+                <div class="live-score">${g.scoreA}</div>
+                <div style="margin:0 15px; color:var(--text-muted); font-size:0.8rem;">VS</div>
+                <div class="live-score">${g.scoreH}</div>
+                <div style="flex:1; text-align:right;">${g.home.abbreviation}</div>
+            `;
+            liveGrid.appendChild(card);
+        });
+
+        // Background waivers, transfers & recoveries
+        simulateCPUTrades();
+        simulateCPUWaivers();
+        simulateCPUSignings();
+        processGlobalRecoveries();
+
+        currentSeasonRound++;
+        saveRostersState();
+        renderStandings();
+        renderLeagueLeaders();
+
+        if (currentSeasonRound >= REGULAR_SEASON_LENGTH) {
+            initPlayoffBracket();
+        } else {
+            updateMatchupPreview();
+        }
     }
 
     function appendTickerMessage(msg) {
@@ -1980,218 +2161,6 @@
         });
     }
 
-    // --- GAME SIMULATOR ALGORITHMS ---
-    function executeGameRotationSimulation(teamAway, teamHome, isLive, onUpdate, loopDelay = 350) {
-        let fullRosterAway = PLAYERS.filter(p => p.teamId === teamAway.id && p.injuryDays === 0).map(p => ({ ...p, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, min: 0, gp: 1, fatigue: 100 }));
-        let fullRosterHome = PLAYERS.filter(p => p.teamId === teamHome.id && p.injuryDays === 0).map(p => ({ ...p, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, min: 0, gp: 1, fatigue: 100 }));
-
-        const positions = ["PG", "SG", "SF", "PF", "C"];
-        positions.forEach((pos, idx) => {
-            if (fullRosterAway.length < 5) fullRosterAway.push({ id: `sub_a_${idx}`, name: "Sub Away", pos: pos, ovr: 70, off: 70, def: 70, reb: 70, ast: 70, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, min: 0, gp: 1, fatigue: 100, photo: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png" });
-            if (fullRosterHome.length < 5) fullRosterHome.push({ id: `sub_h_${idx}`, name: "Sub Home", pos: pos, ovr: 70, off: 70, def: 70, reb: 70, ast: 70, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, min: 0, gp: 1, fatigue: 100, photo: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png" });
-        });
-
-        let activeCourtAway = [];
-        let activeCourtHome = [];
-
-        const assignStarters = (roster, dest, team) => {
-            if (team.id === userTeamId) {
-                positions.forEach(pos => {
-                    let pId = customLineup[pos];
-                    let pObj = roster.find(p => p.id === pId && p.injuryDays === 0);
-                    if (pObj) dest.push(pObj);
-                });
-            }
-            positions.forEach(pos => {
-                if (dest.length < 5 && !dest.some(rx => rx.pos === pos)) {
-                    let candidates = roster.filter(p => p.pos === pos && !dest.some(rx => rx.id === p.id));
-                    if (candidates.length > 0) {
-                        candidates.sort((a, b) => b.ovr - a.ovr);
-                        dest.push(candidates[0]);
-                    }
-                }
-            });
-            roster.forEach(p => {
-                if (dest.length < 5 && !dest.some(rx => rx.id === p.id)) {
-                    dest.push(p);
-                }
-            });
-        };
-
-        assignStarters(fullRosterAway, activeCourtAway, teamAway);
-        assignStarters(fullRosterHome, activeCourtHome, teamHome);
-
-        let scoreAway = 0, scoreHome = 0, totalPossessions = 96, currentPoss = 0;
-
-        function runNextPossession() {
-            currentPoss++;
-            let isAwayPoss = (currentPoss % 2 === 1);
-            let offSquad = isAwayPoss ? activeCourtAway : activeCourtHome;
-            let defSquad = isAwayPoss ? activeCourtHome : activeCourtAway;
-            let fullOffRoster = isAwayPoss ? fullRosterAway : fullRosterHome;
-            let fullDefRoster = isAwayPoss ? fullRosterHome : fullRosterAway;
-
-            if (offSquad.length === 0) return { scoreAway, scoreHome, quarter: 4, time: "0:00", tickerMessage: "", isFinished: true, statsAway: fullRosterAway, statsHome: fullRosterHome };
-
-            fullOffRoster.forEach(p => {
-                if (offSquad.some(ox => ox.id === p.id)) {
-                    p.min += 0.5; p.fatigue = Math.max(40, p.fatigue - 1.5);
-                } else { p.fatigue = Math.min(100, p.fatigue + 3.0); }
-            });
-            fullDefRoster.forEach(p => {
-                if (defSquad.some(dx => dx.id === p.id)) {
-                    p.min += 0.5; p.fatigue = Math.max(40, p.fatigue - 1.5);
-                } else { p.fatigue = Math.min(100, p.fatigue + 3.0); }
-            });
-
-            let subMessage = "";
-            const makeSubs = (court, roster, sideLabel) => {
-                for (let i = 0; i < court.length; i++) {
-                    let player = court[i];
-                    if (player.fatigue < 65) {
-                        let benchCandidates = roster.filter(p => !court.some(cx => cx.id === p.id) && p.fatigue > 85);
-                        if (benchCandidates.length > 0) {
-                            let bestMatch = benchCandidates.find(p => p.pos === player.pos);
-                            if (!bestMatch) {
-                                benchCandidates.sort((a, b) => b.ovr - a.ovr);
-                                bestMatch = benchCandidates[0];
-                            }
-                            court[i] = bestMatch;
-                            if(isLive && loopDelay > 50) subMessage += `🔄 Sub: <strong>${bestMatch.name}</strong> enters for <strong>${player.name}</strong>.<br>`;
-                            break;
-                        }
-                    }
-                }
-            };
-
-            makeSubs(activeCourtAway, fullRosterAway, teamAway.name);
-            makeSubs(activeCourtHome, fullRosterHome, teamHome.name);
-
-            let usage = offSquad.map(p => {
-                let u = p.off * (p.fatigue / 100);
-                if (p.pos === "PG" || p.pos === "SG") u += 15;
-                return u;
-            });
-
-            let shooterIdx = getWeightedRandomIdx(usage);
-            if(shooterIdx === -1) shooterIdx = 0;
-            let shooter = offSquad[shooterIdx];
-            let defender = defSquad[shooterIdx] || defSquad[Math.floor(Math.random() * defSquad.length)] || shooter;
-
-            let successCap = 46 + (shooter.off - defender.def) * 0.45;
-            let dice = Math.random() * 100;
-            let msg = subMessage;
-
-            if (dice < successCap) {
-                let isThree = (shooter.pos === "PG" || shooter.pos === "SG") && Math.random() < 0.35;
-                let pts = isThree ? 3 : 2;
-                shooter.pts += pts;
-                if (isAwayPoss) scoreAway += pts; else scoreHome += pts;
-
-                let assist = Math.random() < 0.58;
-                let assister = null;
-                if (assist) {
-                    let astWeights = offSquad.map((p, idx) => idx === shooterIdx ? 0 : p.ast);
-                    assister = offSquad[getWeightedRandomIdx(astWeights)];
-                    if(assister) assister.ast += 1;
-                }
-                
-                if(isLive && loopDelay > 50) {
-                    msg += isThree ? 
-                        `🎯 <strong>${shooter.name}</strong> drills a deep 3! ${assister ? `(Ast: ${assister.name})` : ''}` :
-                        `🏀 <strong>${shooter.name}</strong> drives inside for a layup. ${assister ? `(Ast: ${assister.name})` : ''}`;
-                }
-            } else {
-                let block = Math.random() * 100 < (defender.def * 0.1);
-                if (block) {
-                    let blockers = defSquad.filter(p => p.pos === "C" || p.pos === "PF");
-                    let blocker = blockers.length > 0 ? blockers[Math.floor(Math.random() * blockers.length)] : defender;
-                    blocker.blk += 1;
-                    if(isLive && loopDelay > 50) msg += `❌ <strong>${shooter.name}</strong> shoots, but it's rejected by <strong>${blocker.name}</strong>!`;
-                } else {
-                    let rebOff = offSquad.map(p => p.reb);
-                    let rebDef = defSquad.map(p => p.reb * 1.5);
-                    let totalRebSum = rebOff.reduce((a, b) => a + b, 0) + rebDef.reduce((a, b) => a + b, 0);
-                    if(totalRebSum === 0) totalRebSum = 1;
-
-                    if (Math.random() < (rebOff.reduce((a, b) => a + b, 0) / totalRebSum)) {
-                        let reber = offSquad[getWeightedRandomIdx(rebOff)];
-                        if(reber) {
-                            reber.reb += 1;
-                            if(isLive && loopDelay > 50) msg += `🗑️ Offensive board secured by <strong>${reber.name}</strong>.`;
-                        }
-                    } else {
-                        let reber = defSquad[getWeightedRandomIdx(rebDef)];
-                        if(reber) {
-                            reber.reb += 1;
-                            if(isLive && loopDelay > 50) msg += `🛡️ Defensive board secured by <strong>${reber.name}</strong>.`;
-                        }
-                    }
-                }
-            }
-
-            if (Math.random() < 0.08) {
-                let stealer = defSquad[getWeightedRandomIdx(defSquad.map(p => p.def))];
-                if(stealer) {
-                    stealer.stl += 1;
-                    if(isLive && loopDelay > 50) msg += `<br>⚡ Turnover! <strong>${stealer.name}</strong> intercepts the pass cleanly.`;
-                }
-            }
-
-            let q = Math.min(4, Math.floor((currentPoss / totalPossessions) * 4) + 1);
-            let mRem = Math.max(0, 12 - Math.floor(((currentPoss % (totalPossessions / 4)) / (totalPossessions / 4)) * 12));
-            let sRem = Math.floor(Math.random() * 60);
-            let timeStr = `Q${q} - ${mRem}:${sRem < 10 ? '0' + sRem : sRem}`;
-
-            return {
-                scoreAway, scoreHome, quarter: q, time: timeStr, tickerMessage: msg, isFinished: currentPoss >= totalPossessions,
-                statsAway: fullRosterAway, statsHome: fullRosterHome
-            };
-        }
-
-        if (isLive) {
-            if(loopDelay > 50) appendTickerMessage("🏀 Tip-off! The match has begun.");
-            currentSimInterval = setInterval(() => {
-                try {
-                    let state = runNextPossession();
-                    onUpdate(state);
-                    if (state.isFinished) {
-                        clearInterval(currentSimInterval);
-                        currentSimInterval = null;
-                        checkRosterInjuries(fullRosterAway, teamAway.name);
-                        checkRosterInjuries(fullRosterHome, teamHome.name);
-                    }
-                } catch(e) {
-                    clearInterval(currentSimInterval);
-                    onUpdate({ scoreAway, scoreHome, quarter: 4, time: "0:00", tickerMessage: "Error computing play.", isFinished: true, statsAway: fullRosterAway, statsHome: fullRosterHome });
-                }
-            }, loopDelay);
-        } else {
-            let finalState = {};
-            for (let p = 0; p < totalPossessions; p++) {
-                try { finalState = runNextPossession(); } catch(e){}
-            }
-            finalState.tickerMessage = "⚡ Game simulated instantly. Box score populated.";
-            onUpdate(finalState);
-            checkRosterInjuries(fullRosterAway, teamAway.name);
-            checkRosterInjuries(fullRosterHome, teamHome.name);
-        }
-
-        return { statsAway: fullRosterAway, statsHome: fullRosterHome };
-    }
-
-    function getWeightedRandomIdx(w) {
-        let sum = w.reduce((a, b) => a + b, 0);
-        if(sum === 0) return 0;
-        let rand = Math.random() * sum;
-        let accum = 0;
-        for (let i = 0; i < w.length; i++) {
-            accum += w[i];
-            if (rand <= accum) return i;
-        }
-        return w.length - 1;
-    }
-
     // --- REBUILT SEASON SYSTEM ---
     function startSeason() {
         const activePool = ALL_TEAMS.filter(t => t.id !== "FA");
@@ -2227,10 +2196,7 @@
 
         document.getElementById("playoff-bracket").style.display = "none";
         document.getElementById("season-champ-card").style.display = "none";
-        document.getElementById("sim-day-btn").disabled = false;
-        document.getElementById("sim-all-btn").disabled = false;
         document.getElementById("live-season-scoreboard").style.display = "none";
-        document.getElementById("sim-day-btn").textContent = "📅 Play Next Game-day";
 
         generateSeasonSchedule(activePool);
         
@@ -2240,154 +2206,7 @@
         saveRostersState();
         renderStandings();
         renderLeagueLeaders();
-    }
-
-    function generateSeasonSchedule(teams) {
-        seasonSchedule = [];
-        let list = [...teams];
-        let n = list.length; 
-
-        for (let r = 0; r < n - 1; r++) {
-            let roundGames = [];
-            for (let i = 0; i < n / 2; i++) {
-                let home = list[i];
-                let away = list[n - 1 - i];
-                roundGames.push({ home: home, away: away, played: false, scoreH: 0, scoreA: 0 });
-            }
-            list.splice(1, 0, list.pop());
-            seasonSchedule.push(roundGames);
-        }
-    }
-
-    function renderStandings() {
-        seasonStandings.sort((a, b) => {
-            if (b.wins !== a.wins) return b.wins - a.wins;
-            return (b.ptsFor - b.ptsAgainst) - (a.ptsFor - a.ptsAgainst);
-        });
-
-        const tbody = document.getElementById("season-standings-body");
-        if (!tbody) return;
-        tbody.innerHTML = "";
-
-        seasonStandings.forEach((t, i) => {
-            let pct = t.wins + t.losses > 0 ? (t.wins / (t.wins + t.losses)).toFixed(3) : ".000";
-            const row = document.createElement("tr");
-            
-            if(t.id === userTeamId) row.className = "user-team";
-            
-            row.innerHTML = `
-                <td><strong>#${i+1}</strong></td>
-                <td><span style="font-weight:700;">${t.name}</span></td>
-                <td style="text-align: center;">${t.wins}</td>
-                <td style="text-align: center;">${t.losses}</td>
-                <td style="text-align: center; color: var(--text-muted); font-family: monospace;">${pct}</td>
-            `;
-            tbody.appendChild(row);
-        });
-
-        const stage = document.getElementById("season-stage");
-        if (currentSeasonRound < seasonSchedule.length) {
-            stage.textContent = `Round ${currentSeasonRound + 1} / ${seasonSchedule.length}`;
-        } else if (!playoffsState) {
-            stage.textContent = "Regular Season Complete";
-        } else {
-            stage.textContent = `Playoffs - ${playoffsState.round.toUpperCase()}`;
-        }
-    }
-
-    async function simSeasonDay() {
-        if (currentSeasonRound >= seasonSchedule.length && !playoffsState) {
-            alert("The Regular Season is completed! Start Playoffs or Force Restart Season.");
-            return;
-        }
-
-        if (currentSeasonRound >= seasonSchedule.length) {
-            if (!playoffsState) {
-                initPlayoffBracket();
-            } else {
-                await runPlayoffsStep();
-            }
-            return;
-        }
-
-        document.getElementById("sim-day-btn").disabled = true;
-        document.getElementById("sim-all-btn").disabled = true;
-
-        const games = seasonSchedule[currentSeasonRound];
-        
-        const liveBoard = document.getElementById("live-season-scoreboard");
-        const liveGrid = document.getElementById("live-games-grid");
-        liveBoard.style.display = "block";
-        liveGrid.innerHTML = "";
-
-        for (let g of games) {
-            if (!g.away.players || g.away.players.length === 0) try { await loadTeamRosterDynamically(g.away.id); } catch(e){}
-            if (!g.home.players || g.home.players.length === 0) try { await loadTeamRosterDynamically(g.home.id); } catch(e){}
-        }
-
-        games.forEach((g) => {
-            let box = executeGameRotationSimulation(g.away, g.home, false, () => {});
-            
-            g.scoreA = box.statsAway.reduce((sum, p) => sum + p.pts, 0);
-            g.scoreH = box.statsHome.reduce((sum, p) => sum + p.pts, 0);
-            g.played = true;
-
-            let standAway = seasonStandings.find(t => t.id === g.away.id);
-            let standHome = seasonStandings.find(t => t.id === g.home.id);
-
-            standAway.ptsFor += g.scoreA; standAway.ptsAgainst += g.scoreH;
-            standHome.ptsFor += g.scoreH; standHome.ptsAgainst += g.scoreA;
-
-            if (g.scoreA > g.scoreH) {
-                standAway.wins++; standHome.losses++;
-            } else {
-                standHome.wins++; standAway.losses++;
-            }
-
-            accumulateSeasonStats(box.statsAway);
-            accumulateSeasonStats(box.statsHome);
-
-            const card = document.createElement("div");
-            card.className = "live-game-card";
-            if (g.away.id === userTeamId || g.home.id === userTeamId) {
-                card.style = "border-color: var(--accent-gold); box-shadow: 0 0 10px rgba(234, 179, 8, 0.15);";
-            }
-            card.innerHTML = `
-                <div style="flex:1;">${g.away.abbreviation}</div>
-                <div class="live-score">${g.scoreA}</div>
-                <div style="margin:0 15px; color:var(--text-muted); font-size:0.8rem;">VS</div>
-                <div class="live-score">${g.scoreH}</div>
-                <div style="flex:1; text-align:right;">${g.home.abbreviation}</div>
-            `;
-            liveGrid.appendChild(card);
-        });
-
-        simulateCPUTrades();
-        processGlobalRecoveries();
-
-        currentSeasonRound++;
-        saveRostersState();
-        renderStandings();
-        renderLeagueLeaders();
-
-        if (currentSeasonRound >= seasonSchedule.length) {
-            initPlayoffBracket();
-        }
-
-        document.getElementById("sim-day-btn").disabled = false;
-        document.getElementById("sim-all-btn").disabled = false;
-    }
-
-    async function simWholeSeason() {
-        document.getElementById("sim-day-btn").disabled = true;
-        document.getElementById("sim-all-btn").disabled = true;
-
-        while (currentSeasonRound < seasonSchedule.length) {
-            await simSeasonDay();
-        }
-
-        document.getElementById("sim-day-btn").disabled = false;
-        document.getElementById("sim-all-btn").disabled = false;
+        updateMatchupPreview();
     }
 
     function accumulateSeasonStats(boxRoster) {
@@ -2426,28 +2245,49 @@
         makeList("leader-ast-list", "ast");
     }
 
-    // --- PLAYOFF BRACKET MANAGEMENT ---
-    function initPlayoffBracket() {
-        document.getElementById("playoff-bracket").style.display = "block";
-        document.getElementById("sim-day-btn").textContent = "🏆 Play Quarterfinals";
-        document.getElementById("sim-all-btn").disabled = true;
-        document.getElementById("live-season-scoreboard").style.display = "none";
+    // --- PLAYOFF BRACKET DECK ---
+    function findActiveUserPlayoffMatch() {
+        if (!playoffsState) return null;
+        const r = playoffsState.round;
+        if (r === "quarters") {
+            return [playoffsState.q1, playoffsState.q2, playoffsState.q3, playoffsState.q4].find(m => m.t1.id === userTeamId || m.t2.id === userTeamId);
+        } else if (r === "semis") {
+            return [playoffsState.semi1, playoffsState.semi2].find(m => m.t1.id === userTeamId || m.t2.id === userTeamId);
+        } else if (r === "finals") {
+            return (playoffsState.finals.t1.id === userTeamId || playoffsState.finals.t2.id === userTeamId) ? playoffsState.finals : null;
+        }
+        return null;
+    }
 
+    function initPlayoffBracket() {
         let top8 = [];
+        let qualified = false;
         for(let i=0; i<8; i++){
             let teamObj = ALL_TEAMS.find(t => t.id === seasonStandings[i].id);
             top8.push(teamObj);
+            if (teamObj.id === userTeamId) qualified = true;
         }
+
+        if (!qualified) {
+            // User eliminated before playoffs
+            addNewsItem('milestone', `❌ <strong>Playoffs Eliminated</strong>: Your team placed outside the top 8 standings and did not qualify for the postseason.`);
+            alert("Eliminated: Your team failed to make the playoffs! Start next season to try again.");
+            endEliminatedSeason();
+            return;
+        }
+
+        document.getElementById("playoff-bracket").style.display = "block";
+        document.getElementById("live-season-scoreboard").style.display = "none";
 
         playoffsState = {
             round: "quarters",
-            q1: { t1: top8[0], t2: top8[7], winner: null },
-            q2: { t1: top8[3], t2: top8[4], winner: null },
-            q3: { t1: top8[1], t2: top8[6], winner: null },
-            q4: { t1: top8[2], t2: top8[5], winner: null },
-            semi1: { t1: null, t2: null, winner: null },
-            semi2: { t1: null, t2: null, winner: null },
-            finals: { t1: null, t2: null, winner: null }
+            q1: { t1: top8[0], t2: top8[7], winner: null, scoreA:0, scoreH:0, played:false },
+            q2: { t1: top8[3], t2: top8[4], winner: null, scoreA:0, scoreH:0, played:false },
+            q3: { t1: top8[1], t2: top8[6], winner: null, scoreA:0, scoreH:0, played:false },
+            q4: { t1: top8[2], t2: top8[5], winner: null, scoreA:0, scoreH:0, played:false },
+            semi1: { t1: null, t2: null, winner: null, scoreA:0, scoreH:0, played:false },
+            semi2: { t1: null, t2: null, winner: null, scoreA:0, scoreH:0, played:false },
+            finals: { t1: null, t2: null, winner: null, scoreA:0, scoreH:0, played:false }
         };
 
         document.getElementById("bracket-q1-t1").textContent = `(1) ${top8[0].abbreviation}`;
@@ -2463,54 +2303,45 @@
 
         saveRostersState();
         renderStandings();
+        updateMatchupPreview();
     }
 
-    async function runPlayoffsStep() {
-        document.getElementById("sim-day-btn").disabled = true;
-        
-        const liveBoard = document.getElementById("live-season-scoreboard");
-        const liveGrid = document.getElementById("live-games-grid");
-        liveBoard.style.display = "block";
-        liveGrid.innerHTML = "";
-
-        const preHydrate = async (match) => {
-            if (!match.t1.players || match.t1.players.length === 0) try{ await loadTeamRosterDynamically(match.t1.id); }catch(e){}
-            if (!match.t2.players || match.t2.players.length === 0) try{ await loadTeamRosterDynamically(match.t2.id); }catch(e){}
-        };
-
+    function runPlayoffsStepResolution(scoreA, scoreH, userMatchRef) {
         if (playoffsState.round === "quarters") {
-            await Promise.all([preHydrate(playoffsState.q1), preHydrate(playoffsState.q2), preHydrate(playoffsState.q3), preHydrate(playoffsState.q4)]);
+            // Auto-Sim remainder of quarterfinals matches in background
+            const resolveQuarters = (m, box) => {
+                m.scoreA = box.statsAway.reduce((sum, p) => sum + p.pts, 0);
+                m.scoreH = box.statsHome.reduce((sum, p) => sum + p.pts, 0);
+                m.played = true;
+                m.winner = m.scoreA > m.scoreH ? m.t1 : m.t2;
+            };
 
-            let r1 = executeGameRotationSimulation(playoffsState.q1.t1, playoffsState.q1.t2, false, () => {});
-            let r2 = executeGameRotationSimulation(playoffsState.q2.t1, playoffsState.q2.t2, false, () => {});
-            let r3 = executeGameRotationSimulation(playoffsState.q3.t1, playoffsState.q3.t2, false, () => {});
-            let r4 = executeGameRotationSimulation(playoffsState.q4.t1, playoffsState.q4.t2, false, () => {});
+            // Set user quarters matchup
+            userMatchRef.winner = scoreA > scoreH ? userMatchRef.t1 : userMatchRef.t2;
 
-            let scoreA1 = r1.statsAway.reduce((sum, p) => sum + p.pts, 0);
-            let scoreH1 = r1.statsHome.reduce((sum, p) => sum + p.pts, 0);
+            if (playoffsState.q1 !== userMatchRef) resolveQuarters(playoffsState.q1, executeGameRotationSimulation(playoffsState.q1.t1, playoffsState.q1.t2, false, () => {}));
+            if (playoffsState.q2 !== userMatchRef) resolveQuarters(playoffsState.q2, executeGameRotationSimulation(playoffsState.q2.t1, playoffsState.q2.t2, false, () => {}));
+            if (playoffsState.q3 !== userMatchRef) resolveQuarters(playoffsState.q3, executeGameRotationSimulation(playoffsState.q3.t1, playoffsState.q3.t2, false, () => {}));
+            if (playoffsState.q4 !== userMatchRef) resolveQuarters(playoffsState.q4, executeGameRotationSimulation(playoffsState.q4.t1, playoffsState.q4.t2, false, () => {}));
 
-            let scoreA2 = r2.statsAway.reduce((sum, p) => sum + p.pts, 0);
-            let scoreH2 = r2.statsHome.reduce((sum, p) => sum + p.pts, 0);
+            // Update trees
+            document.getElementById("bracket-q1-t1").innerHTML = `(1) ${playoffsState.q1.t1.abbreviation} - <strong>${playoffsState.q1.scoreA}</strong>`;
+            document.getElementById("bracket-q1-t2").innerHTML = `(8) ${playoffsState.q1.t2.abbreviation} - <strong>${playoffsState.q1.scoreH}</strong>`;
+            document.getElementById("bracket-q2-t1").innerHTML = `(4) ${playoffsState.q2.t1.abbreviation} - <strong>${playoffsState.q2.scoreA}</strong>`;
+            document.getElementById("bracket-q2-t2").innerHTML = `(5) ${playoffsState.q2.t2.abbreviation} - <strong>${playoffsState.q2.scoreH}</strong>`;
+            document.getElementById("bracket-q3-t1").innerHTML = `(2) ${playoffsState.q3.t1.abbreviation} - <strong>${playoffsState.q3.scoreA}</strong>`;
+            document.getElementById("bracket-q3-t2").innerHTML = `(7) ${playoffsState.q3.t2.abbreviation} - <strong>${playoffsState.q3.scoreH}</strong>`;
+            document.getElementById("bracket-q4-t1").innerHTML = `(3) ${playoffsState.q4.t1.abbreviation} - <strong>${playoffsState.q4.scoreA}</strong>`;
+            document.getElementById("bracket-q4-t2").innerHTML = `(6) ${playoffsState.q4.t2.abbreviation} - <strong>${playoffsState.q4.scoreH}</strong>`;
 
-            let scoreA3 = r3.statsAway.reduce((sum, p) => sum + p.pts, 0);
-            let scoreH3 = r3.statsHome.reduce((sum, p) => sum + p.pts, 0);
-
-            let scoreA4 = r4.statsAway.reduce((sum, p) => sum + p.pts, 0);
-            let scoreH4 = r4.statsHome.reduce((sum, p) => sum + p.pts, 0);
-
-            playoffsState.q1.winner = scoreA1 > scoreH1 ? playoffsState.q1.t1 : playoffsState.q1.t2;
-            playoffsState.q2.winner = scoreA2 > scoreH2 ? playoffsState.q2.t1 : playoffsState.q2.t2;
-            playoffsState.q3.winner = scoreA3 > scoreH3 ? playoffsState.q3.t1 : playoffsState.q3.t2;
-            playoffsState.q4.winner = scoreA4 > scoreH4 ? playoffsState.q4.t1 : playoffsState.q4.t2;
-
-            document.getElementById("bracket-q1-t1").innerHTML = `(1) ${playoffsState.q1.t1.abbreviation} - <strong>${scoreA1}</strong>`;
-            document.getElementById("bracket-q1-t2").innerHTML = `(8) ${playoffsState.q1.t2.abbreviation} - <strong>${scoreH1}</strong>`;
-            document.getElementById("bracket-q2-t1").innerHTML = `(4) ${playoffsState.q2.t1.abbreviation} - <strong>${scoreA2}</strong>`;
-            document.getElementById("bracket-q2-t2").innerHTML = `(5) ${playoffsState.q2.t2.abbreviation} - <strong>${scoreH2}</strong>`;
-            document.getElementById("bracket-q3-t1").innerHTML = `(2) ${playoffsState.q3.t1.abbreviation} - <strong>${scoreA3}</strong>`;
-            document.getElementById("bracket-q3-t2").innerHTML = `(7) ${playoffsState.q3.t2.abbreviation} - <strong>${scoreH3}</strong>`;
-            document.getElementById("bracket-q4-t1").innerHTML = `(3) ${playoffsState.q4.t1.abbreviation} - <strong>${scoreA4}</strong>`;
-            document.getElementById("bracket-q4-t2").innerHTML = `(6) ${playoffsState.q4.t2.abbreviation} - <strong>${scoreH4}</strong>`;
+            // Validate user advanced
+            if (playoffsState.q1.winner.id !== userTeamId && playoffsState.q2.winner.id !== userTeamId &&
+                playoffsState.q3.winner.id !== userTeamId && playoffsState.q4.winner.id !== userTeamId) {
+                addNewsItem('milestone', `❌ <strong>Knocked Out</strong>: Your team was eliminated in the Quarterfinals!`);
+                alert("Knocked Out! Your team lost in the Quarterfinals. Start next season to try again.");
+                endEliminatedSeason();
+                return;
+            }
 
             playoffsState.semi1.t1 = playoffsState.q1.winner;
             playoffsState.semi1.t2 = playoffsState.q2.winner;
@@ -2523,62 +2354,59 @@
             document.getElementById("bracket-s2-t1").textContent = playoffsState.semi2.t1.abbreviation;
             document.getElementById("bracket-s2-t2").textContent = playoffsState.semi2.t2.abbreviation;
 
-            addNewsItem('milestone', `🏆 <strong>Playoff Semifinals Set</strong>: Remaining teams advance. ${playoffsState.semi1.t1.name} vs ${playoffsState.semi1.t2.name} and ${playoffsState.semi2.t1.name} vs ${playoffsState.semi2.t2.name}.`);
+            addNewsItem('milestone', `🏆 <strong>Playoff Semifinals Set</strong>: Bracket narrows down to the remaining four teams.`);
 
-            document.getElementById("sim-day-btn").textContent = "🏆 Play Semifinals";
             saveRostersState();
+            updateMatchupPreview();
 
         } else if (playoffsState.round === "semis") {
-            await Promise.all([preHydrate(playoffsState.semi1), preHydrate(playoffsState.semi2)]);
+            const resolveSemis = (m, box) => {
+                m.scoreA = box.statsAway.reduce((sum, p) => sum + p.pts, 0);
+                m.scoreH = box.statsHome.reduce((sum, p) => sum + p.pts, 0);
+                m.played = true;
+                m.winner = m.scoreA > m.scoreH ? m.t1 : m.t2;
+            };
 
-            let r1 = executeGameRotationSimulation(playoffsState.semi1.t1, playoffsState.semi1.t2, false, () => {});
-            let r2 = executeGameRotationSimulation(playoffsState.semi2.t1, playoffsState.semi2.t2, false, () => {});
+            userMatchRef.winner = scoreA > scoreH ? userMatchRef.t1 : userMatchRef.t2;
 
-            let scoreA1 = r1.statsAway.reduce((sum, p) => sum + p.pts, 0);
-            let scoreH1 = r1.statsHome.reduce((sum, p) => sum + p.pts, 0);
+            if (playoffsState.semi1 !== userMatchRef) resolveSemis(playoffsState.semi1, executeGameRotationSimulation(playoffsState.semi1.t1, playoffsState.semi1.t2, false, () => {}));
+            if (playoffsState.semi2 !== userMatchRef) resolveSemis(playoffsState.semi2, executeGameRotationSimulation(playoffsState.semi2.t1, playoffsState.semi2.t2, false, () => {}));
 
-            let scoreA2 = r2.statsAway.reduce((sum, p) => sum + p.pts, 0);
-            let scoreH2 = r2.statsHome.reduce((sum, p) => sum + p.pts, 0);
+            document.getElementById("bracket-s1-t1").innerHTML = `${playoffsState.semi1.t1.abbreviation} - <strong>${playoffsState.semi1.scoreA}</strong>`;
+            document.getElementById("bracket-s1-t2").innerHTML = `${playoffsState.semi1.t2.abbreviation} - <strong>${playoffsState.semi1.scoreH}</strong>`;
+            document.getElementById("bracket-s2-t1").innerHTML = `${playoffsState.semi2.t1.abbreviation} - <strong>${playoffsState.semi2.scoreA}</strong>`;
+            document.getElementById("bracket-s2-t2").innerHTML = `${playoffsState.semi2.t2.abbreviation} - <strong>${playoffsState.semi2.scoreH}</strong>`;
 
-            let w1 = scoreA1 > scoreH1 ? playoffsState.semi1.t1 : playoffsState.semi1.t2;
-            let w2 = scoreA2 > scoreH2 ? playoffsState.semi2.t1 : playoffsState.semi2.t2;
+            // Validate user advanced
+            if (playoffsState.semi1.winner.id !== userTeamId && playoffsState.semi2.winner.id !== userTeamId) {
+                addNewsItem('milestone', `❌ <strong>Knocked Out</strong>: Your team was eliminated in the Semifinals!`);
+                alert("Knocked Out! Your team lost in the Semifinals. Start next season to try again.");
+                endEliminatedSeason();
+                return;
+            }
 
-            playoffsState.semi1.winner = w1;
-            playoffsState.semi2.winner = w2;
-
-            document.getElementById("bracket-s1-t1").innerHTML = `${playoffsState.semi1.t1.abbreviation} - <strong>${scoreA1}</strong>`;
-            document.getElementById("bracket-s1-t2").innerHTML = `${playoffsState.semi1.t2.abbreviation} - <strong>${scoreH1}</strong>`;
-            document.getElementById("bracket-s2-t1").innerHTML = `${playoffsState.semi2.t1.abbreviation} - <strong>${scoreA2}</strong>`;
-            document.getElementById("bracket-s2-t2").innerHTML = `${playoffsState.semi2.t2.abbreviation} - <strong>${scoreH2}</strong>`;
-
-            playoffsState.finals.t1 = w1;
-            playoffsState.finals.t2 = w2;
+            playoffsState.finals.t1 = playoffsState.semi1.winner;
+            playoffsState.finals.t2 = playoffsState.semi2.winner;
             playoffsState.round = "finals";
 
-            document.getElementById("bracket-f-t1").textContent = w1.abbreviation;
-            document.getElementById("bracket-f-t2").textContent = w2.abbreviation;
+            document.getElementById("bracket-f-t1").textContent = playoffsState.finals.t1.abbreviation;
+            document.getElementById("bracket-f-t2").textContent = playoffsState.finals.t2.abbreviation;
 
-            addNewsItem('milestone', `🏆 <strong>Grand Finals Set</strong>: The championship showdown has been determined. <strong>${w1.name}</strong> faces off against <strong>${w2.name}</strong> for the trophy!`);
+            addNewsItem('milestone', `🏆 <strong>Grand Finals Determined</strong>: Showdown set between the top two teams.`);
 
-            document.getElementById("sim-day-btn").textContent = "🏆 Play Finals";
             saveRostersState();
+            updateMatchupPreview();
 
         } else if (playoffsState.round === "finals") {
-            let rF = executeGameRotationSimulation(playoffsState.finals.t1, playoffsState.finals.t2, false, () => {});
-
-            let scoreA = rF.statsAway.reduce((sum, p) => sum + p.pts, 0);
-            let scoreH = rF.statsHome.reduce((sum, p) => sum + p.pts, 0);
-
             let champ = scoreA > scoreH ? playoffsState.finals.t1 : playoffsState.finals.t2;
             let runnerUp = scoreA > scoreH ? playoffsState.finals.t2 : playoffsState.finals.t1;
 
-            // Earn or deduct MM ONLY during the Grand Finals
             if (champ.id === userTeamId) {
-                addMM(30000000); 
-                addNewsItem('milestone', `🏆 <strong>FINALS BONUS</strong>: Your team won the Grand Finals! Bonus payout of 30,000,000 MM processed.`);
+                addMC(30000000); 
+                addNewsItem('milestone', `🏆 <strong>FINALS BONUS</strong>: Your team won the Grand Finals! Payout of 30,000,000 MC processed.`);
             } else if (runnerUp.id === userTeamId) {
-                addMM(10000000); 
-                addNewsItem('milestone', `🥈 <strong>FINALS BONUS</strong>: Your team finished as the runner-up in the Finals. Bonus payout of 10,000,000 MM processed.`);
+                addMC(10000000); 
+                addNewsItem('milestone', `🥈 <strong>FINALS BONUS</strong>: Your team finished as the runner-up. Payout of 10,000,000 MC processed.`);
             }
 
             document.getElementById("bracket-f-t1").innerHTML = `${playoffsState.finals.t1.abbreviation} - <strong>${scoreA}</strong>`;
@@ -2586,15 +2414,23 @@
 
             document.getElementById("season-champ-name").textContent = champ.name.toUpperCase();
             document.getElementById("season-champ-card").style.display = "block";
-            document.getElementById("sim-day-btn").disabled = true;
+            document.getElementById("play-live-btn").disabled = true;
+            document.getElementById("instant-sim-btn").disabled = true;
 
-            addNewsItem('milestone', `⭐ <strong>CHAMPIONS CROWNED</strong>: The <strong>${champ.name}</strong> have won the tournament championship! Congratulations!`);
+            addNewsItem('milestone', `⭐ <strong>CHAMPIONS CROWNED</strong>: The <strong>${champ.name}</strong> have won the tournament!`);
 
             playoffsState = null;
             saveRostersState();
         }
+    }
 
-        if(playoffsState) document.getElementById("sim-day-btn").disabled = false;
+    function endEliminatedSeason() {
+        document.getElementById("season-champ-name").textContent = "SEASON OVER";
+        document.getElementById("season-champ-card").style.display = "block";
+        document.getElementById("play-live-btn").disabled = true;
+        document.getElementById("instant-sim-btn").disabled = true;
+        playoffsState = null;
+        saveRostersState();
     }
 
     // --- CUSTOM UPGRADES LAB ENGINE ---
@@ -2684,9 +2520,9 @@
         keys.forEach(k => {
             let diff = upgradeProposedStats[k] - upgradeOriginalStats[k];
             if (diff > 0) {
-                netCost += diff * 250000; // Cost is 250,000 MM per upgraded point
+                netCost += diff * 250000; // Cost is 250,000 MC per upgraded point
             } else {
-                netCost += diff * 150000; // Refund is 150,000 MM per downgraded point
+                netCost += diff * 150000; // Refund is 150,000 MC per downgraded point
             }
         });
 
@@ -2695,10 +2531,10 @@
 
         const costEl = document.getElementById("upgrade-total-cost");
         if (netCost >= 0) {
-            costEl.textContent = `${formatMM(netCost)} MM`;
+            costEl.textContent = `${formatMC(netCost)} MC`;
             costEl.style.color = "var(--accent-gold)";
         } else {
-            costEl.textContent = `-${formatMM(Math.abs(netCost))} MM (Refund)`;
+            costEl.textContent = `-${formatMC(Math.abs(netCost))} MC (Refund)`;
             costEl.style.color = "var(--accent-green)";
         }
     }
@@ -2715,12 +2551,12 @@
             else netCost += diff * 150000;
         });
         
-        if (netCost > userMM) {
-            alert(`Insufficient funds. You need ${formatMM(netCost)} MM but only have ${formatMM(userMM)} MM.`);
+        if (netCost > userMC) {
+            alert(`Insufficient funds. You need ${formatMC(netCost)} MC but only have ${formatMC(userMC)} MC.`);
             return;
         }
         
-        addMM(-netCost);
+        addMC(-netCost);
         
         player.off = upgradeProposedStats.off;
         player.def = upgradeProposedStats.def;
@@ -2730,7 +2566,7 @@
         
         addNewsItem('milestone', `🔧 <strong>Lab Tuning</strong>: <strong>${player.name}</strong> of the <strong>${player.team}</strong> had attributes adjusted! Offense: ${player.off}, Defense: ${player.def}, Rebounding: ${player.reb}, Assists: ${player.ast}. New OVR: ${player.ovr}.`);
         
-        alert(`Skill adjustment finalized! Net change: ${netCost >= 0 ? 'Deducted ' + formatMM(netCost) : 'Refunded ' + formatMM(Math.abs(netCost))} MM.`);
+        alert(`Skill adjustment finalized! Net change: ${netCost >= 0 ? 'Deducted ' + formatMC(netCost) : 'Refunded ' + formatMC(Math.abs(netCost))} MC.`);
         
         upgradeOriginalStats = { off: player.off, def: player.def, reb: player.reb, ast: player.ast };
         upgradeProposedStats = { ...upgradeOriginalStats };
