@@ -891,8 +891,7 @@
                             <div style="background-color: var(--bg-hover); border: 2px solid var(--border-color); padding: 4px 12px; font-weight: 800; font-size: 0.85rem;" id="game-status">NOT STARTED</div>
                             <div id="simulation-clock" style="font-size: 1.1rem; font-weight: 700; color: var(--text-muted); margin-top: 8px;">Round - 12:00</div>
                             <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 8px; align-items: center;">
-                                <button class="btn btn-success" id="play-live-btn" onclick="triggerExhibitionSim(true)" style="padding: 0.5rem 1.5rem; font-size: 1rem; width: 100%;">⚡ Play Live Game</button>
-                                <button class="btn" id="instant-sim-btn" onclick="triggerExhibitionSim(false)" style="padding: 0.5rem 1.5rem; font-size: 1rem; width: 100%;">⏩ Fast Sim Game</button>
+                                <button class="btn btn-success" id="play-live-btn" onclick="triggerExhibitionSim(true)" style="padding: 0.8rem 1.5rem; font-size: 1.1rem; width: 100%;">⚡ Play Now</button>
                             </div>
                         </div>
 
@@ -906,7 +905,7 @@
                     <div class="panel" style="margin-bottom: 0; flex-grow: 1;">
                         <div class="panel-title">Game Ticker Feed</div>
                         <div class="ticker-box" id="ticker-feed" style="height: 250px;">
-                            <div class="ticker-entry" style="color: var(--text-muted)">Your upcoming scheduled franchise game is ready. Select 'Play Live' or 'Fast Sim' to proceed.</div>
+                            <div class="ticker-entry" style="color: var(--text-muted)">Your upcoming scheduled franchise game is ready. Select 'Play Now' to proceed.</div>
                         </div>
                     </div>
 
@@ -1224,7 +1223,6 @@
 
     // --- PROXY FAIL-SAFE API PARSER ---
     async function robustFetchJson(url) {
-        // 1. Direct fetch (fastest, no daily rate limit)
         try {
             const res = await fetch(url);
             if (res.ok) return await res.json();
@@ -1232,7 +1230,6 @@
             console.warn("Direct fetch bypassed due to CORS policy. Attempting AllOrigins JSON Wrapper fallback...", e);
         }
         
-        // 2. AllOrigins Wrapper - highly reliable and bypasses CORS policies on GitHub Pages
         try {
             const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
             const res = await fetch(proxyUrl);
@@ -1250,7 +1247,6 @@
             console.warn("AllOrigins proxy wrapper failed. Trying raw fallback proxies...", e);
         }
 
-        // 3. Raw fallbacks
         const rawProxies = [
             `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
             `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
@@ -1340,9 +1336,46 @@
             if (sMC) userMC = parseInt(sMC, 10);
             if (sLine) customLineup = JSON.parse(sLine);
 
+            // Safety check for cached saves that lack roster players
+            ALL_TEAMS.forEach(team => {
+                if (team.id !== "FA" && (!team.players || team.players.length === 0)) {
+                    generateSynchronousRoster(team);
+                }
+            });
+
             return true;
         }
         return false;
+    }
+
+    // --- procedurally generate starting offline rosters ---
+    function generateSynchronousRoster(team) {
+        if (team.id === "FA") return;
+        const positions = ["PG", "SG", "SF", "PF", "C", "PG", "SG", "SF", "PF", "C"];
+        const teamPlayerIds = [];
+        positions.forEach((pos, idx) => {
+            const fallbackId = `fb-${team.id}-${idx}`;
+            let playerObj = PLAYERS.find(p => p.id === fallbackId);
+            if (!playerObj) {
+                playerObj = {
+                    id: fallbackId,
+                    name: generateRealisticSubstituteName(),
+                    pos: pos,
+                    team: team.name,
+                    teamId: team.id,
+                    jersey: Math.floor(Math.random() * 99).toString(),
+                    photo: `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png`,
+                    col1: team.col1,
+                    col2: team.col2,
+                    injuryDays: 0,
+                    injuryType: ""
+                };
+                assignPlayerAttributes(playerObj);
+                PLAYERS.push(playerObj);
+            }
+            teamPlayerIds.push(fallbackId);
+        });
+        team.players = teamPlayerIds;
     }
 
     // --- DATA INTAKE ---
@@ -1395,7 +1428,12 @@
             ALL_TEAMS = tempTeams;
             PLAYERS = [];
 
-            // Preload sequences bypassed on start-up. Roster payloads are loaded on demand.
+            // Instantiate valid offline starting rosters to block crossing or mixing lines
+            ALL_TEAMS.forEach(team => {
+                if (team.id !== "FA") {
+                    generateSynchronousRoster(team);
+                }
+            });
             
             progress.style.width = "100%";
             saveRostersState();
@@ -1419,6 +1457,9 @@
             const rosterUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/${teamId}/roster`;
             const rosterData = await robustFetchJson(rosterUrl);
             const athletes = rosterData.athletes || [];
+            
+            // Purge temporary generated players for this team to avoid collision or duplicates in Free Agency
+            PLAYERS = PLAYERS.filter(p => !p.id.startsWith(`fb-${teamId}-`) && p.teamId !== teamId);
             const teamPlayerIds = [];
 
             athletes.forEach((a, index) => {
@@ -1459,31 +1500,10 @@
 
             team.players = teamPlayerIds;
         } catch (err) {
-            console.error(`Offline or roster payload fetch failed for ${team.name}. Generating fallbacks...`, err);
-            const positions = ["PG", "SG", "SF", "PF", "C", "PG", "SG", "SF", "PF", "C"];
-            const teamPlayerIds = [];
-            positions.forEach((pos, idx) => {
-                const fallbackId = `fallback-${teamId}-${idx}`;
-                const playerObj = {
-                    id: fallbackId,
-                    name: generateRealisticSubstituteName(),
-                    pos: pos,
-                    team: team.name,
-                    teamId: team.id,
-                    jersey: Math.floor(Math.random() * 99).toString(),
-                    photo: `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png`,
-                    col1: team.col1,
-                    col2: team.col2,
-                    injuryDays: 0,
-                    injuryType: ""
-                };
-                assignPlayerAttributes(playerObj);
-                if (!PLAYERS.some(p => p.id === playerObj.id)) {
-                    PLAYERS.push(playerObj);
-                }
-                teamPlayerIds.push(fallbackId);
-            });
-            team.players = teamPlayerIds;
+            console.error(`Offline or roster payload fetch failed for ${team.name}. Retaining existing generated/cached roster.`, err);
+            if (!team.players || team.players.length === 0) {
+                generateSynchronousRoster(team);
+            }
         }
         saveRostersState();
     }
@@ -1918,7 +1938,6 @@
         }
     }
 
-    // CPU teams drop players into the FA pool
     function simulateCPUWaivers() {
         if (Math.random() > 0.20) return; // 20% drop chance per round
         
@@ -1930,7 +1949,7 @@
         if (cpuPlayers.length === 0) return;
         
         cpuPlayers.sort((a, b) => a.ovr - b.ovr);
-        const released = cpuPlayers[0]; // Drops their lowest-rated player to FA
+        const released = cpuPlayers[0]; 
         
         cpuTeam.players = cpuTeam.players.filter(id => id !== released.id);
         released.teamId = "FA";
@@ -1944,7 +1963,6 @@
         addNewsItem('trade', `📋 <strong>Waiver Wire</strong>: The <strong>${cpuTeam.name}</strong> have waived <strong>${released.name}</strong> (${released.pos}, OVR ${released.ovr}). He has cleared waivers and entered the Free Agents pool.`);
     }
 
-    // CPU teams select and claim players from FA pool
     function simulateCPUSignings() {
         if (Math.random() > 0.20) return; // 20% claim chance per round
         
@@ -1955,10 +1973,10 @@
         if (faPlayers.length === 0) return;
         
         faPlayers.sort((a, b) => b.ovr - a.ovr);
-        const selectedFA = faPlayers[0]; // Elite players claimed first
+        const selectedFA = faPlayers[0]; 
         
         cpuTeams.sort((a, b) => a.players.length - b.players.length);
-        const targetTeam = cpuTeams[0]; // Signed by team in need of depth
+        const targetTeam = cpuTeams[0]; 
         
         const faTeam = ALL_TEAMS.find(t => t.id === "FA");
         if (faTeam) faTeam.players = faTeam.players.filter(id => id !== selectedFA.id);
@@ -2026,7 +2044,7 @@
         
         const team = ALL_TEAMS.find(t => t.id === v);
         if (team && v !== "FA" && (!team.players || team.players.length === 0)) {
-            document.getElementById("roster-table-body-b").innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-muted);">🔄 Loading live roster via proxy...</td></tr>`;
+            document.getElementById("roster-table-body-b").innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-muted);">🔄 Loading live roster data...</td></tr>`;
             await loadTeamRosterDynamically(v);
         }
         
@@ -2053,10 +2071,10 @@
                 document.getElementById("simulation-clock").textContent = "Knockout Series";
                 
                 document.getElementById("play-live-btn").disabled = false;
-                document.getElementById("instant-sim-btn").disabled = false;
+                if (document.getElementById("instant-sim-btn")) document.getElementById("instant-sim-btn").disabled = false;
             } else {
                 document.getElementById("play-live-btn").disabled = true;
-                document.getElementById("instant-sim-btn").disabled = true;
+                if (document.getElementById("instant-sim-btn")) document.getElementById("instant-sim-btn").disabled = true;
                 document.getElementById("game-status").textContent = "SEASON OVER";
                 document.getElementById("simulation-clock").textContent = "Eliminated";
             }
@@ -2084,11 +2102,11 @@
                 document.getElementById("simulation-clock").textContent = "Match Ready";
                 
                 document.getElementById("play-live-btn").disabled = false;
-                document.getElementById("instant-sim-btn").disabled = false;
+                if (document.getElementById("instant-sim-btn")) document.getElementById("instant-sim-btn").disabled = false;
             }
         } else {
             document.getElementById("play-live-btn").disabled = true;
-            document.getElementById("instant-sim-btn").disabled = true;
+            if (document.getElementById("instant-sim-btn")) document.getElementById("instant-sim-btn").disabled = true;
             document.getElementById("game-status").textContent = "SEASON OVER";
             document.getElementById("simulation-clock").textContent = "Calculating";
         }
@@ -2118,7 +2136,7 @@
         boxScoreView = "away";
 
         document.getElementById("play-live-btn").disabled = true;
-        document.getElementById("instant-sim-btn").disabled = true;
+        if (document.getElementById("instant-sim-btn")) document.getElementById("instant-sim-btn").disabled = true;
 
         const executeMergedScheduleStep = async () => {
             if (!teamAway.players || teamAway.players.length === 0) await loadTeamRosterDynamically(teamAway.id);
@@ -2144,7 +2162,7 @@
         executeMergedScheduleStep().catch(err => {
             appendTickerMessage(`❌ Execution Interrupted: ${err.message}`);
             document.getElementById("play-live-btn").disabled = false;
-            document.getElementById("instant-sim-btn").disabled = false;
+            if (document.getElementById("instant-sim-btn")) document.getElementById("instant-sim-btn").disabled = false;
         });
     }
 
@@ -2175,8 +2193,23 @@
             standHome.wins++; standAway.losses++;
         }
 
-        // Auto-Sim remainder of league matches for this game-day
+        // Regular Season payout rewards (500,000 MyCASH for win, 150,000 MyCASH for loss)
         const games = seasonSchedule[currentSeasonRound];
+        const userMatch = games.find(g => g.away.id === userTeamId || g.home.id === userTeamId);
+        if (userMatch) {
+            const userIsAway = userMatch.away.id === userTeamId;
+            const userWon = (userIsAway && scoreAway > scoreHome) || (!userIsAway && scoreHome > scoreAway);
+            
+            if (userWon) {
+                addMC(500000);
+                addNewsItem('milestone', `💰 <strong>Victory Payout</strong>: Your franchise earned <strong>500,000 MyCASH</strong> for securing the win against the ${userIsAway ? userMatch.home.name : userMatch.away.name}!`);
+            } else {
+                addMC(150000);
+                addNewsItem('milestone', `💰 <strong>Consolation Payout</strong>: Your franchise earned <strong>150,000 MyCASH</strong> for competing against the ${userIsAway ? userMatch.home.name : userMatch.away.name}.`);
+            }
+        }
+
+        // Auto-Sim remainder of league matches for this game-day
         const liveBoard = document.getElementById("live-season-scoreboard");
         const liveGrid = document.getElementById("live-games-grid");
         
@@ -2234,8 +2267,8 @@
 
         // Background waivers, transfers, recoveries
         simulateCPUTrades();
-        simulateCPUWaivers(); // Triggering drops dynamically
-        simulateCPUSignings(); // Triggering claims dynamically
+        simulateCPUWaivers(); 
+        simulateCPUSignings(); 
         processGlobalRecoveries();
 
         currentSeasonRound++;
@@ -2534,6 +2567,10 @@
                 return;
             }
 
+            // Award 2,000,000 MC for making Semis
+            addMC(2000000);
+            addNewsItem('milestone', `💰 <strong>Postseason Payout</strong>: Received <strong>2,000,000 MyCASH</strong> for advancing to the Semifinals!`);
+
             playoffsState.semi1.t1 = playoffsState.q1.winner;
             playoffsState.semi1.t2 = playoffsState.q2.winner;
             playoffsState.semi2.t1 = playoffsState.q3.winner;
@@ -2576,6 +2613,10 @@
                 return;
             }
 
+            // Award 5,000,000 MC for making Finals
+            addMC(5000000);
+            addNewsItem('milestone', `💰 <strong>Postseason Payout</strong>: Received <strong>5,000,000 MyCASH</strong> for advancing to the Grand Finals!`);
+
             playoffsState.finals.t1 = playoffsState.semi1.winner;
             playoffsState.finals.t2 = playoffsState.semi2.winner;
             playoffsState.round = "finals";
@@ -2594,10 +2635,10 @@
 
             if (champ.id === userTeamId) {
                 addMC(30000000); 
-                addNewsItem('milestone', `🏆 <strong>FINALS BONUS</strong>: Your team won the Grand Finals! Payout of 30,000,000 MC processed.`);
+                addNewsItem('milestone', `🏆 <strong>FINALS BONUS</strong>: Your team won the Grand Finals! Payout of 30,000,000 MyCASH processed.`);
             } else if (runnerUp.id === userTeamId) {
                 addMC(10000000); 
-                addNewsItem('milestone', `🥈 <strong>FINALS BONUS</strong>: Your team finished as the runner-up. Payout of 10,000,000 MC processed.`);
+                addNewsItem('milestone', `🥈 <strong>FINALS BONUS</strong>: Your team finished as the runner-up. Payout of 10,000,000 MyCASH processed.`);
             }
 
             document.getElementById("bracket-f-t1").innerHTML = `${playoffsState.finals.t1.abbreviation} - <strong>${scoreA}</strong>`;
@@ -2606,7 +2647,6 @@
             document.getElementById("season-champ-name").textContent = champ.name.toUpperCase();
             document.getElementById("season-champ-card").style.display = "block";
             document.getElementById("play-live-btn").disabled = true;
-            document.getElementById("instant-sim-btn").disabled = true;
 
             addNewsItem('milestone', `⭐ <strong>CHAMPIONS CROWNED</strong>: The <strong>${champ.name}</strong> have won the tournament!`);
 
@@ -2619,7 +2659,6 @@
         document.getElementById("season-champ-name").textContent = "SEASON OVER";
         document.getElementById("season-champ-card").style.display = "block";
         document.getElementById("play-live-btn").disabled = true;
-        document.getElementById("instant-sim-btn").disabled = true;
         playoffsState = null;
         saveRostersState();
     }
@@ -2869,7 +2908,7 @@
             }, 150); 
 
         } else {
-            // Fast simulation
+            // Fast simulation fallback
             while (quarter <= 4 || scoreAway === scoreHome) {
                 secondsLeft -= (Math.floor(Math.random() * 15) + 30);
                 if (secondsLeft <= 0) {
