@@ -237,7 +237,6 @@
             }
         }
 
-        /* Prevent Scroll Chaining globally on scroll containers */
         .roster-pane, .ticker-box, .cd-menu, .team-selection-box, .team-selection-overlay {
             overscroll-behavior: contain !important;
         }
@@ -358,12 +357,6 @@
             background-color: var(--accent-blue);
         }
 
-        .players-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
         .player-card {
             background-color: var(--bg-card);
             border: 2px solid var(--border-color);
@@ -390,14 +383,6 @@
             font-weight: 900;
             font-size: 1.1rem;
             padding: 4px 10px;
-        }
-
-        .grid-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            gap: 2rem;
         }
 
         .scoreboard-panel {
@@ -557,7 +542,6 @@
             text-align: center;
         }
 
-        /* Overlay for Team Selection */
         .team-selection-overlay {
             position: fixed;
             top: 0;
@@ -685,7 +669,6 @@
     </div>
 </div>
 
-<!-- MyNBA Initial Team Selection Overlay -->
 <div class="team-selection-overlay" id="team-selection-overlay">
     <div class="team-selection-box">
         <h2 style="font-weight: 900; font-size: 2.2rem; color: var(--accent-gold); text-transform: uppercase; margin-bottom: 1rem;">Welcome to MyNBA</h2>
@@ -707,7 +690,8 @@
                 <button class="nav-btn active" id="tab-btn-rosters" onclick="switchTab('tab-rosters')">Rosters & Trades</button>
                 <button class="nav-btn" id="tab-btn-game" onclick="switchTab('tab-exhibition')">Play Game</button>
                 <button class="nav-btn" id="tab-btn-season" onclick="switchTab('tab-season')">Season</button>
-                <button class="nav-btn" id="tab-btn-news" onclick="switchTab('tab-news')">News Wire</button>
+                <button class="nav-btn" id="tab-btn-upgrades" onclick="switchTab('tab-upgrades')">Upgrades</button>
+                <button class="nav-btn" id="tab-btn-news" onclick="switchTab('tab-news')">News</button>
             </nav>
         </div>
     </header>
@@ -719,19 +703,11 @@
                 <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
                     <div>
                         <h3 style="font-weight: 800; font-size: 1.4rem; color: var(--accent-gold);">Franchise Management</h3>
-                        <p style="font-size:0.95rem; color:var(--text-muted); margin-top: 5px;">Manage your locked-in roster. Propose trades and spend MM to develop your players.</p>
+                        <p style="font-size:0.95rem; color:var(--text-muted); margin-top: 5px;">Manage your locked-in roster. Propose trades and adjust attributes in the Upgrades tab.</p>
                         
                         <div style="margin-top: 15px; display: flex; align-items: center; gap: 12px;">
                             <span style="font-weight: 700; font-size: 1rem;">Your Franchise:</span>
                             <div id="locked-team-display" style="font-size: 1.2rem; font-weight: 900; display:flex; align-items:center; gap: 10px; background: var(--bg-hover); padding: 8px 16px; border: 1px solid var(--border-color);"></div>
-                        </div>
-                    </div>
-
-                    <div style="background: var(--bg-dark); border: 2px solid var(--border-color); padding: 20px; width: 450px;">
-                        <h4 style="font-size: 0.9rem; color: var(--accent-green); margin-bottom: 10px;">Player Development (Cost: 1,000,000 MM)</h4>
-                        <div style="display: flex; gap: 8px;">
-                            <div id="cd-wrapper-upgrade" style="flex:1;"></div>
-                            <button class="btn btn-success" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="buyPlayerUpgrade()">+1 OVR</button>
                         </div>
                     </div>
                 </div>
@@ -894,7 +870,78 @@
 
         <!-- TAB 3: SEASON -->
         <section id="tab-season" class="tab-content">
-            <div class="trades-grid">
+            <!-- Symmetrical Tournament Bracket & Trophy Panel sits on TOP of both columns -->
+            <div class="panel" id="season-champ-card" style="display: none; text-align: center; border-color: var(--accent-green); background: linear-gradient(180deg, rgba(16,185,129,0.1) 0%, rgba(15,21,36,1) 100%); padding: 3rem;">
+                <h2 style="color: var(--accent-green); font-weight: 900; font-size: 2rem;">🏆 LEAGUE CHAMPION CROWNED</h2>
+                <h1 id="season-champ-name" style="font-weight: 900; margin-top: 1rem; font-size: 3rem;">--</h1>
+                <button class="btn btn-success" style="margin-top: 2rem; font-size: 1.2rem; padding: 1rem 2.5rem;" onclick="startSeason()">Start Next Season</button>
+            </div>
+
+            <div class="panel" id="playoff-bracket" style="display: none; border-color: var(--accent-gold);">
+                <div class="panel-title" style="color: var(--accent-gold); border-bottom: 2px solid rgba(234, 179, 8, 0.3)">Postseason Bracket</div>
+                <div id="playoff-bracket-board">
+                    <!-- Column 1: Left Quarterfinals -->
+                    <div style="display: flex; flex-direction: column; gap: 60px;">
+                        <div class="bracket-box">
+                            <div class="bracket-box-title">Quarterfinal 1</div>
+                            <div id="bracket-q1-t1" class="bracket-team-line">--</div>
+                            <div id="bracket-q1-t2" class="bracket-team-line">--</div>
+                        </div>
+                        <div class="bracket-box">
+                            <div class="bracket-box-title">Quarterfinal 2</div>
+                            <div id="bracket-q2-t1" class="bracket-team-line">--</div>
+                            <div id="bracket-q2-t2" class="bracket-team-line">--</div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Left Semifinals -->
+                    <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+                        <div class="bracket-box semi-box">
+                            <div class="bracket-box-title">Semifinal 1</div>
+                            <div id="bracket-s1-t1" class="bracket-team-line">--</div>
+                            <div id="bracket-s1-t2" class="bracket-team-line">--</div>
+                        </div>
+                    </div>
+
+                    <!-- Column 3: Grand Finals Trophy / Winner (Center) -->
+                    <div style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px;">
+                        <svg style="width: 90px; height: 90px; filter: drop-shadow(0 0 15px rgba(234, 179, 8, 0.5));" viewBox="0 0 24 24" fill="var(--accent-gold)">
+                            <path d="M18 2H6c-1.1 0-2 .9-2 2v1c0 2.21 1.79 4 4 4h1v5c0 2.21 1.79 4 4 4h2c2.21 0 4-1.79 4-4V9h1c2.21 0 4-1.79 4-4V4c0-1.1-.9-2-2-2zm-1 7h-1V5h1v4zm-7-4h4v8c0 1.1-.9 2-2 2s-2-.9-2-2V5zM5 5h1v4H5V5zm14 4h-1V5h1v4zM12 18c-2.21 0-4 1.79-4 4h8c0-2.21-1.79-4-4-4z"/>
+                        </svg>
+                        <div class="bracket-box finals-box" style="width: 100%;">
+                            <div class="bracket-box-title" style="color:var(--accent-gold); font-size:0.85rem;">Grand Final</div>
+                            <div id="bracket-f-t1" class="bracket-team-line">--</div>
+                            <div id="bracket-f-t2" class="bracket-team-line">--</div>
+                        </div>
+                    </div>
+
+                    <!-- Column 4: Right Semifinals -->
+                    <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+                        <div class="bracket-box semi-box">
+                            <div class="bracket-box-title">Semifinal 2</div>
+                            <div id="bracket-s2-t1" class="bracket-team-line">--</div>
+                            <div id="bracket-s2-t2" class="bracket-team-line">--</div>
+                        </div>
+                    </div>
+
+                    <!-- Column 5: Right Quarterfinals -->
+                    <div style="display: flex; flex-direction: column; gap: 60px;">
+                        <div class="bracket-box">
+                            <div class="bracket-box-title">Quarterfinal 3</div>
+                            <div id="bracket-q3-t1" class="bracket-team-line">--</div>
+                            <div id="bracket-q3-t2" class="bracket-team-line">--</div>
+                        </div>
+                        <div class="bracket-box">
+                            <div class="bracket-box-title">Quarterfinal 4</div>
+                            <div id="bracket-q4-t1" class="bracket-team-line">--</div>
+                            <div id="bracket-q4-t2" class="bracket-team-line">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Standard Split for Standings and Controls -->
+            <div class="trades-grid" style="margin-top: 1.8rem;">
                 <div>
                     <div class="panel">
                         <div class="panel-title">
@@ -913,77 +960,6 @@
                             </thead>
                             <tbody id="season-standings-body"></tbody>
                         </table>
-                    </div>
-
-                    <!-- SYMMETRICAL TOURNAMENT KNOCKOUT BRACKET -->
-                    <div class="panel" id="playoff-bracket" style="display: none; border-color: var(--accent-gold);">
-                        <div class="panel-title" style="color: var(--accent-gold); border-bottom: 2px solid rgba(234, 179, 8, 0.3)">Postseason Bracket</div>
-                        
-                        <div id="playoff-bracket-board">
-                            <!-- Column 1: Left Quarterfinals -->
-                            <div style="display: flex; flex-direction: column; gap: 60px;">
-                                <div class="bracket-box">
-                                    <div class="bracket-box-title">Quarterfinal 1</div>
-                                    <div id="bracket-q1-t1" class="bracket-team-line">--</div>
-                                    <div id="bracket-q1-t2" class="bracket-team-line">--</div>
-                                </div>
-                                <div class="bracket-box">
-                                    <div class="bracket-box-title">Quarterfinal 2</div>
-                                    <div id="bracket-q2-t1" class="bracket-team-line">--</div>
-                                    <div id="bracket-q2-t2" class="bracket-team-line">--</div>
-                                </div>
-                            </div>
-
-                            <!-- Column 2: Left Semifinals -->
-                            <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                                <div class="bracket-box semi-box">
-                                    <div class="bracket-box-title">Semifinal 1</div>
-                                    <div id="bracket-s1-t1" class="bracket-team-line">--</div>
-                                    <div id="bracket-s1-t2" class="bracket-team-line">--</div>
-                                </div>
-                            </div>
-
-                            <!-- Column 3: Grand Finals Trophy / Winner (Center) -->
-                            <div style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px;">
-                                <svg style="width: 90px; height: 90px; filter: drop-shadow(0 0 15px rgba(234, 179, 8, 0.5));" viewBox="0 0 24 24" fill="var(--accent-gold)">
-                                    <path d="M18 2H6c-1.1 0-2 .9-2 2v1c0 2.21 1.79 4 4 4h1v5c0 2.21 1.79 4 4 4h2c2.21 0 4-1.79 4-4V9h1c2.21 0 4-1.79 4-4V4c0-1.1-.9-2-2-2zm-1 7h-1V5h1v4zm-7-4h4v8c0 1.1-.9 2-2 2s-2-.9-2-2V5zM5 5h1v4H5V5zm14 4h-1V5h1v4zM12 18c-2.21 0-4 1.79-4 4h8c0-2.21-1.79-4-4-4z"/>
-                                </svg>
-                                <div class="bracket-box finals-box" style="width: 100%;">
-                                    <div class="bracket-box-title" style="color:var(--accent-gold); font-size:0.85rem;">Grand Final</div>
-                                    <div id="bracket-f-t1" class="bracket-team-line">--</div>
-                                    <div id="bracket-f-t2" class="bracket-team-line">--</div>
-                                </div>
-                            </div>
-
-                            <!-- Column 4: Right Semifinals -->
-                            <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                                <div class="bracket-box semi-box">
-                                    <div class="bracket-box-title">Semifinal 2</div>
-                                    <div id="bracket-s2-t1" class="bracket-team-line">--</div>
-                                    <div id="bracket-s2-t2" class="bracket-team-line">--</div>
-                                </div>
-                            </div>
-
-                            <!-- Column 5: Right Quarterfinals -->
-                            <div style="display: flex; flex-direction: column; gap: 60px;">
-                                <div class="bracket-box">
-                                    <div class="bracket-box-title">Quarterfinal 3</div>
-                                    <div id="bracket-q3-t1" class="bracket-team-line">--</div>
-                                    <div id="bracket-q3-t2" class="bracket-team-line">--</div>
-                                </div>
-                                <div class="bracket-box">
-                                    <div class="bracket-box-title">Quarterfinal 4</div>
-                                    <div id="bracket-q4-t1" class="bracket-team-line">--</div>
-                                    <div id="bracket-q4-t2" class="bracket-team-line">--</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="panel" id="season-champ-card" style="display: none; text-align: center; border-color: var(--accent-green); background: linear-gradient(180deg, rgba(16,185,129,0.1) 0%, rgba(15,21,36,1) 100%); padding: 3rem;">
-                        <h2 style="color: var(--accent-green); font-weight: 900; font-size: 2rem;">🏆 LEAGUE CHAMPION CROWNED</h2>
-                        <h1 id="season-champ-name" style="font-weight: 900; margin-top: 1rem; font-size: 3rem;">--</h1>
-                        <button class="btn btn-success" style="margin-top: 2rem; font-size: 1.2rem; padding: 1rem 2.5rem;" onclick="startSeason()">Start Next Season</button>
                     </div>
                 </div>
 
@@ -1023,7 +999,47 @@
             </div>
         </section>
 
-        <!-- TAB 4: NEWS WIRE -->
+        <!-- TAB 4: UPGRADES -->
+        <section id="tab-upgrades" class="tab-content">
+            <div class="panel">
+                <div class="panel-title">
+                    <span>Player Skill Lab</span>
+                    <span style="color: var(--accent-gold); font-size: 0.95rem;">Fine-tune Attributes • Dynamic Refund Processing</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 2.5rem; align-items: start;">
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div>
+                            <label style="font-weight: 800; display: block; margin-bottom: 8px;">Select Franchise Player:</label>
+                            <div id="cd-wrapper-upgrade-select"></div>
+                        </div>
+                        <div id="upgrade-player-card" class="player-card" style="display:none; text-align: center;">
+                            <div class="ovr-badge" id="upgrade-player-ovr-badge">99</div>
+                            <img id="upgrade-player-img" class="player-headshot-large" src="" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">
+                            <h3 id="upgrade-player-name" style="font-weight: 900; margin-top: 10px;">Player Name</h3>
+                            <div id="upgrade-player-pos" class="pos-badge" style="display: inline-block; margin-top: 8px;">PG</div>
+                        </div>
+                    </div>
+                    
+                    <div class="panel" style="background: var(--bg-dark); border-color: var(--border-color); margin-bottom: 0;">
+                        <h4 style="font-weight: 800; text-transform: uppercase; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: 1.5rem;">Attributes Configurator</h4>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;" id="upgrade-modifiers-container">
+                            <!-- Injected Sliders -->
+                        </div>
+                        
+                        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 700;">TOTAL ESTIMATED COST:</div>
+                                <div id="upgrade-total-cost" style="font-size: 1.8rem; font-weight: 900; color: var(--accent-gold);">0 MM</div>
+                            </div>
+                            <button class="btn btn-primary" id="btn-upgrade-purchase" onclick="processUpgradePurchase()" style="font-size: 1.1rem; padding: 1rem 2.5rem;">Confirm Transaction</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: NEWS -->
         <section id="tab-news" class="tab-content">
             <div class="panel">
                 <div class="panel-title">SLAM News & Transaction Wire</div>
@@ -1033,7 +1049,7 @@
                             <span>League Milestone</span>
                             <span>Day 0</span>
                         </div>
-                        Welcome to the SLAM franchise experience. Keep an eye here for major transaction reports, player health updates, and trade reports from around the league!
+                        Welcome to the SLAM news deck. Keep an eye here for major transaction reports, player health updates, and trade reports from around the league!
                     </div>
                 </div>
             </div>
@@ -1068,6 +1084,11 @@
     let tradeB = [];
 
     let customLineup = { PG: "", SG: "", SF: "", PF: "", C: "" };
+
+    // Player Upgrades Cache
+    let activeUpgradePlayerId = "";
+    let upgradeProposedStats = { off: 0, def: 0, reb: 0, ast: 0 };
+    let upgradeOriginalStats = { off: 0, def: 0, reb: 0, ast: 0 };
 
     const ESPN_TEAMS_API = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams";
 
@@ -1315,7 +1336,7 @@
             loader.style.display = "none";
             initApp();
         } catch (err) {
-            alert("Error loading dynamic JSON. Initializing fail-safe configuration.");
+            alert("Error loading data. Initializing fail-safe configuration.");
             loader.style.display = "none";
         }
     }
@@ -1390,7 +1411,6 @@
             switchTab("tab-rosters");
             updateUserTeamDisplay();
             renderRosterSide('a');
-            populateUpgradeList();
             buildCustomLogoDropdowns();
             renderLineupSelectors();
         }
@@ -1414,7 +1434,7 @@
         
         document.getElementById(tabId).classList.add('active');
         
-        const idx = ['tab-rosters', 'tab-exhibition', 'tab-season', 'tab-news'].indexOf(tabId);
+        const idx = ['tab-rosters', 'tab-exhibition', 'tab-season', 'tab-upgrades', 'tab-news'].indexOf(tabId);
         if(document.querySelectorAll('.nav-btn')[idx]) {
             document.querySelectorAll('.nav-btn')[idx].classList.add('active');
         }
@@ -1428,6 +1448,8 @@
         } else if (tabId === 'tab-season') {
             renderStandings();
             renderLeagueLeaders();
+        } else if (tabId === 'tab-upgrades') {
+            buildCustomUpgradesDropdown();
         } else if (tabId === 'tab-news') {
             renderNewsFeed();
         }
@@ -1456,7 +1478,6 @@
             updateUserTeamDisplay();
             buildCustomLogoDropdowns();
             renderRosterSide('a');
-            populateUpgradeList();
             renderLineupSelectors();
             startSeason(); 
         }
@@ -1490,44 +1511,6 @@
         if(titleA) titleA.textContent = team.name;
 
         activeExhibitionAway = userTeamId;
-    }
-
-    function populateUpgradeList() {
-        const roster = PLAYERS.filter(p => p.teamId === userTeamId);
-        roster.sort((a, b) => b.ovr - a.ovr);
-        let opts = roster.map(p => ({label: `${p.name} (${p.ovr})`, value: p.id}));
-        if(opts.length > 0) {
-            createDropdown('upgrade', opts, opts[0].value, '', '');
-        }
-    }
-
-    function buyPlayerUpgrade() {
-        const pId = activeDropdowns['upgrade'];
-        const player = PLAYERS.find(p => p.id === pId);
-        
-        if (!player) return;
-        if (userMM < 1000000) {
-            alert(`Not enough MM! You need 1,000,000 MM to develop a player.`);
-            return;
-        }
-        if (player.ovr >= 99) {
-            alert(`${player.name} is already at max overall (99).`);
-            return;
-        }
-
-        userMM -= 1000000;
-        player.off = Math.min(99, player.off + 1);
-        player.def = Math.min(99, player.def + 1);
-        player.reb = Math.min(99, player.reb + 1);
-        player.ast = Math.min(99, player.ast + 1);
-        player.ovr += 1;
-        
-        addNewsItem('milestone', `📈 <strong>Player Development</strong>: <strong>${player.name}</strong> of the <strong>${player.team}</strong> has been trained, increasing their OVR to ${player.ovr}!`);
-        
-        updateMMDisplay();
-        renderRosterSide('a');
-        populateUpgradeList();
-        saveRostersState();
     }
 
     function renderLineupSelectors() {
@@ -1756,7 +1739,6 @@
             }
         }
 
-        // Swaps
         tradeA.forEach(p => {
             teamA.players = teamA.players.filter(id => id !== p.id);
             if(teamB.id !== "FA") teamB.players.push(p.id);
@@ -1782,14 +1764,13 @@
         saveRostersState();
         renderRosterSide('a');
         renderRosterSide('b');
-        populateUpgradeList();
         renderLineupSelectors();
         updateTradeCenterPanel();
     }
 
     // --- CPU TRADING SYSTEM ---
     function simulateCPUTrades() {
-        if (Math.random() > 0.15) return; // Happens 15% of rounds
+        if (Math.random() > 0.15) return; 
 
         const eligibleTeams = ALL_TEAMS.filter(t => t.id !== "FA" && t.id !== userTeamId);
         if (eligibleTeams.length < 2) return;
@@ -1808,7 +1789,6 @@
         let playerA = rosterA[Math.floor(Math.random() * rosterA.length)];
         let playerB = rosterB[Math.floor(Math.random() * rosterB.length)];
 
-        // Ensure players have similar overalls for a realistic transaction
         if (Math.abs(playerA.ovr - playerB.ovr) <= 4) {
             tA.players = tA.players.filter(id => id !== playerA.id);
             tB.players = tB.players.filter(id => id !== playerB.id);
@@ -1828,7 +1808,6 @@
         boxRoster.forEach(p => {
             if (p.injuryDays && p.injuryDays > 0) return;
 
-            // 1% chance per game played of sustaining an injury
             if (Math.random() < 0.01) {
                 const injuryTypes = [
                     { type: "Sprained Knee", duration: 4 },
@@ -1840,7 +1819,6 @@
                 ];
                 let selected = injuryTypes[Math.floor(Math.random() * injuryTypes.length)];
                 
-                // Set both local execution model and master player record
                 p.injuryDays = selected.duration;
                 p.injuryType = selected.type;
 
@@ -1932,8 +1910,11 @@
 
                 if (update.tickerMessage) appendTickerMessage(update.tickerMessage);
                 
+                // Keep box score dynamically updating in real-time
+                exhibitionBox = { statsAway: update.statsAway, statsHome: update.statsHome };
+                renderBoxScoreStats();
+                
                 if (update.isFinished) {
-                    renderBoxScoreStats();
                     if(update.scoreAway > update.scoreHome) {
                          addMM(150000);
                     } else {
@@ -2050,7 +2031,7 @@
             let fullOffRoster = isAwayPoss ? fullRosterAway : fullRosterHome;
             let fullDefRoster = isAwayPoss ? fullRosterHome : fullRosterAway;
 
-            if (offSquad.length === 0) return { scoreAway, scoreHome, quarter: 4, time: "0:00", tickerMessage: "", isFinished: true };
+            if (offSquad.length === 0) return { scoreAway, scoreHome, quarter: 4, time: "0:00", tickerMessage: "", isFinished: true, statsAway: fullRosterAway, statsHome: fullRosterHome };
 
             fullOffRoster.forEach(p => {
                 if (offSquad.some(ox => ox.id === p.id)) {
@@ -2163,7 +2144,8 @@
             let timeStr = `Q${q} - ${mRem}:${sRem < 10 ? '0' + sRem : sRem}`;
 
             return {
-                scoreAway, scoreHome, quarter: q, time: timeStr, tickerMessage: msg, isFinished: currentPoss >= totalPossessions
+                scoreAway, scoreHome, quarter: q, time: timeStr, tickerMessage: msg, isFinished: currentPoss >= totalPossessions,
+                statsAway: fullRosterAway, statsHome: fullRosterHome
             };
         }
 
@@ -2181,7 +2163,7 @@
                     }
                 } catch(e) {
                     clearInterval(currentSimInterval);
-                    onUpdate({ scoreAway, scoreHome, quarter: 4, time: "0:00", tickerMessage: "Error computing play.", isFinished: true });
+                    onUpdate({ scoreAway, scoreHome, quarter: 4, time: "0:00", tickerMessage: "Error computing play.", isFinished: true, statsAway: fullRosterAway, statsHome: fullRosterHome });
                 }
             }, loopDelay);
         } else {
@@ -2263,7 +2245,7 @@
     function generateSeasonSchedule(teams) {
         seasonSchedule = [];
         let list = [...teams];
-        let n = list.length; // 30 teams
+        let n = list.length; 
 
         for (let r = 0; r < n - 1; r++) {
             let roundGames = [];
@@ -2313,7 +2295,6 @@
         }
     }
 
-    // SIMULATE SEASON COMPONENT
     async function simSeasonDay() {
         if (currentSeasonRound >= seasonSchedule.length && !playoffsState) {
             alert("The Regular Season is completed! Start Playoffs or Force Restart Season.");
@@ -2339,13 +2320,11 @@
         liveBoard.style.display = "block";
         liveGrid.innerHTML = "";
 
-        // Auto-complete dynamic prehydration cleanly
         for (let g of games) {
             if (!g.away.players || g.away.players.length === 0) try { await loadTeamRosterDynamically(g.away.id); } catch(e){}
             if (!g.home.players || g.home.players.length === 0) try { await loadTeamRosterDynamically(g.home.id); } catch(e){}
         }
 
-        // Complete games instantly in the background without lag
         games.forEach((g) => {
             let box = executeGameRotationSimulation(g.away, g.home, false, () => {});
             
@@ -2361,12 +2340,8 @@
 
             if (g.scoreA > g.scoreH) {
                 standAway.wins++; standHome.losses++;
-                if(g.away.id === userTeamId) addMM(450000); 
-                else if(g.home.id === userTeamId) addMM(-60000);
             } else {
                 standHome.wins++; standAway.losses++;
-                if(g.home.id === userTeamId) addMM(450000);
-                else if(g.away.id === userTeamId) addMM(-60000);
             }
 
             accumulateSeasonStats(box.statsAway);
@@ -2387,7 +2362,6 @@
             liveGrid.appendChild(card);
         });
 
-        // Run transaction logic and health systems
         simulateCPUTrades();
         processGlobalRecoveries();
 
@@ -2596,9 +2570,15 @@
             let scoreH = rF.statsHome.reduce((sum, p) => sum + p.pts, 0);
 
             let champ = scoreA > scoreH ? playoffsState.finals.t1 : playoffsState.finals.t2;
+            let runnerUp = scoreA > scoreH ? playoffsState.finals.t2 : playoffsState.finals.t1;
 
-            if(champ.id === userTeamId) {
-                addMM(30000000); // 30,000,000 MM Champion prize
+            // Earn or deduct MM ONLY during the Grand Finals
+            if (champ.id === userTeamId) {
+                addMM(30000000); 
+                addNewsItem('milestone', `🏆 <strong>FINALS BONUS</strong>: Your team won the Grand Finals! Bonus payout of 30,000,000 MM processed.`);
+            } else if (runnerUp.id === userTeamId) {
+                addMM(10000000); 
+                addNewsItem('milestone', `🥈 <strong>FINALS BONUS</strong>: Your team finished as the runner-up in the Finals. Bonus payout of 10,000,000 MM processed.`);
             }
 
             document.getElementById("bracket-f-t1").innerHTML = `${playoffsState.finals.t1.abbreviation} - <strong>${scoreA}</strong>`;
@@ -2615,6 +2595,151 @@
         }
 
         if(playoffsState) document.getElementById("sim-day-btn").disabled = false;
+    }
+
+    // --- CUSTOM UPGRADES LAB ENGINE ---
+    function buildCustomUpgradesDropdown() {
+        const roster = PLAYERS.filter(p => p.teamId === userTeamId);
+        roster.sort((a, b) => b.ovr - a.ovr);
+        let opts = roster.map(p => ({ label: `${p.name} (OVR ${p.ovr})`, value: p.id }));
+        
+        if (opts.length > 0) {
+            createDropdown('upgrade-select', opts, activeUpgradePlayerId || opts[0].value, 'Select Player', 'onUpgradePlayerSelect');
+            if (!activeUpgradePlayerId) {
+                onUpgradePlayerSelect(opts[0].value);
+            } else {
+                onUpgradePlayerSelect(activeUpgradePlayerId);
+            }
+        } else {
+            document.getElementById("upgrade-player-card").style.display = "none";
+        }
+    }
+
+    window.onUpgradePlayerSelect = (pId) => {
+        activeUpgradePlayerId = pId;
+        const player = PLAYERS.find(p => p.id === pId);
+        if (!player) return;
+        
+        upgradeOriginalStats = { off: player.off, def: player.def, reb: player.reb, ast: player.ast };
+        upgradeProposedStats = { ...upgradeOriginalStats };
+        
+        document.getElementById("upgrade-player-card").style.display = "block";
+        document.getElementById("upgrade-player-name").textContent = player.name;
+        document.getElementById("upgrade-player-pos").textContent = player.pos;
+        document.getElementById("upgrade-player-img").src = player.photo;
+        
+        renderUpgradeSliders();
+    };
+
+    function renderUpgradeSliders() {
+        const container = document.getElementById("upgrade-modifiers-container");
+        if (!container) return;
+        
+        const attributes = [
+            { key: "off", label: "Offense (scoring & shot making)", color: "var(--accent-red)" },
+            { key: "def", label: "Defense (perimeter defense, rim protection)", color: "var(--accent-blue)" },
+            { key: "reb", label: "Rebounding (boxing out, crashing glass)", color: "var(--accent-green)" },
+            { key: "ast", label: "Assists & Passing (court vision, ball security)", color: "var(--accent-gold)" }
+        ];
+        
+        container.innerHTML = attributes.map(attr => {
+            const currentVal = upgradeProposedStats[attr.key];
+            const originalVal = upgradeOriginalStats[attr.key];
+            const diff = currentVal - originalVal;
+            let diffText = "";
+            if (diff > 0) diffText = `<span style="color:var(--accent-green); font-weight:800; margin-left:8px;">(+${diff})</span>`;
+            if (diff < 0) diffText = `<span style="color:var(--accent-red); font-weight:800; margin-left:8px;">(${diff})</span>`;
+            
+            return `
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 15px; border-radius: 2px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-weight:700; font-size:1rem;">${attr.label}</span>
+                        <span style="font-size:1.1rem; font-weight:900; color:${attr.color}">${currentVal} ${diffText}</span>
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <button class="btn" style="padding:4px 14px; font-size:1.1rem;" onclick="changeUpgradeStat('${attr.key}', -1)">-</button>
+                        <div style="flex:1; height:6px; background:var(--bg-dark); position:relative; border-radius:3px; overflow:hidden;">
+                            <div style="position:absolute; left:0; top:0; height:100%; width:${(currentVal - 50) / 49 * 100}%; background:${attr.color};"></div>
+                        </div>
+                        <button class="btn" style="padding:4px 14px; font-size:1.1rem;" onclick="changeUpgradeStat('${attr.key}', 1)">+</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        calculateUpgradeTotal();
+    }
+
+    function changeUpgradeStat(key, amount) {
+        let newVal = upgradeProposedStats[key] + amount;
+        if (newVal < 50 || newVal > 99) return;
+        upgradeProposedStats[key] = newVal;
+        
+        renderUpgradeSliders();
+    }
+
+    function calculateUpgradeTotal() {
+        let netCost = 0;
+        const keys = ["off", "def", "reb", "ast"];
+        keys.forEach(k => {
+            let diff = upgradeProposedStats[k] - upgradeOriginalStats[k];
+            if (diff > 0) {
+                netCost += diff * 250000; // Cost is 250,000 MM per upgraded point
+            } else {
+                netCost += diff * 150000; // Refund is 150,000 MM per downgraded point
+            }
+        });
+
+        let proposedOVR = Math.round((upgradeProposedStats.off + upgradeProposedStats.def + upgradeProposedStats.reb + upgradeProposedStats.ast) / 4);
+        document.getElementById("upgrade-player-ovr-badge").textContent = proposedOVR;
+
+        const costEl = document.getElementById("upgrade-total-cost");
+        if (netCost >= 0) {
+            costEl.textContent = `${formatMM(netCost)} MM`;
+            costEl.style.color = "var(--accent-gold)";
+        } else {
+            costEl.textContent = `-${formatMM(Math.abs(netCost))} MM (Refund)`;
+            costEl.style.color = "var(--accent-green)";
+        }
+    }
+
+    function processUpgradePurchase() {
+        const player = PLAYERS.find(p => p.id === activeUpgradePlayerId);
+        if (!player) return;
+        
+        let netCost = 0;
+        const keys = ["off", "def", "reb", "ast"];
+        keys.forEach(k => {
+            let diff = upgradeProposedStats[k] - upgradeOriginalStats[k];
+            if (diff > 0) netCost += diff * 250000;
+            else netCost += diff * 150000;
+        });
+        
+        if (netCost > userMM) {
+            alert(`Insufficient funds. You need ${formatMM(netCost)} MM but only have ${formatMM(userMM)} MM.`);
+            return;
+        }
+        
+        addMM(-netCost);
+        
+        player.off = upgradeProposedStats.off;
+        player.def = upgradeProposedStats.def;
+        player.reb = upgradeProposedStats.reb;
+        player.ast = upgradeProposedStats.ast;
+        player.ovr = Math.round((player.off + player.def + player.reb + player.ast) / 4);
+        
+        addNewsItem('milestone', `🔧 <strong>Lab Tuning</strong>: <strong>${player.name}</strong> of the <strong>${player.team}</strong> had attributes adjusted! Offense: ${player.off}, Defense: ${player.def}, Rebounding: ${player.reb}, Assists: ${player.ast}. New OVR: ${player.ovr}.`);
+        
+        alert(`Skill adjustment finalized! Net change: ${netCost >= 0 ? 'Deducted ' + formatMM(netCost) : 'Refunded ' + formatMM(Math.abs(netCost))} MM.`);
+        
+        upgradeOriginalStats = { off: player.off, def: player.def, reb: player.reb, ast: player.ast };
+        upgradeProposedStats = { ...upgradeOriginalStats };
+        
+        renderRosterSide('a');
+        buildCustomUpgradesDropdown();
+        renderLineupSelectors();
+        renderUpgradeSliders();
+        saveRostersState();
     }
 
     // --- RUNTIME BOOTSTRAP GATEWAY ---
