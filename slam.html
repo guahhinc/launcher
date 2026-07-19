@@ -237,7 +237,6 @@
             }
         }
 
-        /* Unified Overscroll Containment to Prevent Chaining Scroll Events to Page Body */
         .scrollable-area, .roster-pane, .ticker-box, .cd-menu, .team-selection-box, .team-selection-overlay, .news-container {
             overscroll-behavior: contain !important;
         }
@@ -565,7 +564,6 @@
             width: 100%;
             max-width: 700px;
             text-align: center;
-            /* Unified Flat shadow - Removed colored glow */
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
 
@@ -590,7 +588,6 @@
         .bracket-box.finals-box {
             border-color: var(--accent-gold);
             padding: 18px;
-            /* Unified Flat shadow - Removed colored glow */
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
         }
 
@@ -859,7 +856,6 @@
 
                     <!-- Column 3: Grand Finals Trophy / Winner (Center) -->
                     <div style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px;">
-                        <!-- Flat Trophy SVG with removed shadow filters -->
                         <svg style="width: 90px; height: 90px;" viewBox="0 0 24 24" fill="var(--accent-gold)">
                             <path d="M18 2H6c-1.1 0-2 .9-2 2v1c0 2.21 1.79 4 4 4h1v5c0 2.21 1.79 4 4 4h2c2.21 0 4-1.79 4-4V9h1c2.21 0 4-1.79 4-4V4c0-1.1-.9-2-2-2zm-1 7h-1V5h1v4zm-7-4h4v8c0 1.1-.9 2-2 2s-2-.9-2-2V5zM5 5h1v4H5V5zm14 4h-1V5h1v4zM12 18c-2.21 0-4 1.79-4 4h8c0-2.21-1.79-4-4-4z"/>
                         </svg>
@@ -913,17 +909,18 @@
                             </div>
                         </div>
 
+                        <!-- Home Team (Opponent) changed color to flat text-main -->
                         <div style="width: 35%;">
                             <div id="ex-logo-home" style="margin-bottom: 0.5rem; height: 60px; display:flex; align-items:center; justify-content:center;"></div>
-                            <div style="font-weight: 900; font-size: 1.1rem; background: var(--bg-dark); padding: 0.5rem; border: 2px solid var(--border-color); color: var(--accent-gold); text-align: center;" id="ex-name-home">Opponent</div>
+                            <div style="font-weight: 900; font-size: 1.1rem; background: var(--bg-dark); padding: 0.5rem; border: 2px solid var(--border-color); color: var(--text-main); text-align: center;" id="ex-name-home">Opponent</div>
                             <div class="scoreboard-score" id="score-home-val" style="margin-top: 0.5rem; font-size: 3rem;">0</div>
                         </div>
                     </div>
 
-                    <!-- Optimized Game Ticker panel stretching to fill the vertical layout space -->
-                    <div class="panel" style="margin-bottom: 0; flex-grow: 1; display: flex; flex-direction: column;">
+                    <!-- Game Ticker Panel: Set fixed size of 300px height -->
+                    <div class="panel" style="margin-bottom: 0;">
                         <div class="panel-title">Game Ticker Feed</div>
-                        <div class="ticker-box" id="ticker-feed" style="flex-grow: 1; min-height: 250px;">
+                        <div class="ticker-box" id="ticker-feed" style="height: 300px;" class="scrollable-area">
                             <div class="ticker-entry" style="color: var(--text-muted)">Your upcoming scheduled franchise game is ready. Select 'Play Now' to proceed.</div>
                         </div>
                     </div>
@@ -1076,7 +1073,7 @@
     let playoffsState = null;
     
     let userTeamId = ""; 
-    let userMC = 2500000; // Starting franchise budget
+    let userMC = 1000000; // Updated starting balance to 1 Million MyCASH
 
     let activeExhibitionAway = "";
     let activeExhibitionHome = "";
@@ -1102,45 +1099,23 @@
     let pendingContractPlayerId = null;
     let pendingContractFromId = null;
 
-    // --- FALLBACK NBA FRANCHISES ---
-    const FALLBACK_TEAMS = [
-        { id: "1", name: "Atlanta Hawks", abbreviation: "ATL", col1: "#E03A3E", col2: "#C1D32F", logo: "https://a.espncdn.com/i/teamlogos/nba/500/atl.png" },
-        { id: "2", name: "Boston Celtics", abbreviation: "BOS", col1: "#007A33", col2: "#BA9653", logo: "https://a.espncdn.com/i/teamlogos/nba/500/bos.png" },
-        { id: "3", name: "New Orleans Pelicans", abbreviation: "NOP", col1: "#0C2340", col2: "#C8102E", logo: "https://a.espncdn.com/i/teamlogos/nba/500/no.png" },
-        { id: "4", name: "Chicago Bulls", abbreviation: "CHI", col1: "#CE1141", col2: "#000000", logo: "https://a.espncdn.com/i/teamlogos/nba/500/chi.png" },
-        { id: "5", name: "Cleveland Cavaliers", abbreviation: "CLE", col1: "#860038", col2: "#FDBB30", logo: "https://a.espncdn.com/i/teamlogos/nba/500/cle.png" },
-        { id: "6", name: "Dallas Mavericks", abbreviation: "DAL", col1: "#00538C", col2: "#B8C4CA", logo: "https://a.espncdn.com/i/teamlogos/nba/500/dal.png" },
-        { id: "7", name: "Denver Nuggets", abbreviation: "DEN", col1: "#0E2240", col2: "#FEC524", logo: "https://a.espncdn.com/i/teamlogos/nba/500/den.png" },
-        { id: "8", name: "Detroit Pistons", abbreviation: "DET", col1: "#C8102E", col2: "#1D428A", logo: "https://a.espncdn.com/i/teamlogos/nba/500/det.png" },
-        { id: "9", name: "Golden State Warriors", abbreviation: "GSW", col1: "#1D428A", col2: "#FFC72C", logo: "https://a.espncdn.com/i/teamlogos/nba/500/gs.png" },
-        { id: "10", name: "Houston Rockets", abbreviation: "HOU", col1: "#CE1141", col2: "#000000", logo: "https://a.espncdn.com/i/teamlogos/nba/500/hou.png" }
-    ];
-
     const ESPN_TEAMS_API = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams";
 
     function formatMC(val) {
         return val.toLocaleString();
     }
 
-    // --- REALISTIC BENCH SUBSTITUTE NAME GENERATOR ---
-    function generateRealisticSubstituteName() {
-        const firstNames = ["Marcus", "Andre", "Tyler", "Brandon", "Derrick", "Malik", "Devin", "Jordan", "Christian", "DeAndre", "Reggie", "Zach", "Xavier", "Anthony", "Donovan", "Jalen", "Caleb", "Tre", "Darius"];
-        const lastNames = ["Carter", "Jackson", "Miller", "Williams", "Smith", "Johnson", "Davis", "Robinson", "Harris", "Thompson", "Dixon", "Jefferson", "Porter", "Allen", "Young", "Brooks", "Smart"];
-        return firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)];
-    }
-
     // --- ASSIGN PLAYER ATTRIBUTES HELPER ---
     function assignPlayerAttributes(p) {
         const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
         let base = rand(68, 85);
-        if (Math.random() < 0.12) base = rand(86, 96); // Superstars
+        if (Math.random() < 0.12) base = rand(86, 96); 
         
         p.off = base + rand(-5, 5);
         p.def = base + rand(-5, 5);
         p.reb = base + rand(-5, 5);
         p.ast = base + rand(-5, 5);
         
-        // Positional modifiers
         if (p.pos === "PG") { p.ast += 6; p.off += 2; p.reb -= 4; }
         if (p.pos === "SG") { p.off += 4; p.reb -= 2; }
         if (p.pos === "PF") { p.reb += 3; p.def += 2; }
@@ -1156,7 +1131,7 @@
         p.injuryType = "";
 
         if (typeof p.contractSeasons === 'undefined') {
-            p.contractSeasons = Math.floor(Math.random() * 3) + 2; // Default 2 to 4 seasons
+            p.contractSeasons = Math.floor(Math.random() * 3) + 2; 
         }
     }
 
@@ -1231,7 +1206,6 @@
     // --- PROXY FAIL-SAFE API PARSER ---
     async function robustFetchJson(url) {
         try {
-            // First attempt direct fetch. ESPN normally works directly for GET.
             const res = await fetch(url);
             if (res.ok) return await res.json();
         } catch (e) {
@@ -1290,39 +1264,39 @@
     }
 
     // --- LOCAL STORAGE STATE PERSISTENCE ---
-    // Updated save/load keys to v15 to cleanly purge old cache and force initial roster downloads
+    // Updated key to v16 to cleanly purge and re-initialize storage
     function saveRostersState() {
-        localStorage.setItem("slam_sim_players_v15", JSON.stringify(PLAYERS));
-        localStorage.setItem("slam_sim_teams_v15", JSON.stringify(ALL_TEAMS));
-        localStorage.setItem("slam_sim_season_standings_v15", JSON.stringify(seasonStandings));
-        localStorage.setItem("slam_sim_season_schedule_v15", JSON.stringify(seasonSchedule));
-        localStorage.setItem("slam_sim_season_round_v15", currentSeasonRound.toString());
-        localStorage.setItem("slam_sim_playoffs_state_v15", JSON.stringify(playoffsState));
-        localStorage.setItem("slam_sim_player_season_stats_v15", JSON.stringify(playerSeasonStats));
+        localStorage.setItem("slam_sim_players_v16", JSON.stringify(PLAYERS));
+        localStorage.setItem("slam_sim_teams_v16", JSON.stringify(ALL_TEAMS));
+        localStorage.setItem("slam_sim_season_standings_v16", JSON.stringify(seasonStandings));
+        localStorage.setItem("slam_sim_season_schedule_v16", JSON.stringify(seasonSchedule));
+        localStorage.setItem("slam_sim_season_round_v16", currentSeasonRound.toString());
+        localStorage.setItem("slam_sim_playoffs_state_v16", JSON.stringify(playoffsState));
+        localStorage.setItem("slam_sim_player_season_stats_v16", JSON.stringify(playerSeasonStats));
         
-        localStorage.setItem("slam_sim_user_team_v15", userTeamId);
-        localStorage.setItem("slam_sim_user_mc_v15", userMC.toString());
-        localStorage.setItem("slam_sim_custom_lineup_v15", JSON.stringify(customLineup));
-        localStorage.setItem("slam_sim_news_feed_v15", JSON.stringify(NEWS));
+        localStorage.setItem("slam_sim_user_team_v16", userTeamId);
+        localStorage.setItem("slam_sim_user_mc_v16", userMC.toString());
+        localStorage.setItem("slam_sim_custom_lineup_v16", JSON.stringify(customLineup));
+        localStorage.setItem("slam_sim_news_feed_v16", JSON.stringify(NEWS));
     }
 
     function checkRostersState() {
-        const cachedPlayers = localStorage.getItem("slam_sim_players_v15");
-        const cachedTeams = localStorage.getItem("slam_sim_teams_v15");
+        const cachedPlayers = localStorage.getItem("slam_sim_players_v16");
+        const cachedTeams = localStorage.getItem("slam_sim_teams_v16");
         if (cachedPlayers && cachedTeams) {
             PLAYERS = JSON.parse(cachedPlayers);
             ALL_TEAMS = JSON.parse(cachedTeams);
 
-            const sStand = localStorage.getItem("slam_sim_season_standings_v15");
-            const sSched = localStorage.getItem("slam_sim_season_schedule_v15");
-            const sRound = localStorage.getItem("slam_sim_season_round_v15");
-            const sPlay = localStorage.getItem("slam_sim_playoffs_state_v15");
-            const sStats = localStorage.getItem("slam_sim_player_season_stats_v15");
-            const sNews = localStorage.getItem("slam_sim_news_feed_v15");
+            const sStand = localStorage.getItem("slam_sim_season_standings_v16");
+            const sSched = localStorage.getItem("slam_sim_season_schedule_v16");
+            const sRound = localStorage.getItem("slam_sim_season_round_v16");
+            const sPlay = localStorage.getItem("slam_sim_playoffs_state_v16");
+            const sStats = localStorage.getItem("slam_sim_player_season_stats_v16");
+            const sNews = localStorage.getItem("slam_sim_news_feed_v16");
             
-            const sTeam = localStorage.getItem("slam_sim_user_team_v15");
-            const sMC = localStorage.getItem("slam_sim_user_mc_v15");
-            const sLine = localStorage.getItem("slam_sim_custom_lineup_v15");
+            const sTeam = localStorage.getItem("slam_sim_user_team_v16");
+            const sMC = localStorage.getItem("slam_sim_user_mc_v16");
+            const sLine = localStorage.getItem("slam_sim_custom_lineup_v16");
 
             if (sStand) seasonStandings = JSON.parse(sStand);
             if (sSched) seasonSchedule = JSON.parse(sSched);
@@ -1335,55 +1309,13 @@
             if (sMC) userMC = parseInt(sMC, 10);
             if (sLine) customLineup = JSON.parse(sLine);
 
-            ALL_TEAMS.forEach(team => {
-                if (team.id !== "FA" && (!team.players || team.players.length === 0)) {
-                    generateSynchronousRoster(team);
-                }
-            });
-
             return true;
         }
         return false;
     }
 
-    // --- PROCEDURAL OFFLINE ROSTER GENERATOR ---
-    function generateSynchronousRoster(team) {
-        if (team.id === "FA") return;
-        const positions = ["PG", "SG", "SF", "PF", "C", "PG", "SG", "SF", "PF", "C"];
-        const teamPlayerIds = [];
-        positions.forEach((pos, idx) => {
-            const fallbackId = `fb-${team.id}-${idx}`;
-            let playerObj = PLAYERS.find(p => p.id === fallbackId);
-            if (!playerObj) {
-                playerObj = {
-                    id: fallbackId,
-                    name: generateRealisticSubstituteName(),
-                    pos: pos,
-                    team: team.name,
-                    teamId: team.id,
-                    jersey: Math.floor(Math.random() * 99).toString(),
-                    photo: `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png`,
-                    col1: team.col1,
-                    col2: team.col2,
-                    injuryDays: 0,
-                    injuryType: "",
-                    contractSeasons: Math.floor(Math.random() * 3) + 2
-                };
-                assignPlayerAttributes(playerObj);
-                PLAYERS.push(playerObj);
-            } else {
-                playerObj.team = team.name;
-                playerObj.teamId = team.id;
-                playerObj.col1 = team.col1;
-                playerObj.col2 = team.col2;
-            }
-            teamPlayerIds.push(fallbackId);
-        });
-        team.players = teamPlayerIds;
-    }
-
     // --- DATA INTAKE ---
-    // Fetches all team structures and downloads their real rosters immediately, saving them to the browser's persistent store
+    // Strictly downloads structures and active rosters from ESPN Live API (No offline backup generation or faking)
     async function loadNBADataFromAPI() {
         const loader = document.getElementById("api-loader");
         const progress = document.getElementById("loader-progress");
@@ -1397,17 +1329,9 @@
             progress.style.width = "10%";
             
             let rawTeams = [];
-            try {
-                const teamsData = await robustFetchJson(ESPN_TEAMS_API);
-                if (teamsData && teamsData.sports?.[0]?.leagues?.[0]?.teams) {
-                    rawTeams = teamsData.sports[0].leagues[0].teams.map(t => t.team);
-                }
-            } catch (err) {
-                console.warn("Online API could not be reached. Activating fail-safe fallback database...", err);
-            }
-
-            if (rawTeams.length === 0) {
-                rawTeams = FALLBACK_TEAMS;
+            const teamsData = await robustFetchJson(ESPN_TEAMS_API);
+            if (teamsData && teamsData.sports?.[0]?.leagues?.[0]?.teams) {
+                rawTeams = teamsData.sports[0].leagues[0].teams.map(t => t.team);
             }
             
             const tempTeams = rawTeams.map(t => {
@@ -1420,7 +1344,7 @@
                 else if (t.col2) color2 = t.col2;
 
                 return {
-                    id: (t.id || Math.random().toString(36).substr(2, 9)).toString(),
+                    id: (t.id).toString(),
                     name: t.name || t.displayName,
                     abbreviation: t.abbreviation || t.name?.substring(0,3).toUpperCase(),
                     col1: color1,
@@ -1443,10 +1367,9 @@
             ALL_TEAMS = tempTeams;
             PLAYERS = [];
 
-            msg.textContent = "Downloading and structuring rosters offline...";
+            msg.textContent = "Downloading real NBA rosters...";
             progress.style.width = "20%";
 
-            // Download real rosters for all 30 teams concurrently to cache everything permanently
             const rosterPromises = tempTeams.filter(t => t.id !== "FA").map(async (team, index, arr) => {
                 try {
                     const rosterUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/${team.id}/roster`;
@@ -1470,7 +1393,7 @@
                         else if (posAbbr.includes("Center") || posAbbr === "C") posAbbr = "C";
 
                         const playerObj = {
-                            id: (a.id || Math.random().toString(36).substr(2, 9)).toString(),
+                            id: (a.id).toString(),
                             name: a.fullName || a.displayName || "Unknown",
                             pos: posAbbr,
                             team: team.name,
@@ -1489,41 +1412,15 @@
                         teamPlayerIds.push(playerObj.id);
                     });
                     
-                    // Fallback backfill
-                    const positions = ["PG", "SG", "SF", "PF", "C"];
-                    while (teamPlayerIds.length < 8) {
-                        const fallbackId = `fb-${team.id}-extra-${teamPlayerIds.length}`;
-                        const fallbackPlayer = {
-                            id: fallbackId,
-                            name: generateRealisticSubstituteName(),
-                            pos: positions[teamPlayerIds.length % positions.length],
-                            team: team.name,
-                            teamId: team.id,
-                            jersey: Math.floor(Math.random() * 99).toString(),
-                            photo: `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png`,
-                            col1: team.col1,
-                            col2: team.col2,
-                            injuryDays: 0,
-                            injuryType: "",
-                            contractSeasons: Math.floor(Math.random() * 3) + 2
-                        };
-                        assignPlayerAttributes(fallbackPlayer);
-                        if (!PLAYERS.some(p => p.id === fallbackId)) {
-                            PLAYERS.push(fallbackPlayer);
-                        }
-                        teamPlayerIds.push(fallbackId);
-                    }
                     team.players = teamPlayerIds;
                 } catch (e) {
-                    console.warn(`Roster load failed for team ${team.name}, using generated offline roster.`, e);
-                    generateSynchronousRoster(team);
+                    console.warn(`Roster load failed for team ${team.name}.`, e);
                 }
                 const percent = 20 + Math.round(((index + 1) / arr.length) * 80);
                 progress.style.width = `${percent}%`;
             });
 
             await Promise.all(rosterPromises);
-            
             saveRostersState();
             
             setTimeout(() => {
@@ -1531,343 +1428,14 @@
                 initApp();
             }, 500);
         } catch (err) {
-            alert("Critical Error loading data. Initializing offline generation fail-safe.");
+            alert("Critical Connection Error. Please verify your internet connection and refresh.");
             loader.style.display = "none";
         }
     }
 
     async function loadTeamRosterDynamically(teamId) {
-        // Roster payloads are fully pre-cached during startup load, fallback method preserved
-        const team = ALL_TEAMS.find(t => t.id === teamId);
-        if (!team || teamId === "FA") return;
+        // Fully preloaded during stream
         saveRostersState();
-    }
-
-    // --- LIFECYCLE ---
-    function initApp() {
-        const posOpts = [
-            {label:'All Pos', value:'ALL'},{label:'PG', value:'PG'},{label:'SG', value:'SG'},
-            {label:'SF', value:'SF'},{label:'PF', value:'PF'},{label:'C', value:'C'}
-        ];
-        createDropdown('pos-a', posOpts, 'ALL', '', 'onRosterPosA');
-        createDropdown('pos-b', posOpts, 'ALL', '', 'onRosterPosB');
-        
-        updateMCDisplay();
-        
-        if (!userTeamId) {
-            document.body.style.overflow = "hidden";
-            renderStartupTeamSelectors();
-            document.getElementById("team-selection-overlay").style.display = "flex";
-        } else {
-            document.body.style.overflow = "";
-            document.getElementById("team-selection-overlay").style.display = "none";
-            switchTab("tab-rosters");
-            updateUserTeamDisplay();
-            renderRosterSide('a');
-            buildCustomLogoDropdowns();
-            renderLineupSelectors();
-        }
-
-        renderNewsFeed();
-        if(seasonStandings.length === 0 && userTeamId) startSeason();
-    }
-
-    function renderStartupTeamSelectors() {
-        const wrapper = document.getElementById("cd-wrapper-startup");
-        if(!wrapper) return;
-        
-        let opts = ALL_TEAMS.filter(t => t.id !== "FA").map(t => ({
-            label: t.name,
-            value: t.id,
-            logo: t.logo
-        }));
-        
-        createDropdown('startup', opts, opts[0]?.value, 'Select Team to Lock In', '');
-    }
-
-    async function lockInMyNBATeam() {
-        const selectedTeamId = activeDropdowns['startup'];
-        if (!selectedTeamId) return;
-
-        userTeamId = selectedTeamId;
-        saveRostersState();
-
-        const loader = document.getElementById("api-loader");
-        loader.style.display = "flex";
-        document.getElementById("loader-msg").textContent = "Structuring your franchise roster...";
-
-        await loadTeamRosterDynamically(userTeamId);
-
-        loader.style.display = "none";
-        initApp();
-    }
-
-    window.onRosterPosA = (v) => { renderRosterSide('a'); }
-    window.onRosterPosB = (v) => { renderRosterSide('b'); }
-
-    window.onLineupPG = (val) => { customLineup.PG = val; saveRostersState(); }
-    window.onLineupSG = (val) => { customLineup.SG = val; saveRostersState(); }
-    window.onLineupSF = (val) => { customLineup.SF = val; saveRostersState(); }
-    window.onLineupPF = (val) => { customLineup.PF = val; saveRostersState(); }
-    window.onLineupC  = (val) => { customLineup.C  = val; saveRostersState(); }
-
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        
-        document.getElementById(tabId).classList.add('active');
-        
-        const idx = ['tab-rosters', 'tab-play', 'tab-upgrades', 'tab-news'].indexOf(tabId);
-        if(document.querySelectorAll('.nav-btn')[idx]) {
-            document.querySelectorAll('.nav-btn')[idx].classList.add('active');
-        }
-
-        if (tabId === 'tab-rosters') {
-            renderRosterSide('a');
-            renderRosterSide('b');
-            renderLineupSelectors();
-        } else if (tabId === 'tab-play') {
-            updateMatchupPreview();
-            renderStandings();
-            renderLeagueLeaders();
-        } else if (tabId === 'tab-upgrades') {
-            buildCustomUpgradesDropdown();
-        } else if (tabId === 'tab-news') {
-            renderNewsFeed();
-        }
-    }
-
-    // --- MYCASH INDICATOR AND DATA CONTROLLER ---
-    function updateMCDisplay() {
-        const display = document.getElementById("mc-display");
-        if (display) {
-            display.innerHTML = `💰 ${formatMC(userMC)} MyCASH`;
-        }
-        saveRostersState();
-    }
-
-    function addMC(amount) {
-        userMC = Math.max(0, userMC + amount); 
-        updateMCDisplay();
-    }
-
-    function resetMyNBAMode() {
-        if(confirm("Are you sure you want to reset your franchise save?")) {
-            localStorage.clear();
-            location.reload();
-        }
-    }
-
-    function updateUserTeamDisplay() {
-        const team = ALL_TEAMS.find(t => t.id === userTeamId);
-        if(!team) return;
-        
-        const title = document.getElementById("locked-team-display");
-        const titleA = document.getElementById("roster-a-title");
-        const logo = team.logo ? `<img src="${team.logo}" class="dropdown-logo-mini">` : `🏀`;
-        title.innerHTML = `${logo} <span>${team.name}</span>`;
-        if(titleA) titleA.textContent = team.name;
-
-        activeExhibitionAway = userTeamId;
-    }
-
-    function renderLineupSelectors() {
-        const positions = ["PG", "SG", "SF", "PF", "C"];
-        const customPlayers = PLAYERS.filter(p => p.teamId === userTeamId);
-
-        positions.forEach(pos => {
-            const candidates = customPlayers.filter(p => p.pos === pos);
-            let opts = candidates.map(p => ({
-                label: `${p.name} (${p.ovr}) ${p.injuryDays > 0 ? '🏥 (OUT)' : ''}`, 
-                value: p.id, 
-                logo: p.photo
-            }));
-            if(opts.length === 0) {
-                opts.push({label: 'No valid players', value: ''});
-            }
-            
-            let def = customLineup[pos];
-            if (!def || !candidates.some(c => c.id === def)) {
-                const healthy = candidates.find(c => c.injuryDays === 0);
-                def = healthy ? healthy.id : (candidates[0] ? candidates[0].id : "");
-                customLineup[pos] = def;
-            }
-            
-            activeDropdowns[pos.toLowerCase()] = def;
-            createDropdown(pos.toLowerCase(), opts, def, '', `onLineup${pos}`);
-        });
-        saveRostersState();
-    }
-
-    // --- CONTRACT MANAGEMENT LOGIC ---
-    function getPlayerSalaryDemand(player) {
-        let base = Math.pow(Math.max(1, player.ovr - 55), 2) * 250;
-        
-        const userRoster = PLAYERS.filter(p => p.teamId === userTeamId);
-        userRoster.sort((a,b) => b.ovr - a.ovr);
-        
-        let isStar = false;
-        if (player.teamId === userTeamId) {
-            if (userRoster.indexOf(player) <= 1) isStar = true;
-        } else {
-            let hypothetical = [...userRoster, player].sort((a,b) => b.ovr - a.ovr);
-            if (hypothetical.indexOf(player) <= 1) isStar = true;
-        }
-        
-        if (isStar) base *= 1.5;
-        return { yearly: Math.round(base), isStar };
-    }
-
-    function openContractModal(playerId, fromId) {
-        const player = PLAYERS.find(p => p.id === playerId);
-        if (!player) return;
-
-        pendingContractPlayerId = playerId;
-        pendingContractFromId = fromId;
-
-        const { yearly, isStar } = getPlayerSalaryDemand(player);
-        
-        document.getElementById("contract-player-name").textContent = `${player.name} (OVR ${player.ovr})`;
-        
-        let msg = `Requested Salary: <strong>${formatMC(yearly)} MC</strong> per season.`;
-        if (isStar) {
-            msg += `<br><span style="color:var(--accent-gold); font-size:0.9rem;">⭐ Star Premium Applied (+50% salary demand)</span>`;
-        }
-        document.getElementById("contract-msg").innerHTML = msg;
-
-        const optsContainer = document.getElementById("contract-options");
-        optsContainer.innerHTML = [1, 2, 3, 4].map(yrs => {
-            const total = yearly * yrs;
-            const canAfford = userMC >= total;
-            return `
-                <button class="btn ${canAfford ? 'btn-primary' : ''}" 
-                        style="flex-direction:column; padding: 1rem; ${!canAfford ? 'opacity:0.4; cursor:not-allowed;' : ''}"
-                        onclick="${canAfford ? `confirmContract(${yrs}, ${total})` : ''}" ${!canAfford ? 'disabled' : ''}>
-                    <div style="font-weight:900; font-size:1.2rem;">${yrs} Year${yrs>1?'s':''}</div>
-                    <div style="font-size:0.8rem; color:var(--accent-gold);">${formatMC(total)} MC</div>
-                </button>
-            `;
-        }).join('');
-
-        document.getElementById("contract-overlay").style.display = "flex";
-    }
-
-    function closeContractModal() {
-        document.getElementById("contract-overlay").style.display = "none";
-        pendingContractPlayerId = null;
-        pendingContractFromId = null;
-    }
-
-    function confirmContract(years, totalCost) {
-        if (userMC < totalCost) return;
-        
-        addMC(-totalCost);
-        
-        const player = PLAYERS.find(p => p.id === pendingContractPlayerId);
-        if (player) {
-            if (pendingContractFromId === "FA") {
-                player.contractSeasons = years;
-                transferPlayerDirect(player.id, "FA", userTeamId, true);
-                addNewsItem('trade', `✍️ <strong>Free Agent Signing</strong>: The <strong>${ALL_TEAMS.find(t=>t.id===userTeamId).name}</strong> have signed <strong>${player.name}</strong> to a ${years}-year deal worth ${formatMC(totalCost)} MC.`);
-            } else {
-                player.contractSeasons = (player.contractSeasons || 0) + years;
-                addNewsItem('trade', `📝 <strong>Contract Extension</strong>: <strong>${player.name}</strong> has agreed to a ${years}-year extension with the franchise for ${formatMC(totalCost)} MC.`);
-                saveRostersState();
-                renderRosterSide('a');
-            }
-        }
-        closeContractModal();
-    }
-
-    function renderRosterSide(side) {
-        const teamId = (side === "a") ? userTeamId : activeRosterTeamB;
-        const tbody = document.getElementById(`roster-table-body-${side}`);
-        if (!tbody) return;
-        tbody.innerHTML = "";
-
-        const team = ALL_TEAMS.find(t => t.id === teamId);
-        if (!team) return;
-
-        if (teamId !== "FA" && (!team.players || team.players.length === 0)) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-muted);">🔄 Loading live roster data...</td></tr>`;
-            loadTeamRosterDynamically(teamId).then(() => renderRosterSide(side));
-            return;
-        }
-        
-        const searchQuery = (document.getElementById(`roster-query-${side}`)?.value || "").toLowerCase();
-        const posFilter = activeDropdowns[`pos-${side}`] || "ALL";
-
-        let rosterPlayers = PLAYERS.filter(p => p.teamId === teamId);
-
-        if (searchQuery) rosterPlayers = rosterPlayers.filter(p => p.name.toLowerCase().includes(searchQuery));
-        if (posFilter !== "ALL") rosterPlayers = rosterPlayers.filter(p => p.pos === posFilter);
-
-        rosterPlayers.sort((a, b) => b.ovr - a.ovr);
-
-        const activeCount = rosterPlayers.length;
-        let avgStrength = 0;
-        if (activeCount > 0) {
-            const topPlayers = rosterPlayers.slice(0, 15);
-            avgStrength = Math.round(topPlayers.reduce((acc, p) => acc + p.ovr, 0) / topPlayers.length);
-        }
-        const strEl = document.getElementById(`roster-${side}-strength`);
-        if (strEl) strEl.textContent = `TEAM OVR: ${avgStrength}`;
-
-        const playersToRender = teamId === "FA" ? rosterPlayers.slice(0, 50) : rosterPlayers;
-
-        playersToRender.forEach(p => {
-            const row = document.createElement("tr");
-            row.id = `player-row-${p.id}`;
-            
-            let isSel = (side==='a' && tradeA.some(x=>x.id===p.id)) || (side==='b' && tradeB.some(x=>x.id===p.id));
-            if (isSel) row.classList.add('selected');
-
-            row.onclick = () => {
-                if (p.injuryDays > 0) {
-                    alert(`${p.name} is sidelined with a ${p.injuryType} and cannot be processed in active trade rosters.`);
-                    return;
-                }
-                toggleTradeSelection(p, side);
-            };
-
-            let rosterActionBtn = "";
-            if (side === 'a') {
-                rosterActionBtn = `
-                    <div style="display:flex; gap:5px; justify-content:flex-end;">
-                        <button class="btn btn-primary" style="padding: 2px 6px; font-size: 0.7rem;" title="Renew Contract" onclick="event.stopPropagation(); openContractModal('${p.id}', '${userTeamId}')">📝 Ext</button>
-                        <button class="btn btn-danger" style="padding: 2px 6px; font-size: 0.7rem;" title="Release to Free Agency" onclick="event.stopPropagation(); transferPlayerDirect('${p.id}', '${userTeamId}', 'FA')">Cut</button>
-                    </div>`;
-            } else if (side === 'b' && teamId === "FA") {
-                rosterActionBtn = `<button class="btn btn-success" style="padding: 2px 6px; font-size: 0.7rem;" title="Sign player" onclick="event.stopPropagation(); openContractModal('${p.id}', 'FA')">✍️ Sign</button>`;
-            }
-
-            let statusMarkup = "";
-            if (p.injuryDays > 0) {
-                statusMarkup = `<span class="injury-badge" title="${p.injuryType}">🏥 OUT ${p.injuryDays}D</span>`;
-            }
-
-            let contractText = p.contractSeasons > 1 ? `${p.contractSeasons} Yrs` : `${p.contractSeasons} Yr`;
-            let contractStyle = p.contractSeasons <= 1 ? `background:var(--accent-red); color:white; padding:1px 4px; border-radius:2px; font-weight:800;` : `color:var(--text-muted);`;
-
-            row.innerHTML = `
-                <td>
-                    <div class="player-row-info">
-                        <img src="${p.photo}" class="player-photo-mini" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">
-                        <div>
-                            <div style="font-weight: 700; display:flex; align-items:center; gap:8px;">${p.name} ${statusMarkup}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top:4px;">
-                                <span class="pos-badge" style="padding:1px 4px; font-size:0.65rem;">${p.pos}</span> 
-                                <span style="margin-left:4px;">#${p.jersey}</span> 
-                                <span style="margin-left:8px; ${contractStyle}">📄 ${contractText}</span>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-                <td style="text-align: center; font-weight: 700; color: var(--accent-gold); font-size: 1.1rem;">${p.ovr}</td>
-                <td style="text-align: right;">${rosterActionBtn}</td>
-            `;
-            tbody.appendChild(row);
-        });
     }
 
     // --- TRANSACTION LOGIC ---
@@ -1928,30 +1496,6 @@
         updateTradeCenterPanel();
     }
 
-    function calcTradeValue(playersArr) {
-        return playersArr.reduce((sum, p) => sum + Math.pow(p.ovr, 5), 0);
-    }
-
-    function updateTradeCenterPanel() {
-        const msg = document.getElementById("trade-negotiator-msg");
-        const actions = document.getElementById("trade-actions");
-        const outDiv = document.getElementById("trade-offer-out");
-        const inDiv = document.getElementById("trade-offer-in");
-
-        if (tradeA.length > 0 || tradeB.length > 0) {
-            msg.style.display = "none";
-            actions.style.display = "flex";
-            
-            outDiv.innerHTML = tradeA.length > 0 ? tradeA.map(p => `<span style="background:var(--bg-dark); padding:4px 8px; border:1px solid var(--accent-blue); border-radius:2px; font-size:0.9rem; display:inline-block; margin:2px;">${p.name} (${p.ovr}) [${p.contractSeasons}Y]</span>`).join('') : `<span style="color:var(--text-muted)">None</span>`;
-            inDiv.innerHTML = tradeB.length > 0 ? tradeB.map(p => `<span style="background:var(--bg-dark); padding:4px 8px; border:1px solid var(--accent-gold); border-radius:2px; font-size:0.9rem; display:inline-block; margin:2px;">${p.name} (${p.ovr}) [${p.contractSeasons}Y]</span>`).join('') : `<span style="color:var(--text-muted)">None</span>`;
-
-        } else {
-            msg.style.display = "block";
-            actions.style.display = "none";
-            msg.textContent = "Select players from your team and the target team to begin trade negotiations. (Multiple allowed)";
-        }
-    }
-
     function processSelectedTrade() {
         if (tradeA.length === 0 && tradeB.length === 0) return;
 
@@ -1960,10 +1504,12 @@
 
         if (!teamA || !teamB) return;
 
+        // Caps strictly updated to 25 players to fix roster overflow bugs
         if (teamB.id !== "FA") {
             if (teamA.players.length - tradeA.length + tradeB.length < 5) return alert("You must have at least 5 players on your roster.");
             if (teamB.players.length - tradeB.length + tradeA.length < 5) return alert("The CPU team must have at least 5 players.");
-            if (teamB.players.length - tradeB.length + tradeA.length > 15) return alert(`Trade Rejected: The ${teamB.name} roster cannot take on this many players (Max 15).`);
+            if (teamB.players.length - tradeB.length + tradeA.length > 25) return alert(`Trade Rejected: The ${teamB.name} roster cannot take on this many players (Max 25).`);
+            if (teamA.players.length - tradeA.length + tradeB.length > 25) return alert(`Trade Rejected: Your roster cannot take on this many players (Max 25).`);
         }
 
         let userMax = tradeA.length > 0 ? Math.max(...tradeA.map(p => p.ovr)) : 0;
@@ -2188,24 +1734,25 @@
         updateTradeCenterPanel();
     }
 
+    // Positions your team ALWAYS on the left (Away) and the opponent ALWAYS on the right (Home)
     function updateMatchupPreview() {
-        // Reset preview scores strictly to 0 when loading/updating matchups
         document.getElementById("score-away-val").textContent = "0";
         document.getElementById("score-home-val").textContent = "0";
 
         if (playoffsState) {
             const userMatch = findActiveUserPlayoffMatch();
             if (userMatch) {
-                const awayTeam = userMatch.t1;
-                const homeTeam = userMatch.t2;
+                const userIsT1 = userMatch.t1.id === userTeamId;
+                const userTeam = userIsT1 ? userMatch.t1 : userMatch.t2;
+                const opponentTeam = userIsT1 ? userMatch.t2 : userMatch.t1;
                 
-                document.getElementById("ex-logo-away").innerHTML = awayTeam.logo ? `<img src="${awayTeam.logo}" class="team-logo-img">` : `🏀`;
-                document.getElementById("ex-name-away").textContent = awayTeam.name;
-                document.getElementById("box-tab-away").textContent = awayTeam.name;
+                document.getElementById("ex-logo-away").innerHTML = userTeam.logo ? `<img src="${userTeam.logo}" class="team-logo-img">` : `🏀`;
+                document.getElementById("ex-name-away").textContent = userTeam.name;
+                document.getElementById("box-tab-away").textContent = userTeam.name;
                 
-                document.getElementById("ex-logo-home").innerHTML = homeTeam.logo ? `<img src="${homeTeam.logo}" class="team-logo-img">` : `🏀`;
-                document.getElementById("ex-name-home").textContent = homeTeam.name;
-                document.getElementById("box-tab-home").textContent = homeTeam.name;
+                document.getElementById("ex-logo-home").innerHTML = opponentTeam.logo ? `<img src="${opponentTeam.logo}" class="team-logo-img">` : `🏀`;
+                document.getElementById("ex-name-home").textContent = opponentTeam.name;
+                document.getElementById("box-tab-home").textContent = opponentTeam.name;
                 
                 document.getElementById("game-status").textContent = `PLAYOFFS - ${playoffsState.round.toUpperCase()}`;
                 document.getElementById("simulation-clock").textContent = "Knockout Series";
@@ -2227,16 +1774,17 @@
             
             const userGame = games.find(g => g.away.id === userTeamId || g.home.id === userTeamId);
             if (userGame) {
-                const awayTeam = userGame.away;
-                const homeTeam = userGame.home;
+                const userIsAway = userGame.away.id === userTeamId;
+                const userTeam = userIsAway ? userGame.away : userGame.home;
+                const opponentTeam = userIsAway ? userGame.home : userGame.away;
                 
-                document.getElementById("ex-logo-away").innerHTML = awayTeam.logo ? `<img src="${awayTeam.logo}" class="team-logo-img">` : `🏀`;
-                document.getElementById("ex-name-away").textContent = awayTeam.name;
-                document.getElementById("box-tab-away").textContent = awayTeam.name;
+                document.getElementById("ex-logo-away").innerHTML = userTeam.logo ? `<img src="${userTeam.logo}" class="team-logo-img">` : `🏀`;
+                document.getElementById("ex-name-away").textContent = userTeam.name;
+                document.getElementById("box-tab-away").textContent = userTeam.name;
                 
-                document.getElementById("ex-logo-home").innerHTML = homeTeam.logo ? `<img src="${homeTeam.logo}" class="team-logo-img">` : `🏀`;
-                document.getElementById("ex-name-home").textContent = homeTeam.name;
-                document.getElementById("box-tab-home").textContent = homeTeam.name;
+                document.getElementById("ex-logo-home").innerHTML = opponentTeam.logo ? `<img src="${opponentTeam.logo}" class="team-logo-img">` : `🏀`;
+                document.getElementById("ex-name-home").textContent = opponentTeam.name;
+                document.getElementById("box-tab-home").textContent = opponentTeam.name;
                 
                 document.getElementById("game-status").textContent = `ROUND ${currentSeasonRound + 1} / ${REGULAR_SEASON_LENGTH}`;
                 document.getElementById("simulation-clock").textContent = "Match Ready";
@@ -2262,14 +1810,16 @@
         if (playoffsState) {
             activeMatchRef = findActiveUserPlayoffMatch();
             if (!activeMatchRef) return;
-            teamAway = activeMatchRef.t1;
-            teamHome = activeMatchRef.t2;
+            const userIsT1 = activeMatchRef.t1.id === userTeamId;
+            teamAway = userIsT1 ? activeMatchRef.t1 : activeMatchRef.t2;
+            teamHome = userIsT1 ? activeMatchRef.t2 : activeMatchRef.t1;
         } else {
             const currentRoundGames = seasonSchedule[currentSeasonRound];
             activeMatchRef = currentRoundGames.find(g => g.away.id === userTeamId || g.home.id === userTeamId);
             if (!activeMatchRef) return;
-            teamAway = activeMatchRef.away;
-            teamHome = activeMatchRef.home;
+            const userIsAway = activeMatchRef.away.id === userTeamId;
+            teamAway = userIsAway ? activeMatchRef.away : activeMatchRef.home;
+            teamHome = userIsAway ? activeMatchRef.home : activeMatchRef.away;
         }
 
         document.getElementById("ticker-feed").innerHTML = "";
@@ -2308,24 +1858,26 @@
 
     function processPostgameResolution(scoreAway, scoreHome, activeMatchRef) {
         if (playoffsState) {
-            activeMatchRef.scoreA = scoreAway;
-            activeMatchRef.scoreH = scoreHome;
+            const userIsT1 = activeMatchRef.t1.id === userTeamId;
+            activeMatchRef.scoreA = userIsT1 ? scoreAway : scoreHome;
+            activeMatchRef.scoreH = userIsT1 ? scoreHome : scoreAway;
             activeMatchRef.played = true;
-            runPlayoffsStepResolution(scoreAway, scoreHome, activeMatchRef);
+            runPlayoffsStepResolution(activeMatchRef.scoreA, activeMatchRef.scoreH, activeMatchRef);
             return;
         }
 
-        activeMatchRef.scoreA = scoreAway;
-        activeMatchRef.scoreH = scoreHome;
+        const userIsAway = activeMatchRef.away.id === userTeamId;
+        activeMatchRef.scoreA = userIsAway ? scoreAway : scoreHome;
+        activeMatchRef.scoreH = userIsAway ? scoreHome : scoreAway;
         activeMatchRef.played = true;
 
         let standAway = seasonStandings.find(t => t.id === activeMatchRef.away.id);
         let standHome = seasonStandings.find(t => t.id === activeMatchRef.home.id);
 
-        standAway.ptsFor += scoreAway; standAway.ptsAgainst += scoreHome;
-        standHome.ptsFor += scoreHome; standHome.ptsAgainst += scoreAway;
+        standAway.ptsFor += activeMatchRef.scoreA; standAway.ptsAgainst += activeMatchRef.scoreH;
+        standHome.ptsFor += activeMatchRef.scoreH; standHome.ptsAgainst += activeMatchRef.scoreA;
 
-        if (scoreAway > scoreHome) {
+        if (activeMatchRef.scoreA > activeMatchRef.scoreH) {
             standAway.wins++; standHome.losses++;
         } else {
             standHome.wins++; standAway.losses++;
@@ -2523,12 +2075,6 @@
             switchTab('tab-rosters');
             return;
         }
-        
-        activePool.forEach(t => {
-            if (!t.players || t.players.length < 5) {
-                generateSynchronousRoster(t);
-            }
-        });
 
         seasonStandings = activePool.map(t => ({
             id: t.id, name: t.name, wins: 0, losses: 0, ptsFor: 0, ptsAgainst: 0, pct: 0
@@ -2824,13 +2370,95 @@
         }
     }
 
-    function endEliminatedSeason() {
-        document.getElementById("season-champ-name").textContent = "SEASON OVER";
-        document.getElementById("season-champ-card").style.display = "block";
-        document.getElementById("play-live-btn").disabled = true;
-        playoffsState = null;
-        processSeasonEnd();
-        saveRostersState();
+    function renderRosterSide(side) {
+        const teamId = (side === "a") ? userTeamId : activeRosterTeamB;
+        const tbody = document.getElementById(`roster-table-body-${side}`);
+        if (!tbody) return;
+        tbody.innerHTML = "";
+
+        const team = ALL_TEAMS.find(t => t.id === teamId);
+        if (!team) return;
+
+        if (teamId !== "FA" && (!team.players || team.players.length === 0)) {
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-muted);">🔄 Loading live roster data...</td></tr>`;
+            loadTeamRosterDynamically(teamId).then(() => renderRosterSide(side));
+            return;
+        }
+        
+        const searchQuery = (document.getElementById(`roster-query-${side}`)?.value || "").toLowerCase();
+        const posFilter = activeDropdowns[`pos-${side}`] || "ALL";
+
+        let rosterPlayers = PLAYERS.filter(p => p.teamId === teamId);
+
+        if (searchQuery) rosterPlayers = rosterPlayers.filter(p => p.name.toLowerCase().includes(searchQuery));
+        if (posFilter !== "ALL") rosterPlayers = rosterPlayers.filter(p => p.pos === posFilter);
+
+        rosterPlayers.sort((a, b) => b.ovr - a.ovr);
+
+        const activeCount = rosterPlayers.length;
+        let avgStrength = 0;
+        if (activeCount > 0) {
+            const topPlayers = rosterPlayers.slice(0, 15);
+            avgStrength = Math.round(topPlayers.reduce((acc, p) => acc + p.ovr, 0) / topPlayers.length);
+        }
+        const strEl = document.getElementById(`roster-${side}-strength`);
+        if (strEl) strEl.textContent = `TEAM OVR: ${avgStrength}`;
+
+        const playersToRender = teamId === "FA" ? rosterPlayers.slice(0, 50) : rosterPlayers;
+
+        playersToRender.forEach(p => {
+            const row = document.createElement("tr");
+            row.id = `player-row-${p.id}`;
+            
+            let isSel = (side==='a' && tradeA.some(x=>x.id===p.id)) || (side==='b' && tradeB.some(x=>x.id===p.id));
+            if (isSel) row.classList.add('selected');
+
+            row.onclick = () => {
+                if (p.injuryDays > 0) {
+                    alert(`${p.name} is sidelined with a ${p.injuryType} and cannot be processed in active trade rosters.`);
+                    return;
+                }
+                toggleTradeSelection(p, side);
+            };
+
+            let rosterActionBtn = "";
+            if (side === 'a') {
+                rosterActionBtn = `
+                    <div style="display:flex; gap:5px; justify-content:flex-end;">
+                        <button class="btn btn-primary" style="padding: 2px 6px; font-size: 0.7rem;" title="Renew Contract" onclick="event.stopPropagation(); openContractModal('${p.id}', '${userTeamId}')">📝 Ext</button>
+                        <button class="btn btn-danger" style="padding: 2px 6px; font-size: 0.7rem;" title="Release to Free Agency" onclick="event.stopPropagation(); transferPlayerDirect('${p.id}', '${userTeamId}', 'FA')">Cut</button>
+                    </div>`;
+            } else if (side === 'b' && teamId === "FA") {
+                rosterActionBtn = `<button class="btn btn-success" style="padding: 2px 6px; font-size: 0.7rem;" title="Sign player" onclick="event.stopPropagation(); openContractModal('${p.id}', 'FA')">✍️ Sign</button>`;
+            }
+
+            let statusMarkup = "";
+            if (p.injuryDays > 0) {
+                statusMarkup = `<span class="injury-badge" title="${p.injuryType}">🏥 OUT ${p.injuryDays}D</span>`;
+            }
+
+            let contractText = p.contractSeasons > 1 ? `${p.contractSeasons} Yrs` : `${p.contractSeasons} Yr`;
+            let contractStyle = p.contractSeasons <= 1 ? `background:var(--accent-red); color:white; padding:1px 4px; border-radius:2px; font-weight:800;` : `color:var(--text-muted);`;
+
+            row.innerHTML = `
+                <td>
+                    <div class="player-row-info">
+                        <img src="${p.photo}" class="player-photo-mini" onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png'">
+                        <div>
+                            <div style="font-weight: 700; display:flex; align-items:center; gap:8px;">${p.name} ${statusMarkup}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top:4px;">
+                                <span class="pos-badge" style="padding:1px 4px; font-size:0.65rem;">${p.pos}</span> 
+                                <span style="margin-left:4px;">#${p.jersey}</span> 
+                                <span style="margin-left:8px; ${contractStyle}">📄 ${contractText}</span>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td style="text-align: center; font-weight: 700; color: var(--accent-gold); font-size: 1.1rem;">${p.ovr}</td>
+                <td style="text-align: right;">${rosterActionBtn}</td>
+            `;
+            tbody.appendChild(row);
+        });
     }
 
     // --- GAME ROTATION ENGINE ---
@@ -2846,18 +2474,12 @@
                 let player = activeRoster.find(p => p.id === pId);
                 if (!player) player = activeRoster.filter(p => p.pos === pos).sort((a,b)=>b.ovr-a.ovr)[0];
                 if (!player) player = activeRoster.find(p => !starters.includes(p));
-                if (!player) {
-                    player = { id: `fill-s-${pos}`, name: generateRealisticSubstituteName(), pos: pos, ovr: 72, off: 72, def: 72, reb: 72, ast: 72, photo: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png" };
-                }
                 starters.push(player);
             });
         } else {
             positions.forEach(pos => {
                 let player = activeRoster.filter(p => p.pos === pos).sort((a,b)=>b.ovr-a.ovr)[0];
                 if (!player) player = activeRoster.find(p => !starters.includes(p));
-                if (!player) {
-                    player = { id: `fill-s-${pos}-${team.id}`, name: generateRealisticSubstituteName(), pos: pos, ovr: 72, off: 72, def: 72, reb: 72, ast: 72, photo: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png" };
-                }
                 starters.push(player);
             });
         }
@@ -2866,10 +2488,6 @@
             if (!starters.includes(p)) bench.push(p);
         });
 
-        while (bench.length < 3) {
-            const benchPos = positions[bench.length % positions.length];
-            bench.push({ id: `fill-b-${bench.length}-${team.id}`, name: generateRealisticSubstituteName(), pos: benchPos, ovr: 68, off: 68, def: 68, reb: 68, ast: 68, photo: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png" });
-        }
         return { starters, bench };
     }
 
@@ -2887,7 +2505,7 @@
 
         const getTeamStrength = (lineup) => {
             const avgStarters = lineup.starters.reduce((s, p) => s + p.ovr, 0) / 5;
-            const avgBench = lineup.bench.reduce((s, p) => s + p.ovr, 0) / lineup.bench.length;
+            const avgBench = lineup.bench.length > 0 ? (lineup.bench.reduce((s, p) => s + p.ovr, 0) / lineup.bench.length) : avgStarters;
             return avgStarters * 0.75 + avgBench * 0.25;
         };
 
@@ -3025,10 +2643,11 @@
     }
 
     // --- CUSTOM UPGRADES LAB ENGINE ---
+    // Injected player images into lab upgrades dropdown menu mapping
     function buildCustomUpgradesDropdown() {
         const roster = PLAYERS.filter(p => p.teamId === userTeamId);
         roster.sort((a, b) => b.ovr - a.ovr);
-        let opts = roster.map(p => ({ label: `${p.name} (OVR ${p.ovr})`, value: p.id }));
+        let opts = roster.map(p => ({ label: `${p.name} (OVR ${p.ovr})`, value: p.id, logo: p.photo }));
         
         if (opts.length > 0) {
             createDropdown('upgrade-select', opts, activeUpgradePlayerId || opts[0].value, 'Select Player', 'onUpgradePlayerSelect');
