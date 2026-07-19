@@ -237,7 +237,8 @@
             }
         }
 
-        .roster-pane, .ticker-box, .cd-menu, .team-selection-box, .team-selection-overlay {
+        /* Unified Overscroll Containment to Prevent Chaining Scroll Events to Page Body */
+        .scrollable-area, .roster-pane, .ticker-box, .cd-menu, .team-selection-box, .team-selection-overlay, .news-container {
             overscroll-behavior: contain !important;
         }
 
@@ -312,7 +313,6 @@
         .ticker-box {
             background-color: var(--bg-dark);
             border: 2px solid var(--border-color);
-            height: 380px;
             overflow-y: auto;
             padding: 1.2rem;
             font-family: monospace;
@@ -565,7 +565,8 @@
             width: 100%;
             max-width: 700px;
             text-align: center;
-            box-shadow: 0 0 30px rgba(234, 179, 8, 0.2);
+            /* Unified Flat shadow - Removed colored glow */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
 
         /* SYMMETRIC PLAYOFF BRACKET STYLING */
@@ -589,7 +590,8 @@
         .bracket-box.finals-box {
             border-color: var(--accent-gold);
             padding: 18px;
-            box-shadow: 0 0 20px rgba(234, 179, 8, 0.15);
+            /* Unified Flat shadow - Removed colored glow */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
         }
 
         .bracket-box.semi-box {
@@ -857,7 +859,8 @@
 
                     <!-- Column 3: Grand Finals Trophy / Winner (Center) -->
                     <div style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px;">
-                        <svg style="width: 90px; height: 90px; filter: drop-shadow(0 0 15px rgba(234, 179, 8, 0.5));" viewBox="0 0 24 24" fill="var(--accent-gold)">
+                        <!-- Flat Trophy SVG with removed shadow filters -->
+                        <svg style="width: 90px; height: 90px;" viewBox="0 0 24 24" fill="var(--accent-gold)">
                             <path d="M18 2H6c-1.1 0-2 .9-2 2v1c0 2.21 1.79 4 4 4h1v5c0 2.21 1.79 4 4 4h2c2.21 0 4-1.79 4-4V9h1c2.21 0 4-1.79 4-4V4c0-1.1-.9-2-2-2zm-1 7h-1V5h1v4zm-7-4h4v8c0 1.1-.9 2-2 2s-2-.9-2-2V5zM5 5h1v4H5V5zm14 4h-1V5h1v4zM12 18c-2.21 0-4 1.79-4 4h8c0-2.21-1.79-4-4-4z"/>
                         </svg>
                         <div class="bracket-box finals-box" style="width: 100%;">
@@ -917,9 +920,10 @@
                         </div>
                     </div>
 
-                    <div class="panel" style="margin-bottom: 0; flex-grow: 1;">
+                    <!-- Optimized Game Ticker panel stretching to fill the vertical layout space -->
+                    <div class="panel" style="margin-bottom: 0; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="panel-title">Game Ticker Feed</div>
-                        <div class="ticker-box" id="ticker-feed" style="height: 250px;">
+                        <div class="ticker-box" id="ticker-feed" style="flex-grow: 1; min-height: 250px;">
                             <div class="ticker-entry" style="color: var(--text-muted)">Your upcoming scheduled franchise game is ready. Select 'Play Now' to proceed.</div>
                         </div>
                     </div>
@@ -932,7 +936,7 @@
                                 <button class="btn" style="padding: 4px 12px; font-size: 0.8rem;" id="box-tab-home" onclick="switchBoxView('home')">Opponent</button>
                             </div>
                         </div>
-                        <div style="overflow-x: auto; max-height: 280px;">
+                        <div style="overflow-x: auto; max-height: 280px;" class="scrollable-area">
                             <table class="roster-table" style="font-size: 0.85rem;">
                                 <thead>
                                     <tr>
@@ -960,7 +964,7 @@
                             <span>Season Standings</span>
                             <span style="background-color: var(--bg-hover); padding: 4px 10px; font-size: 0.8rem; color: var(--accent-gold);" id="season-stage">Regular Season</span>
                         </div>
-                        <div style="max-height: 380px; overflow-y: auto;">
+                        <div style="max-height: 380px; overflow-y: auto;" class="scrollable-area">
                             <table class="roster-table" style="font-size: 0.85rem;">
                                 <thead>
                                     <tr>
@@ -978,7 +982,7 @@
 
                     <div class="panel" id="live-season-scoreboard" style="display: none; border-color: var(--accent-blue); margin-bottom: 0;">
                         <div class="panel-title" style="color: var(--accent-blue); font-size: 1rem;">Today's League Results</div>
-                        <div id="live-games-grid" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 4px;"></div>
+                        <div id="live-games-grid" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 4px;" class="scrollable-area"></div>
                     </div>
 
                     <div class="panel" style="margin-bottom: 0;">
@@ -1072,7 +1076,7 @@
     let playoffsState = null;
     
     let userTeamId = ""; 
-    let userMC = 2500000; // Giving a 2.5M starting budget
+    let userMC = 2500000; // Starting franchise budget
 
     let activeExhibitionAway = "";
     let activeExhibitionHome = "";
@@ -1235,7 +1239,6 @@
         }
         
         try {
-            // Using /raw to get the exact JSON, avoiding wrapper parsing issues
             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
             const res = await fetch(proxyUrl);
             if (res.ok) return await res.json();
@@ -1244,7 +1247,7 @@
         }
 
         const rawProxies = [
-            `https://corsproxy.io/?${encodeURIComponent(url)}`
+            `https://corsproxy.io/?url=${encodeURIComponent(url)}`
         ];
 
         for (let proxyUrl of rawProxies) {
@@ -1287,38 +1290,39 @@
     }
 
     // --- LOCAL STORAGE STATE PERSISTENCE ---
+    // Updated save/load keys to v15 to cleanly purge old cache and force initial roster downloads
     function saveRostersState() {
-        localStorage.setItem("slam_sim_players_v14", JSON.stringify(PLAYERS));
-        localStorage.setItem("slam_sim_teams_v14", JSON.stringify(ALL_TEAMS));
-        localStorage.setItem("slam_sim_season_standings_v14", JSON.stringify(seasonStandings));
-        localStorage.setItem("slam_sim_season_schedule_v14", JSON.stringify(seasonSchedule));
-        localStorage.setItem("slam_sim_season_round_v14", currentSeasonRound.toString());
-        localStorage.setItem("slam_sim_playoffs_state_v14", JSON.stringify(playoffsState));
-        localStorage.setItem("slam_sim_player_season_stats_v14", JSON.stringify(playerSeasonStats));
+        localStorage.setItem("slam_sim_players_v15", JSON.stringify(PLAYERS));
+        localStorage.setItem("slam_sim_teams_v15", JSON.stringify(ALL_TEAMS));
+        localStorage.setItem("slam_sim_season_standings_v15", JSON.stringify(seasonStandings));
+        localStorage.setItem("slam_sim_season_schedule_v15", JSON.stringify(seasonSchedule));
+        localStorage.setItem("slam_sim_season_round_v15", currentSeasonRound.toString());
+        localStorage.setItem("slam_sim_playoffs_state_v15", JSON.stringify(playoffsState));
+        localStorage.setItem("slam_sim_player_season_stats_v15", JSON.stringify(playerSeasonStats));
         
-        localStorage.setItem("slam_sim_user_team_v14", userTeamId);
-        localStorage.setItem("slam_sim_user_mc_v14", userMC.toString());
-        localStorage.setItem("slam_sim_custom_lineup_v14", JSON.stringify(customLineup));
-        localStorage.setItem("slam_sim_news_feed_v14", JSON.stringify(NEWS));
+        localStorage.setItem("slam_sim_user_team_v15", userTeamId);
+        localStorage.setItem("slam_sim_user_mc_v15", userMC.toString());
+        localStorage.setItem("slam_sim_custom_lineup_v15", JSON.stringify(customLineup));
+        localStorage.setItem("slam_sim_news_feed_v15", JSON.stringify(NEWS));
     }
 
     function checkRostersState() {
-        const cachedPlayers = localStorage.getItem("slam_sim_players_v14");
-        const cachedTeams = localStorage.getItem("slam_sim_teams_v14");
+        const cachedPlayers = localStorage.getItem("slam_sim_players_v15");
+        const cachedTeams = localStorage.getItem("slam_sim_teams_v15");
         if (cachedPlayers && cachedTeams) {
             PLAYERS = JSON.parse(cachedPlayers);
             ALL_TEAMS = JSON.parse(cachedTeams);
 
-            const sStand = localStorage.getItem("slam_sim_season_standings_v14");
-            const sSched = localStorage.getItem("slam_sim_season_schedule_v14");
-            const sRound = localStorage.getItem("slam_sim_season_round_v14");
-            const sPlay = localStorage.getItem("slam_sim_playoffs_state_v14");
-            const sStats = localStorage.getItem("slam_sim_player_season_stats_v14");
-            const sNews = localStorage.getItem("slam_sim_news_feed_v14");
+            const sStand = localStorage.getItem("slam_sim_season_standings_v15");
+            const sSched = localStorage.getItem("slam_sim_season_schedule_v15");
+            const sRound = localStorage.getItem("slam_sim_season_round_v15");
+            const sPlay = localStorage.getItem("slam_sim_playoffs_state_v15");
+            const sStats = localStorage.getItem("slam_sim_player_season_stats_v15");
+            const sNews = localStorage.getItem("slam_sim_news_feed_v15");
             
-            const sTeam = localStorage.getItem("slam_sim_user_team_v14");
-            const sMC = localStorage.getItem("slam_sim_user_mc_v14");
-            const sLine = localStorage.getItem("slam_sim_custom_lineup_v14");
+            const sTeam = localStorage.getItem("slam_sim_user_team_v15");
+            const sMC = localStorage.getItem("slam_sim_user_mc_v15");
+            const sLine = localStorage.getItem("slam_sim_custom_lineup_v15");
 
             if (sStand) seasonStandings = JSON.parse(sStand);
             if (sSched) seasonSchedule = JSON.parse(sSched);
@@ -1379,6 +1383,7 @@
     }
 
     // --- DATA INTAKE ---
+    // Fetches all team structures and downloads their real rosters immediately, saving them to the browser's persistent store
     async function loadNBADataFromAPI() {
         const loader = document.getElementById("api-loader");
         const progress = document.getElementById("loader-progress");
@@ -1389,7 +1394,7 @@
         
         try {
             msg.textContent = "Connecting to ESPN Live API...";
-            progress.style.width = "30%";
+            progress.style.width = "10%";
             
             let rawTeams = [];
             try {
@@ -1438,13 +1443,87 @@
             ALL_TEAMS = tempTeams;
             PLAYERS = [];
 
-            ALL_TEAMS.forEach(team => {
-                if (team.id !== "FA") {
+            msg.textContent = "Downloading and structuring rosters offline...";
+            progress.style.width = "20%";
+
+            // Download real rosters for all 30 teams concurrently to cache everything permanently
+            const rosterPromises = tempTeams.filter(t => t.id !== "FA").map(async (team, index, arr) => {
+                try {
+                    const rosterUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/${team.id}/roster`;
+                    const rosterData = await robustFetchJson(rosterUrl);
+                    
+                    let athletes = [];
+                    if (rosterData.athletes && rosterData.athletes.length > 0) {
+                        if (rosterData.athletes[0].items) {
+                            rosterData.athletes.forEach(g => { if(g.items) athletes.push(...g.items); });
+                        } else {
+                            athletes = rosterData.athletes;
+                        }
+                    }
+                    const teamPlayerIds = [];
+                    athletes.forEach((a) => {
+                        let posAbbr = a.position?.abbreviation || "SG";
+                        if (posAbbr.includes("Point") || posAbbr === "PG") posAbbr = "PG";
+                        else if (posAbbr.includes("Shooting") || posAbbr === "SG" || posAbbr === "G") posAbbr = "SG";
+                        else if (posAbbr.includes("Small") || posAbbr === "SF" || posAbbr === "F") posAbbr = "SF";
+                        else if (posAbbr.includes("Power") || posAbbr === "PF") posAbbr = "PF";
+                        else if (posAbbr.includes("Center") || posAbbr === "C") posAbbr = "C";
+
+                        const playerObj = {
+                            id: (a.id || Math.random().toString(36).substr(2, 9)).toString(),
+                            name: a.fullName || a.displayName || "Unknown",
+                            pos: posAbbr,
+                            team: team.name,
+                            teamId: team.id,
+                            jersey: (a.jersey || Math.floor(Math.random()*99)).toString(),
+                            photo: a.headshot?.href || `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/${a.id}.png`,
+                            col1: team.col1,
+                            col2: team.col2,
+                            injuryDays: 0,
+                            injuryType: "",
+                            contractSeasons: Math.floor(Math.random() * 3) + 2
+                        };
+                        assignPlayerAttributes(playerObj);
+                        
+                        if (!PLAYERS.some(p => p.id === playerObj.id)) { PLAYERS.push(playerObj); }
+                        teamPlayerIds.push(playerObj.id);
+                    });
+                    
+                    // Fallback backfill
+                    const positions = ["PG", "SG", "SF", "PF", "C"];
+                    while (teamPlayerIds.length < 8) {
+                        const fallbackId = `fb-${team.id}-extra-${teamPlayerIds.length}`;
+                        const fallbackPlayer = {
+                            id: fallbackId,
+                            name: generateRealisticSubstituteName(),
+                            pos: positions[teamPlayerIds.length % positions.length],
+                            team: team.name,
+                            teamId: team.id,
+                            jersey: Math.floor(Math.random() * 99).toString(),
+                            photo: `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png`,
+                            col1: team.col1,
+                            col2: team.col2,
+                            injuryDays: 0,
+                            injuryType: "",
+                            contractSeasons: Math.floor(Math.random() * 3) + 2
+                        };
+                        assignPlayerAttributes(fallbackPlayer);
+                        if (!PLAYERS.some(p => p.id === fallbackId)) {
+                            PLAYERS.push(fallbackPlayer);
+                        }
+                        teamPlayerIds.push(fallbackId);
+                    }
+                    team.players = teamPlayerIds;
+                } catch (e) {
+                    console.warn(`Roster load failed for team ${team.name}, using generated offline roster.`, e);
                     generateSynchronousRoster(team);
                 }
+                const percent = 20 + Math.round(((index + 1) / arr.length) * 80);
+                progress.style.width = `${percent}%`;
             });
+
+            await Promise.all(rosterPromises);
             
-            progress.style.width = "100%";
             saveRostersState();
             
             setTimeout(() => {
@@ -1452,93 +1531,15 @@
                 initApp();
             }, 500);
         } catch (err) {
-            alert("Critical Error loading data. Initializing fail-safe configuration.");
+            alert("Critical Error loading data. Initializing offline generation fail-safe.");
             loader.style.display = "none";
         }
     }
 
     async function loadTeamRosterDynamically(teamId) {
+        // Roster payloads are fully pre-cached during startup load, fallback method preserved
         const team = ALL_TEAMS.find(t => t.id === teamId);
         if (!team || teamId === "FA") return;
-
-        try {
-            const rosterUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/${teamId}/roster`;
-            const rosterData = await robustFetchJson(rosterUrl);
-            
-            let athletes = [];
-            if (rosterData.athletes && rosterData.athletes.length > 0) {
-                // ESPN nests athletes in positional items arrays
-                if (rosterData.athletes[0].items) {
-                    rosterData.athletes.forEach(group => {
-                        if (group.items) athletes.push(...group.items);
-                    });
-                } else {
-                    athletes = rosterData.athletes;
-                }
-            }
-            
-            PLAYERS = PLAYERS.filter(p => !p.id.startsWith(`fb-${teamId}-`) && p.teamId !== teamId);
-            const teamPlayerIds = [];
-
-            athletes.forEach((a) => {
-                let posAbbr = a.position?.abbreviation || "SG";
-                if (posAbbr.includes("Point") || posAbbr === "PG") posAbbr = "PG";
-                else if (posAbbr.includes("Shooting") || posAbbr === "SG" || posAbbr === "G") posAbbr = "SG";
-                else if (posAbbr.includes("Small") || posAbbr === "SF" || posAbbr === "F") posAbbr = "SF";
-                else if (posAbbr.includes("Power") || posAbbr === "PF") posAbbr = "PF";
-                else if (posAbbr.includes("Center") || posAbbr === "C") posAbbr = "C";
-
-                const playerObj = {
-                    id: (a.id || Math.random().toString(36).substr(2, 9)).toString(),
-                    name: a.fullName || a.displayName || "Unknown",
-                    pos: posAbbr,
-                    team: team.name,
-                    teamId: team.id,
-                    jersey: (a.jersey || Math.floor(Math.random()*99)).toString(),
-                    photo: a.headshot?.href || `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/${a.id}.png`,
-                    col1: team.col1,
-                    col2: team.col2,
-                    injuryDays: 0,
-                    injuryType: "",
-                    contractSeasons: Math.floor(Math.random() * 3) + 2
-                };
-                assignPlayerAttributes(playerObj);
-                
-                if (!PLAYERS.some(p => p.id === playerObj.id)) { PLAYERS.push(playerObj); }
-                teamPlayerIds.push(playerObj.id);
-            });
-
-            const positions = ["PG", "SG", "SF", "PF", "C"];
-            while (teamPlayerIds.length < 8) {
-                const fallbackId = `fb-${teamId}-extra-${teamPlayerIds.length}`;
-                const fallbackPlayer = {
-                    id: fallbackId,
-                    name: generateRealisticSubstituteName(),
-                    pos: positions[teamPlayerIds.length % positions.length],
-                    team: team.name,
-                    teamId: team.id,
-                    jersey: Math.floor(Math.random() * 99).toString(),
-                    photo: `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png`,
-                    col1: team.col1,
-                    col2: team.col2,
-                    injuryDays: 0,
-                    injuryType: "",
-                    contractSeasons: Math.floor(Math.random() * 3) + 2
-                };
-                assignPlayerAttributes(fallbackPlayer);
-                if (!PLAYERS.some(p => p.id === fallbackId)) {
-                    PLAYERS.push(fallbackPlayer);
-                }
-                teamPlayerIds.push(fallbackId);
-            }
-
-            team.players = teamPlayerIds;
-        } catch (err) {
-            console.error(`Offline or roster payload fetch failed for ${team.name}. Retaining existing generated/cached roster.`, err);
-            if (!team.players || team.players.length === 0) {
-                generateSynchronousRoster(team);
-            }
-        }
         saveRostersState();
     }
 
@@ -1593,7 +1594,7 @@
 
         const loader = document.getElementById("api-loader");
         loader.style.display = "flex";
-        document.getElementById("loader-msg").textContent = "Fleshing out your team roster...";
+        document.getElementById("loader-msg").textContent = "Structuring your franchise roster...";
 
         await loadTeamRosterDynamically(userTeamId);
 
@@ -1700,7 +1701,6 @@
 
     // --- CONTRACT MANAGEMENT LOGIC ---
     function getPlayerSalaryDemand(player) {
-        // Adjusted base scaled perfectly for a standard 10 game economy
         let base = Math.pow(Math.max(1, player.ovr - 55), 2) * 250;
         
         const userRoster = PLAYERS.filter(p => p.teamId === userTeamId);
@@ -1929,7 +1929,6 @@
     }
 
     function calcTradeValue(playersArr) {
-        // Enforce strict non-linear scaling for trades to prevent stacking low overall players for stars
         return playersArr.reduce((sum, p) => sum + Math.pow(p.ovr, 5), 0);
     }
 
@@ -2190,6 +2189,10 @@
     }
 
     function updateMatchupPreview() {
+        // Reset preview scores strictly to 0 when loading/updating matchups
+        document.getElementById("score-away-val").textContent = "0";
+        document.getElementById("score-home-val").textContent = "0";
+
         if (playoffsState) {
             const userMatch = findActiveUserPlayoffMatch();
             if (userMatch) {
@@ -2352,7 +2355,7 @@
             if (g.away.id === userTeamId || g.home.id === userTeamId) {
                 const card = document.createElement("div");
                 card.className = "live-game-card";
-                card.style = "border-color: var(--accent-gold); box-shadow: 0 0 10px rgba(234, 179, 8, 0.15);";
+                card.style = "border-color: var(--accent-gold); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);";
                 card.innerHTML = `
                     <div style="flex:1;">${g.away.abbreviation}</div>
                     <div class="live-score">${scoreAway}</div>
