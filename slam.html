@@ -679,6 +679,7 @@
     </div>
 </div>
 
+<!-- Contract Negotiation Modal -->
 <div class="team-selection-overlay" id="contract-overlay" style="z-index: 3000;">
     <div class="team-selection-box" style="max-width: 550px; padding: 2.5rem;">
         <h2 style="color:var(--accent-gold); margin-bottom: 0.5rem; font-weight:900; font-size: 1.8rem; text-transform:uppercase;">Contract Negotiation</h2>
@@ -1071,7 +1072,7 @@
     let playoffsState = null;
     
     let userTeamId = ""; 
-    let userMC = 0;
+    let userMC = 2500000; // Giving a 2.5M starting budget
 
     let activeExhibitionAway = "";
     let activeExhibitionHome = "";
@@ -1099,19 +1100,19 @@
 
     // --- FALLBACK NBA FRANCHISES ---
     const FALLBACK_TEAMS = [
-        { id: "134860", name: "Atlanta Hawks", abbreviation: "ATL", col1: "#E03A3E", col2: "#C1D32F", logo: "https://a.espncdn.com/i/teamlogos/nba/500/atl.png" },
-        { id: "134861", name: "Boston Celtics", abbreviation: "BOS", col1: "#007A33", col2: "#BA9653", logo: "https://a.espncdn.com/i/teamlogos/nba/500/bos.png" },
-        { id: "134862", name: "Brooklyn Nets", abbreviation: "BKN", col1: "#000000", col2: "#FFFFFF", logo: "https://a.espncdn.com/i/teamlogos/nba/500/bkn.png" },
-        { id: "134863", name: "Charlotte Hornets", abbreviation: "CHA", col1: "#1d1160", col2: "#00788c", logo: "https://a.espncdn.com/i/teamlogos/nba/500/cha.png" },
-        { id: "134864", name: "Chicago Bulls", abbreviation: "CHI", col1: "#CE1141", col2: "#000000", logo: "https://a.espncdn.com/i/teamlogos/nba/500/chi.png" },
-        { id: "134865", name: "Cleveland Cavaliers", abbreviation: "CLE", col1: "#860038", col2: "#FDBB30", logo: "https://a.espncdn.com/i/teamlogos/nba/500/cle.png" },
-        { id: "134866", name: "Dallas Mavericks", abbreviation: "DAL", col1: "#00538C", col2: "#B8C4CA", logo: "https://a.espncdn.com/i/teamlogos/nba/500/dal.png" },
-        { id: "134867", name: "Denver Nuggets", abbreviation: "DEN", col1: "#0E2240", col2: "#FEC524", logo: "https://a.espncdn.com/i/teamlogos/nba/500/den.png" },
-        { id: "134868", name: "Detroit Pistons", abbreviation: "DET", col1: "#C8102E", col2: "#1D428A", logo: "https://a.espncdn.com/i/teamlogos/nba/500/det.png" },
-        { id: "134869", name: "Golden State Warriors", abbreviation: "GSW", col1: "#1D428A", col2: "#FFC72C", logo: "https://a.espncdn.com/i/teamlogos/nba/500/gsw.png" }
+        { id: "1", name: "Atlanta Hawks", abbreviation: "ATL", col1: "#E03A3E", col2: "#C1D32F", logo: "https://a.espncdn.com/i/teamlogos/nba/500/atl.png" },
+        { id: "2", name: "Boston Celtics", abbreviation: "BOS", col1: "#007A33", col2: "#BA9653", logo: "https://a.espncdn.com/i/teamlogos/nba/500/bos.png" },
+        { id: "3", name: "New Orleans Pelicans", abbreviation: "NOP", col1: "#0C2340", col2: "#C8102E", logo: "https://a.espncdn.com/i/teamlogos/nba/500/no.png" },
+        { id: "4", name: "Chicago Bulls", abbreviation: "CHI", col1: "#CE1141", col2: "#000000", logo: "https://a.espncdn.com/i/teamlogos/nba/500/chi.png" },
+        { id: "5", name: "Cleveland Cavaliers", abbreviation: "CLE", col1: "#860038", col2: "#FDBB30", logo: "https://a.espncdn.com/i/teamlogos/nba/500/cle.png" },
+        { id: "6", name: "Dallas Mavericks", abbreviation: "DAL", col1: "#00538C", col2: "#B8C4CA", logo: "https://a.espncdn.com/i/teamlogos/nba/500/dal.png" },
+        { id: "7", name: "Denver Nuggets", abbreviation: "DEN", col1: "#0E2240", col2: "#FEC524", logo: "https://a.espncdn.com/i/teamlogos/nba/500/den.png" },
+        { id: "8", name: "Detroit Pistons", abbreviation: "DET", col1: "#C8102E", col2: "#1D428A", logo: "https://a.espncdn.com/i/teamlogos/nba/500/det.png" },
+        { id: "9", name: "Golden State Warriors", abbreviation: "GSW", col1: "#1D428A", col2: "#FFC72C", logo: "https://a.espncdn.com/i/teamlogos/nba/500/gs.png" },
+        { id: "10", name: "Houston Rockets", abbreviation: "HOU", col1: "#CE1141", col2: "#000000", logo: "https://a.espncdn.com/i/teamlogos/nba/500/hou.png" }
     ];
 
-    const THE_SPORTS_DB_TEAMS_API = "https://www.thesportsdb.com/api/v1/json/3/search_all_teams.php?l=NBA";
+    const ESPN_TEAMS_API = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams";
 
     function formatMC(val) {
         return val.toLocaleString();
@@ -1226,32 +1227,24 @@
     // --- PROXY FAIL-SAFE API PARSER ---
     async function robustFetchJson(url) {
         try {
+            // First attempt direct fetch. ESPN normally works directly for GET.
             const res = await fetch(url);
             if (res.ok) return await res.json();
         } catch (e) {
-            console.warn("Direct fetch bypassed due to CORS policy. Attempting AllOrigins JSON Wrapper fallback...", e);
+            console.warn("Direct fetch bypassed. Attempting raw JSON proxy fallback...", e);
         }
         
         try {
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+            // Using /raw to get the exact JSON, avoiding wrapper parsing issues
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
             const res = await fetch(proxyUrl);
-            if (res.ok) {
-                const data = await res.json();
-                if (data && data.contents) {
-                    try {
-                        return JSON.parse(data.contents);
-                    } catch (err) {
-                        if (typeof data.contents === 'object') return data.contents;
-                    }
-                }
-            }
+            if (res.ok) return await res.json();
         } catch (e) {
             console.warn("AllOrigins proxy wrapper failed. Trying raw fallback proxies...", e);
         }
 
         const rawProxies = [
-            `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
-            `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+            `https://corsproxy.io/?${encodeURIComponent(url)}`
         ];
 
         for (let proxyUrl of rawProxies) {
@@ -1295,37 +1288,37 @@
 
     // --- LOCAL STORAGE STATE PERSISTENCE ---
     function saveRostersState() {
-        localStorage.setItem("slam_sim_players_v13", JSON.stringify(PLAYERS));
-        localStorage.setItem("slam_sim_teams_v13", JSON.stringify(ALL_TEAMS));
-        localStorage.setItem("slam_sim_season_standings_v13", JSON.stringify(seasonStandings));
-        localStorage.setItem("slam_sim_season_schedule_v13", JSON.stringify(seasonSchedule));
-        localStorage.setItem("slam_sim_season_round_v13", currentSeasonRound.toString());
-        localStorage.setItem("slam_sim_playoffs_state_v13", JSON.stringify(playoffsState));
-        localStorage.setItem("slam_sim_player_season_stats_v13", JSON.stringify(playerSeasonStats));
+        localStorage.setItem("slam_sim_players_v14", JSON.stringify(PLAYERS));
+        localStorage.setItem("slam_sim_teams_v14", JSON.stringify(ALL_TEAMS));
+        localStorage.setItem("slam_sim_season_standings_v14", JSON.stringify(seasonStandings));
+        localStorage.setItem("slam_sim_season_schedule_v14", JSON.stringify(seasonSchedule));
+        localStorage.setItem("slam_sim_season_round_v14", currentSeasonRound.toString());
+        localStorage.setItem("slam_sim_playoffs_state_v14", JSON.stringify(playoffsState));
+        localStorage.setItem("slam_sim_player_season_stats_v14", JSON.stringify(playerSeasonStats));
         
-        localStorage.setItem("slam_sim_user_team_v13", userTeamId);
-        localStorage.setItem("slam_sim_user_mc_v13", userMC.toString());
-        localStorage.setItem("slam_sim_custom_lineup_v13", JSON.stringify(customLineup));
-        localStorage.setItem("slam_sim_news_feed_v13", JSON.stringify(NEWS));
+        localStorage.setItem("slam_sim_user_team_v14", userTeamId);
+        localStorage.setItem("slam_sim_user_mc_v14", userMC.toString());
+        localStorage.setItem("slam_sim_custom_lineup_v14", JSON.stringify(customLineup));
+        localStorage.setItem("slam_sim_news_feed_v14", JSON.stringify(NEWS));
     }
 
     function checkRostersState() {
-        const cachedPlayers = localStorage.getItem("slam_sim_players_v13");
-        const cachedTeams = localStorage.getItem("slam_sim_teams_v13");
+        const cachedPlayers = localStorage.getItem("slam_sim_players_v14");
+        const cachedTeams = localStorage.getItem("slam_sim_teams_v14");
         if (cachedPlayers && cachedTeams) {
             PLAYERS = JSON.parse(cachedPlayers);
             ALL_TEAMS = JSON.parse(cachedTeams);
 
-            const sStand = localStorage.getItem("slam_sim_season_standings_v13");
-            const sSched = localStorage.getItem("slam_sim_season_schedule_v13");
-            const sRound = localStorage.getItem("slam_sim_season_round_v13");
-            const sPlay = localStorage.getItem("slam_sim_playoffs_state_v13");
-            const sStats = localStorage.getItem("slam_sim_player_season_stats_v13");
-            const sNews = localStorage.getItem("slam_sim_news_feed_v13");
+            const sStand = localStorage.getItem("slam_sim_season_standings_v14");
+            const sSched = localStorage.getItem("slam_sim_season_schedule_v14");
+            const sRound = localStorage.getItem("slam_sim_season_round_v14");
+            const sPlay = localStorage.getItem("slam_sim_playoffs_state_v14");
+            const sStats = localStorage.getItem("slam_sim_player_season_stats_v14");
+            const sNews = localStorage.getItem("slam_sim_news_feed_v14");
             
-            const sTeam = localStorage.getItem("slam_sim_user_team_v13");
-            const sMC = localStorage.getItem("slam_sim_user_mc_v13");
-            const sLine = localStorage.getItem("slam_sim_custom_lineup_v13");
+            const sTeam = localStorage.getItem("slam_sim_user_team_v14");
+            const sMC = localStorage.getItem("slam_sim_user_mc_v14");
+            const sLine = localStorage.getItem("slam_sim_custom_lineup_v14");
 
             if (sStand) seasonStandings = JSON.parse(sStand);
             if (sSched) seasonSchedule = JSON.parse(sSched);
@@ -1395,14 +1388,14 @@
         progress.style.width = "0%";
         
         try {
-            msg.textContent = "Connecting to Sports network...";
+            msg.textContent = "Connecting to ESPN Live API...";
             progress.style.width = "30%";
             
             let rawTeams = [];
             try {
-                const teamsData = await robustFetchJson(THE_SPORTS_DB_TEAMS_API);
-                if (teamsData && teamsData.teams) {
-                    rawTeams = teamsData.teams;
+                const teamsData = await robustFetchJson(ESPN_TEAMS_API);
+                if (teamsData && teamsData.sports?.[0]?.leagues?.[0]?.teams) {
+                    rawTeams = teamsData.sports[0].leagues[0].teams.map(t => t.team);
                 }
             } catch (err) {
                 console.warn("Online API could not be reached. Activating fail-safe fallback database...", err);
@@ -1413,8 +1406,8 @@
             }
             
             const tempTeams = rawTeams.map(t => {
-                let color1 = t.strColour1 || "#3b82f6";
-                let color2 = t.strColour2 || "#ffffff";
+                let color1 = "#3b82f6";
+                let color2 = "#ffffff";
                 
                 if (t.color) color1 = t.color.startsWith("#") ? t.color : `#${t.color}`;
                 else if (t.col1) color1 = t.col1;
@@ -1422,12 +1415,12 @@
                 else if (t.col2) color2 = t.col2;
 
                 return {
-                    id: (t.idTeam || t.id).toString(),
-                    name: t.strTeam || t.name || t.displayName,
-                    abbreviation: t.strTeamShort || t.abbreviation,
+                    id: (t.id || Math.random().toString(36).substr(2, 9)).toString(),
+                    name: t.name || t.displayName,
+                    abbreviation: t.abbreviation || t.name?.substring(0,3).toUpperCase(),
                     col1: color1,
                     col2: color2,
-                    logo: t.strTeamBadge || t.logos?.[0]?.href || t.logo || "",
+                    logo: t.logos?.[0]?.href || t.logo || "",
                     players: []
                 };
             });
@@ -1469,31 +1462,40 @@
         if (!team || teamId === "FA") return;
 
         try {
-            const rosterUrl = `https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?t=${encodeURIComponent(team.name)}`;
+            const rosterUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/${teamId}/roster`;
             const rosterData = await robustFetchJson(rosterUrl);
-            const athletes = rosterData.player || [];
+            
+            let athletes = [];
+            if (rosterData.athletes && rosterData.athletes.length > 0) {
+                // ESPN nests athletes in positional items arrays
+                if (rosterData.athletes[0].items) {
+                    rosterData.athletes.forEach(group => {
+                        if (group.items) athletes.push(...group.items);
+                    });
+                } else {
+                    athletes = rosterData.athletes;
+                }
+            }
             
             PLAYERS = PLAYERS.filter(p => !p.id.startsWith(`fb-${teamId}-`) && p.teamId !== teamId);
             const teamPlayerIds = [];
 
             athletes.forEach((a) => {
-                let posAbbr = a.strPosition || "SG";
-                if (posAbbr.includes("Point")) posAbbr = "PG";
-                else if (posAbbr.includes("Shooting")) posAbbr = "SG";
-                else if (posAbbr.includes("Small")) posAbbr = "SF";
-                else if (posAbbr.includes("Power")) posAbbr = "PF";
-                else if (posAbbr.includes("Center")) posAbbr = "C";
-                else if (posAbbr === "G") posAbbr = "SG";
-                else if (posAbbr === "F") posAbbr = "SF";
+                let posAbbr = a.position?.abbreviation || "SG";
+                if (posAbbr.includes("Point") || posAbbr === "PG") posAbbr = "PG";
+                else if (posAbbr.includes("Shooting") || posAbbr === "SG" || posAbbr === "G") posAbbr = "SG";
+                else if (posAbbr.includes("Small") || posAbbr === "SF" || posAbbr === "F") posAbbr = "SF";
+                else if (posAbbr.includes("Power") || posAbbr === "PF") posAbbr = "PF";
+                else if (posAbbr.includes("Center") || posAbbr === "C") posAbbr = "C";
 
                 const playerObj = {
-                    id: (a.idPlayer || a.id || Math.random().toString(36).substr(2, 9)).toString(),
-                    name: a.strPlayer || a.fullName || a.name || "Unknown",
+                    id: (a.id || Math.random().toString(36).substr(2, 9)).toString(),
+                    name: a.fullName || a.displayName || "Unknown",
                     pos: posAbbr,
                     team: team.name,
                     teamId: team.id,
-                    jersey: (a.strNumber || a.jersey || Math.floor(Math.random()*99)).toString(),
-                    photo: a.strCutout || a.strThumb || a.headshot?.href || `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/default.png`,
+                    jersey: (a.jersey || Math.floor(Math.random()*99)).toString(),
+                    photo: a.headshot?.href || `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/${a.id}.png`,
                     col1: team.col1,
                     col2: team.col2,
                     injuryDays: 0,
@@ -1698,7 +1700,8 @@
 
     // --- CONTRACT MANAGEMENT LOGIC ---
     function getPlayerSalaryDemand(player) {
-        let base = Math.pow(Math.max(1, player.ovr - 55), 2) * 1500;
+        // Adjusted base scaled perfectly for a standard 10 game economy
+        let base = Math.pow(Math.max(1, player.ovr - 55), 2) * 250;
         
         const userRoster = PLAYERS.filter(p => p.teamId === userTeamId);
         userRoster.sort((a,b) => b.ovr - a.ovr);
@@ -1926,7 +1929,7 @@
     }
 
     function calcTradeValue(playersArr) {
-        // Enforce strict scaling for trades to prevent stacking low overall players for stars
+        // Enforce strict non-linear scaling for trades to prevent stacking low overall players for stars
         return playersArr.reduce((sum, p) => sum + Math.pow(p.ovr, 5), 0);
     }
 
