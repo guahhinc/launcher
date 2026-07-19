@@ -701,7 +701,8 @@
         <div style="display: flex; align-items: center;">
             <div class="mc-badge" id="mc-display">💰 0 MyCASH</div>
             <nav style="margin-left: 30px;">
-                <button class="nav-btn active" id="tab-btn-rosters" onclick="switchTab('tab-rosters')">Rosters & Trades</button>
+                <!-- Renamed from Rosters & Trades to Manage -->
+                <button class="nav-btn active" id="tab-btn-rosters" onclick="switchTab('tab-rosters')">Manage</button>
                 <button class="nav-btn" id="tab-btn-play" onclick="switchTab('tab-play')">Play</button>
                 <button class="nav-btn" id="tab-btn-upgrades" onclick="switchTab('tab-upgrades')">Upgrades</button>
                 <button class="nav-btn" id="tab-btn-news" onclick="switchTab('tab-news')">News</button>
@@ -905,11 +906,12 @@
                             <div style="background-color: var(--bg-hover); border: 2px solid var(--border-color); padding: 4px 12px; font-weight: 800; font-size: 0.85rem;" id="game-status">NOT STARTED</div>
                             <div id="simulation-clock" style="font-size: 1.1rem; font-weight: 700; color: var(--text-muted); margin-top: 8px;">Round - 12:00</div>
                             <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 8px; align-items: center;">
-                                <button class="btn btn-success" id="play-live-btn" onclick="triggerExhibitionSim(true)" style="padding: 0.8rem 1.5rem; font-size: 1.1rem; width: 100%;">⚡ Play Now</button>
+                                <!-- Removed electricity emoji -->
+                                <button class="btn btn-success" id="play-live-btn" onclick="triggerExhibitionSim(true)" style="padding: 0.8rem 1.5rem; font-size: 1.1rem; width: 100%;">Play Now</button>
                             </div>
                         </div>
 
-                        <!-- Home Team (Opponent) changed color to flat text-main -->
+                        <!-- Home Team (Opponent) styled in flat text-main -->
                         <div style="width: 35%;">
                             <div id="ex-logo-home" style="margin-bottom: 0.5rem; height: 60px; display:flex; align-items:center; justify-content:center;"></div>
                             <div style="font-weight: 900; font-size: 1.1rem; background: var(--bg-dark); padding: 0.5rem; border: 2px solid var(--border-color); color: var(--text-main); text-align: center;" id="ex-name-home">Opponent</div>
@@ -917,7 +919,7 @@
                         </div>
                     </div>
 
-                    <!-- Game Ticker Panel: Set fixed size of 300px height -->
+                    <!-- Game Ticker Panel: Block height explicitly set to 300px -->
                     <div class="panel" style="margin-bottom: 0;">
                         <div class="panel-title">Game Ticker Feed</div>
                         <div class="ticker-box" id="ticker-feed" style="height: 300px;" class="scrollable-area">
@@ -925,6 +927,7 @@
                         </div>
                     </div>
 
+                    <!-- Game Box Score: Expanded to height of 420px -->
                     <div class="panel" style="margin-bottom: 0;">
                         <div class="panel-title">
                             <span>Game Box Score</span>
@@ -933,7 +936,7 @@
                                 <button class="btn" style="padding: 4px 12px; font-size: 0.8rem;" id="box-tab-home" onclick="switchBoxView('home')">Opponent</button>
                             </div>
                         </div>
-                        <div style="overflow-x: auto; max-height: 280px;" class="scrollable-area">
+                        <div style="overflow-x: auto; max-height: 420px;" class="scrollable-area">
                             <table class="roster-table" style="font-size: 0.85rem;">
                                 <thead>
                                     <tr>
@@ -956,12 +959,13 @@
 
                 <!-- RIGHT SIDE: Stats, standings overview -->
                 <div style="display: flex; flex-direction: column; gap: 1.8rem;">
+                    <!-- Season Standings: Height increased to 500px -->
                     <div class="panel" style="margin-bottom: 0;">
                         <div class="panel-title">
                             <span>Season Standings</span>
                             <span style="background-color: var(--bg-hover); padding: 4px 10px; font-size: 0.8rem; color: var(--accent-gold);" id="season-stage">Regular Season</span>
                         </div>
-                        <div style="max-height: 380px; overflow-y: auto;" class="scrollable-area">
+                        <div style="max-height: 500px; overflow-y: auto;" class="scrollable-area">
                             <table class="roster-table" style="font-size: 0.85rem;">
                                 <thead>
                                     <tr>
@@ -977,9 +981,10 @@
                         </div>
                     </div>
 
+                    <!-- Today's League Results: Height increased to 350px -->
                     <div class="panel" id="live-season-scoreboard" style="display: none; border-color: var(--accent-blue); margin-bottom: 0;">
                         <div class="panel-title" style="color: var(--accent-blue); font-size: 1rem;">Today's League Results</div>
-                        <div id="live-games-grid" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 4px;" class="scrollable-area"></div>
+                        <div id="live-games-grid" style="display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; padding-right: 4px;" class="scrollable-area"></div>
                     </div>
 
                     <div class="panel" style="margin-bottom: 0;">
@@ -1073,7 +1078,7 @@
     let playoffsState = null;
     
     let userTeamId = ""; 
-    let userMC = 1000000; // Updated starting balance to 1 Million MyCASH
+    let userMC = 1000000; // 1 Million Starting Budget
 
     let activeExhibitionAway = "";
     let activeExhibitionHome = "";
@@ -1204,12 +1209,13 @@
     });
 
     // --- PROXY FAIL-SAFE API PARSER ---
+    // Implemented highly reliable raw-payload retrieval and multiple proxy levels
     async function robustFetchJson(url) {
         try {
             const res = await fetch(url);
             if (res.ok) return await res.json();
         } catch (e) {
-            console.warn("Direct fetch bypassed. Attempting raw JSON proxy fallback...", e);
+            console.warn("Direct fetch bypassed. Trying proxy fallback 1 (AllOrigins Raw)...", e);
         }
         
         try {
@@ -1217,20 +1223,37 @@
             const res = await fetch(proxyUrl);
             if (res.ok) return await res.json();
         } catch (e) {
-            console.warn("AllOrigins proxy wrapper failed. Trying raw fallback proxies...", e);
+            console.warn("Proxy fallback 1 (AllOrigins Raw) failed. Trying proxy fallback 2 (AllOrigins JSON)...", e);
         }
 
-        const rawProxies = [
-            `https://corsproxy.io/?url=${encodeURIComponent(url)}`
-        ];
-
-        for (let proxyUrl of rawProxies) {
-            try {
-                const res = await fetch(proxyUrl);
-                if (res.ok) return await res.json();
-            } catch (e) {}
+        try {
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+            const res = await fetch(proxyUrl);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.contents) {
+                    return JSON.parse(data.contents);
+                }
+            }
+        } catch (e) {
+            console.warn("Proxy fallback 2 (AllOrigins JSON) failed. Trying proxy fallback 3 (CorsProxy)...", e);
         }
-        throw new Error(`Failed to establish connection.`);
+
+        try {
+            const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(url)}`;
+            const res = await fetch(proxyUrl);
+            if (res.ok) return await res.json();
+        } catch (e) {
+            console.warn("Proxy fallback 3 (CorsProxy) failed. Trying proxy fallback 4 (Codetabs)...", e);
+        }
+
+        try {
+            const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
+            const res = await fetch(proxyUrl);
+            if (res.ok) return await res.json();
+        } catch (e) {}
+
+        throw new Error(`Failed to load resource through all fallback tunnels.`);
     }
 
     // --- NEWS REPORT SYSTEM ---
@@ -1264,39 +1287,39 @@
     }
 
     // --- LOCAL STORAGE STATE PERSISTENCE ---
-    // Updated key to v16 to cleanly purge and re-initialize storage
+    // Save block updated to v17 for migrations
     function saveRostersState() {
-        localStorage.setItem("slam_sim_players_v16", JSON.stringify(PLAYERS));
-        localStorage.setItem("slam_sim_teams_v16", JSON.stringify(ALL_TEAMS));
-        localStorage.setItem("slam_sim_season_standings_v16", JSON.stringify(seasonStandings));
-        localStorage.setItem("slam_sim_season_schedule_v16", JSON.stringify(seasonSchedule));
-        localStorage.setItem("slam_sim_season_round_v16", currentSeasonRound.toString());
-        localStorage.setItem("slam_sim_playoffs_state_v16", JSON.stringify(playoffsState));
-        localStorage.setItem("slam_sim_player_season_stats_v16", JSON.stringify(playerSeasonStats));
+        localStorage.setItem("slam_sim_players_v17", JSON.stringify(PLAYERS));
+        localStorage.setItem("slam_sim_teams_v17", JSON.stringify(ALL_TEAMS));
+        localStorage.setItem("slam_sim_season_standings_v17", JSON.stringify(seasonStandings));
+        localStorage.setItem("slam_sim_season_schedule_v17", JSON.stringify(seasonSchedule));
+        localStorage.setItem("slam_sim_season_round_v17", currentSeasonRound.toString());
+        localStorage.setItem("slam_sim_playoffs_state_v17", JSON.stringify(playoffsState));
+        localStorage.setItem("slam_sim_player_season_stats_v17", JSON.stringify(playerSeasonStats));
         
-        localStorage.setItem("slam_sim_user_team_v16", userTeamId);
-        localStorage.setItem("slam_sim_user_mc_v16", userMC.toString());
-        localStorage.setItem("slam_sim_custom_lineup_v16", JSON.stringify(customLineup));
-        localStorage.setItem("slam_sim_news_feed_v16", JSON.stringify(NEWS));
+        localStorage.setItem("slam_sim_user_team_v17", userTeamId);
+        localStorage.setItem("slam_sim_user_mc_v17", userMC.toString());
+        localStorage.setItem("slam_sim_custom_lineup_v17", JSON.stringify(customLineup));
+        localStorage.setItem("slam_sim_news_feed_v17", JSON.stringify(NEWS));
     }
 
     function checkRostersState() {
-        const cachedPlayers = localStorage.getItem("slam_sim_players_v16");
-        const cachedTeams = localStorage.getItem("slam_sim_teams_v16");
+        const cachedPlayers = localStorage.getItem("slam_sim_players_v17");
+        const cachedTeams = localStorage.getItem("slam_sim_teams_v17");
         if (cachedPlayers && cachedTeams) {
             PLAYERS = JSON.parse(cachedPlayers);
             ALL_TEAMS = JSON.parse(cachedTeams);
 
-            const sStand = localStorage.getItem("slam_sim_season_standings_v16");
-            const sSched = localStorage.getItem("slam_sim_season_schedule_v16");
-            const sRound = localStorage.getItem("slam_sim_season_round_v16");
-            const sPlay = localStorage.getItem("slam_sim_playoffs_state_v16");
-            const sStats = localStorage.getItem("slam_sim_player_season_stats_v16");
-            const sNews = localStorage.getItem("slam_sim_news_feed_v16");
+            const sStand = localStorage.getItem("slam_sim_season_standings_v17");
+            const sSched = localStorage.getItem("slam_sim_season_schedule_v17");
+            const sRound = localStorage.getItem("slam_sim_season_round_v17");
+            const sPlay = localStorage.getItem("slam_sim_playoffs_state_v17");
+            const sStats = localStorage.getItem("slam_sim_player_season_stats_v17");
+            const sNews = localStorage.getItem("slam_sim_news_feed_v17");
             
-            const sTeam = localStorage.getItem("slam_sim_user_team_v16");
-            const sMC = localStorage.getItem("slam_sim_user_mc_v16");
-            const sLine = localStorage.getItem("slam_sim_custom_lineup_v16");
+            const sTeam = localStorage.getItem("slam_sim_user_team_v17");
+            const sMC = localStorage.getItem("slam_sim_user_mc_v17");
+            const sLine = localStorage.getItem("slam_sim_custom_lineup_v17");
 
             if (sStand) seasonStandings = JSON.parse(sStand);
             if (sSched) seasonSchedule = JSON.parse(sSched);
@@ -1330,7 +1353,7 @@
             
             let rawTeams = [];
             const teamsData = await robustFetchJson(ESPN_TEAMS_API);
-            if (teamsData && teamsData.sports?.[0]?.leagues?.[0]?.teams) {
+            if (teamsData && teamsData.sports && teamsData.sports[0] && teamsData.sports[0].leagues && teamsData.sports[0].leagues[0] && teamsData.sports[0].leagues[0].teams) {
                 rawTeams = teamsData.sports[0].leagues[0].teams.map(t => t.team);
             }
             
@@ -1344,7 +1367,7 @@
                 else if (t.col2) color2 = t.col2;
 
                 return {
-                    id: (t.id).toString(),
+                    id: (t.id || Math.random().toString(36).substr(2, 9)).toString(),
                     name: t.name || t.displayName,
                     abbreviation: t.abbreviation || t.name?.substring(0,3).toUpperCase(),
                     col1: color1,
@@ -1393,13 +1416,13 @@
                         else if (posAbbr.includes("Center") || posAbbr === "C") posAbbr = "C";
 
                         const playerObj = {
-                            id: (a.id).toString(),
+                            id: (a.id || Math.random().toString(36).substr(2, 9)).toString(),
                             name: a.fullName || a.displayName || "Unknown",
                             pos: posAbbr,
                             team: team.name,
                             teamId: team.id,
                             jersey: (a.jersey || Math.floor(Math.random()*99)).toString(),
-                            photo: a.headshot?.href || `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/${a.id}.png`,
+                            photo: a.headshot?.href || `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/${a.id || ''}.png`,
                             col1: team.col1,
                             col2: team.col2,
                             injuryDays: 0,
@@ -1496,6 +1519,31 @@
         updateTradeCenterPanel();
     }
 
+    function calcTradeValue(playersArr) {
+        return playersArr.reduce((sum, p) => sum + Math.pow(p.ovr, 5), 0);
+    }
+
+    function updateTradeCenterPanel() {
+        const msg = document.getElementById("trade-negotiator-msg");
+        const actions = document.getElementById("trade-actions");
+        const outDiv = document.getElementById("trade-offer-out");
+        const inDiv = document.getElementById("trade-offer-in");
+
+        // Contract metrics counted strictly in seasons (e.g. S instead of Y)
+        if (tradeA.length > 0 || tradeB.length > 0) {
+            msg.style.display = "none";
+            actions.style.display = "flex";
+            
+            outDiv.innerHTML = tradeA.length > 0 ? tradeA.map(p => `<span style="background:var(--bg-dark); padding:4px 8px; border:1px solid var(--accent-blue); border-radius:2px; font-size:0.9rem; display:inline-block; margin:2px;">${p.name} (${p.ovr}) [${p.contractSeasons}S]</span>`).join('') : `<span style="color:var(--text-muted)">None</span>`;
+            inDiv.innerHTML = tradeB.length > 0 ? tradeB.map(p => `<span style="background:var(--bg-dark); padding:4px 8px; border:1px solid var(--accent-gold); border-radius:2px; font-size:0.9rem; display:inline-block; margin:2px;">${p.name} (${p.ovr}) [${p.contractSeasons}S]</span>`).join('') : `<span style="color:var(--text-muted)">None</span>`;
+
+        } else {
+            msg.style.display = "block";
+            actions.style.display = "none";
+            msg.textContent = "Select players from your team and the target team to begin trade negotiations. (Multiple allowed)";
+        }
+    }
+
     function processSelectedTrade() {
         if (tradeA.length === 0 && tradeB.length === 0) return;
 
@@ -1504,7 +1552,6 @@
 
         if (!teamA || !teamB) return;
 
-        // Caps strictly updated to 25 players to fix roster overflow bugs
         if (teamB.id !== "FA") {
             if (teamA.players.length - tradeA.length + tradeB.length < 5) return alert("You must have at least 5 players on your roster.");
             if (teamB.players.length - tradeB.length + tradeA.length < 5) return alert("The CPU team must have at least 5 players.");
@@ -1893,8 +1940,9 @@
                 addMC(50000);
                 addNewsItem('milestone', `💰 <strong>Victory Payout</strong>: Your franchise earned <strong>50,000 MyCASH</strong> for securing the win!`);
             } else {
-                addMC(15000);
-                addNewsItem('milestone', `💰 <strong>Consolation Payout</strong>: Your franchise earned <strong>15,000 MyCASH</strong> for competing.`);
+                // Tweak: Competing reward set to 5,000 MC
+                addMC(5000);
+                addNewsItem('milestone', `💰 <strong>Consolation Payout</strong>: Your franchise earned <strong>5,000 MyCASH</strong> for competing.`);
             }
         }
 
@@ -2437,7 +2485,8 @@
                 statusMarkup = `<span class="injury-badge" title="${p.injuryType}">🏥 OUT ${p.injuryDays}D</span>`;
             }
 
-            let contractText = p.contractSeasons > 1 ? `${p.contractSeasons} Yrs` : `${p.contractSeasons} Yr`;
+            // Tweak: Changed contract indicators to "Seasons"
+            let contractText = p.contractSeasons > 1 ? `${p.contractSeasons} Seasons` : `${p.contractSeasons} Season`;
             let contractStyle = p.contractSeasons <= 1 ? `background:var(--accent-red); color:white; padding:1px 4px; border-radius:2px; font-weight:800;` : `color:var(--text-muted);`;
 
             row.innerHTML = `
@@ -2643,7 +2692,6 @@
     }
 
     // --- CUSTOM UPGRADES LAB ENGINE ---
-    // Injected player images into lab upgrades dropdown menu mapping
     function buildCustomUpgradesDropdown() {
         const roster = PLAYERS.filter(p => p.teamId === userTeamId);
         roster.sort((a, b) => b.ovr - a.ovr);
@@ -2780,6 +2828,68 @@
         renderLineupSelectors();
         renderUpgradeSliders();
         saveRostersState();
+    }
+
+    // --- CONTRACT NEGOTIATION SYSTEMS ---
+    function openContractModal(playerId, fromId) {
+        const player = PLAYERS.find(p => p.id === playerId);
+        if (!player) return;
+
+        pendingContractPlayerId = playerId;
+        pendingContractFromId = fromId;
+
+        const { yearly, isStar } = getPlayerSalaryDemand(player);
+        
+        document.getElementById("contract-player-name").textContent = `${player.name} (OVR ${player.ovr})`;
+        
+        let msg = `Requested Salary: <strong>${formatMC(yearly)} MC</strong> per season.`;
+        if (isStar) {
+            msg += `<br><span style="color:var(--accent-gold); font-size:0.9rem;">⭐ Star Premium Applied (+50% salary demand)</span>`;
+        }
+        document.getElementById("contract-msg").innerHTML = msg;
+
+        const optsContainer = document.getElementById("contract-options");
+        optsContainer.innerHTML = [1, 2, 3, 4].map(yrs => {
+            const total = yearly * yrs;
+            const canAfford = userMC >= total;
+            return `
+                <button class="btn ${canAfford ? 'btn-primary' : ''}" 
+                        style="flex-direction:column; padding: 1rem; ${!canAfford ? 'opacity:0.4; cursor:not-allowed;' : ''}"
+                        onclick="${canAfford ? `confirmContract(${yrs}, ${total})` : ''}" ${!canAfford ? 'disabled' : ''}>
+                    <div style="font-weight:900; font-size:1.2rem;">${yrs} Season${yrs>1?'s':''}</div>
+                    <div style="font-size:0.8rem; color:var(--accent-gold);">${formatMC(total)} MC</div>
+                </button>
+            `;
+        }).join('');
+
+        document.getElementById("contract-overlay").style.display = "flex";
+    }
+
+    function closeContractModal() {
+        document.getElementById("contract-overlay").style.display = "none";
+        pendingContractPlayerId = null;
+        pendingContractFromId = null;
+    }
+
+    function confirmContract(years, totalCost) {
+        if (userMC < totalCost) return;
+        
+        addMC(-totalCost);
+        
+        const player = PLAYERS.find(p => p.id === pendingContractPlayerId);
+        if (player) {
+            if (pendingContractFromId === "FA") {
+                player.contractSeasons = years;
+                transferPlayerDirect(player.id, "FA", userTeamId, true);
+                addNewsItem('trade', `✍️ <strong>Free Agent Signing</strong>: The <strong>${ALL_TEAMS.find(t=>t.id===userTeamId).name}</strong> have signed <strong>${player.name}</strong> to a ${years}-season deal worth ${formatMC(totalCost)} MC.`);
+            } else {
+                player.contractSeasons = (player.contractSeasons || 0) + years;
+                addNewsItem('trade', `📝 <strong>Contract Extension</strong>: <strong>${player.name}</strong> has agreed to a ${years}-season extension with the franchise for ${formatMC(totalCost)} MC.`);
+                saveRostersState();
+                renderRosterSide('a');
+            }
+        }
+        closeContractModal();
     }
 
     // --- RUNTIME BOOTSTRAP GATEWAY ---
