@@ -1,3 +1,11 @@
+Here is the complete, self-contained single-file version of Duck TD. It features
+the white logo with a bold orange border, standard "Duck TD" title casing, and
+the animated interactive main menu background (with clouds, swaying reeds, pond
+ripples, floating balloons, and a bobbing duck).
+
+Save this code directly as index.html or Duck_TD.html and open it in any web
+browser:
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,28 +13,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Duck TD</title>
 <style>
-  /* =========================================================================
-     LOCAL ASSETS & FONTS CONFIGURATION
-     ========================================================================= */
-  @font-face {
-    font-family: 'Noto Sans';
-    src: url('Librarys/NotoSans-VariableFont_wdth,wght.ttf') format('truetype');
-    font-weight: 100 900;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: 'Noto Sans';
-    src: url('Librarys/NotoSans-Italic-VariableFont_wdth,wght.ttf') format('truetype');
-    font-weight: 100 900;
-    font-style: italic;
-  }
-
   :root {
     --bg-dark: #0a0f18;
     --panel-bg: #151f30;
     --panel-sub: #0d1522;
     --panel-border: #334661;
     --primary: #f59e0b;
+    --orange-border: #ea580c;
     --green: #16a34a;
     --green-hover: #15803d;
     --red: #dc2626;
@@ -45,7 +38,7 @@
     user-select: none;
     margin: 0;
     padding: 0;
-    font-family: 'Noto Sans', Arial, Helvetica, sans-serif;
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
   }
 
   html, body {
@@ -72,18 +65,23 @@
   }
 
   /* =========================================================================
-     MAIN MENU: STATIC BG WITH SMOOTH MULTI-STOP DARK FADE
+     MAIN MENU: ANIMATED BACKGROUND WITH LEFT SIDEBAR SCRIM
      ========================================================================= */
   #menu-screen {
     position: relative;
     width: 100vw;
     height: 100vh;
     background-color: #0b1424;
-    background-image: url('Icons/duck_td_background.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     overflow: hidden;
+  }
+
+  #menu-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: block;
   }
 
   #menu-ui-overlay {
@@ -94,52 +92,52 @@
     pointer-events: none;
   }
 
-  /* Smooth Multi-Stop Black Scrim Fade */
+  /* Smooth Multi-Stop Black Scrim Fade on the Left */
   .menu-sidebar-scrim {
     width: 560px;
     height: 100%;
     background: linear-gradient(
       to right,
       rgba(9, 14, 23, 0.98) 0%,
-      rgba(9, 14, 23, 0.95) 45%,
-      rgba(9, 14, 23, 0.85) 65%,
-      rgba(9, 14, 23, 0.60) 80%,
-      rgba(9, 14, 23, 0.25) 92%,
+      rgba(9, 14, 23, 0.94) 50%,
+      rgba(9, 14, 23, 0.82) 68%,
+      rgba(9, 14, 23, 0.55) 82%,
+      rgba(9, 14, 23, 0.20) 93%,
       rgba(9, 14, 23, 0) 100%
     );
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding: 40px 65px;
-    gap: 20px;
+    gap: 22px;
     pointer-events: auto;
     box-sizing: border-box;
   }
 
-  /* Logo */
+  /* White Logo with Orange Border */
   .menu-logo-wrapper {
     text-align: left;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
-  .menu-logo-img {
-    max-width: 420px;
-    width: 100%;
-    max-height: 180px;
-    object-fit: contain;
-    filter: drop-shadow(0 8px 0 rgba(0, 0, 0, 0.65));
-    display: block;
-  }
-
-  .menu-fallback-title {
-    font-size: 4.5rem;
+  .menu-logo-title {
+    font-size: 5rem;
     font-weight: 900;
-    color: var(--yellow);
-    letter-spacing: 3px;
-    text-shadow: 4px 4px 0 #000;
+    color: #ffffff;
+    -webkit-text-stroke: 3.5px var(--orange-border);
+    text-shadow:
+      -3px -3px 0 var(--orange-border),
+       3px -3px 0 var(--orange-border),
+      -3px  3px 0 var(--orange-border),
+       3px  3px 0 var(--orange-border),
+       0px  8px 0 #9a3412,
+       0px 12px 25px rgba(0, 0, 0, 0.7);
+    letter-spacing: 2px;
+    line-height: 1;
+    display: inline-block;
   }
 
-  /* Profile Card */
+  /* Commander Profile Card */
   .menu-profile-card {
     background: rgba(13, 21, 34, 0.95);
     border: 3px solid var(--panel-border);
@@ -149,12 +147,11 @@
     align-items: center;
     gap: 16px;
     width: 100%;
-    margin-bottom: 5px;
   }
 
   .menu-avatar-badge {
-    width: 50px;
-    height: 50px;
+    width: 52px;
+    height: 52px;
     background: #1e293b;
     border: 2px solid var(--yellow);
     display: flex;
@@ -197,7 +194,7 @@
     width: 0%;
   }
 
-  /* Menu Action Buttons */
+  /* Action Buttons */
   .menu-action-panel {
     display: flex;
     flex-direction: column;
@@ -741,14 +738,15 @@
 </head>
 <body>
 
-<!-- MAIN MENU WITH STATIC BG & SIDEBAR SCRIM -->
+<!-- MAIN MENU WITH ANIMATED POND BACKGROUND & WHITE/ORANGE TITLE -->
 <div id="menu-screen" class="screen active">
+  <canvas id="menu-canvas"></canvas>
+
   <div id="menu-ui-overlay">
     <div class="menu-sidebar-scrim">
-      <!-- Big Logo -->
+      <!-- White Logo with Orange Border -->
       <div class="menu-logo-wrapper">
-        <img src="Icons/duck_td_logo.png" alt="DUCK TD" class="menu-logo-img" onerror="this.style.display='none'; document.getElementById('menu-text-logo').style.display='block';">
-        <h1 id="menu-text-logo" class="menu-fallback-title" style="display:none;">DUCK TD</h1>
+        <h1 class="menu-logo-title">Duck TD</h1>
       </div>
 
       <!-- Commander Profile Card -->
@@ -1532,6 +1530,255 @@ function drawRoadItemModel(ctx, x, y, type, radius = 18) {
 }
 
 /* =========================================================================
+   ANIMATED MENU TITLE BACKGROUND
+   ========================================================================= */
+class MenuBackground {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.balloons = [];
+    this.clouds = [];
+    this.ripples = [];
+    this.planeX = -100;
+    this.planeY = 90;
+    this.time = 0;
+    this.init();
+  }
+
+  init() {
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+
+    for (let i = 0; i < 4; i++) {
+      this.clouds.push({
+        x: Math.random() * this.canvas.width,
+        y: 40 + Math.random() * 120,
+        size: 40 + Math.random() * 35,
+        speed: 10 + Math.random() * 12
+      });
+    }
+
+    for (let i = 0; i < 8; i++) {
+      this.spawnBalloon();
+    }
+
+    for (let i = 0; i < 4; i++) {
+      this.ripples.push({
+        x: this.canvas.width * (0.45 + Math.random() * 0.35),
+        y: this.canvas.height * (0.75 + Math.random() * 0.15),
+        r: Math.random() * 30,
+        alpha: 0.8
+      });
+    }
+  }
+
+  resize() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  }
+
+  spawnBalloon() {
+    const colors = ['#ef4444', '#3b82f6', '#10b981', '#facc15', '#ec4899', '#9333ea'];
+    this.balloons.push({
+      x: this.canvas.width * 0.35 + Math.random() * (this.canvas.width * 0.65),
+      y: this.canvas.height + 40 + Math.random() * 200,
+      size: 18 + Math.random() * 14,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      speed: 35 + Math.random() * 45,
+      swayOffset: Math.random() * Math.PI * 2,
+      swaySpeed: 1.2 + Math.random() * 1.5
+    });
+  }
+
+  update(dt) {
+    this.time += dt;
+
+    for (const c of this.clouds) {
+      c.x += c.speed * dt;
+      if (c.x > this.canvas.width + 150) {
+        c.x = -150;
+        c.y = 40 + Math.random() * 120;
+      }
+    }
+
+    for (let i = this.balloons.length - 1; i >= 0; i--) {
+      const b = this.balloons[i];
+      b.y -= b.speed * dt;
+      b.swayOffset += b.swaySpeed * dt;
+      if (b.y < -60) {
+        this.balloons.splice(i, 1);
+        this.spawnBalloon();
+      }
+    }
+
+    for (const r of this.ripples) {
+      r.r += dt * 14;
+      r.alpha -= dt * 0.25;
+      if (r.alpha <= 0 || r.r > 55) {
+        r.x = this.canvas.width * (0.45 + Math.random() * 0.35);
+        r.y = this.canvas.height * (0.75 + Math.random() * 0.15);
+        r.r = 2;
+        r.alpha = 0.8;
+      }
+    }
+
+    this.planeX += dt * 120;
+    if (this.planeX > this.canvas.width + 120) {
+      this.planeX = -120;
+      this.planeY = 70 + Math.random() * 130;
+    }
+  }
+
+  render() {
+    const ctx = this.ctx;
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+
+    // Sky
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.7);
+    skyGrad.addColorStop(0, '#0284c7');
+    skyGrad.addColorStop(0.6, '#38bdf8');
+    skyGrad.addColorStop(1, '#7dd3fc');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Clouds
+    for (const c of this.clouds) {
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+      ctx.arc(c.x + c.size * 0.6, c.y - c.size * 0.25, c.size * 0.75, 0, Math.PI * 2);
+      ctx.arc(c.x + c.size * 1.2, c.y, c.size * 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Layered Green Hills
+    ctx.fillStyle = '#15803d';
+    ctx.beginPath();
+    ctx.arc(w * 0.4, h * 1.45, w * 0.65, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#22c55e';
+    ctx.beginPath();
+    ctx.arc(w * 0.75, h * 1.4, w * 0.58, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Trees
+    const menuTrees = [
+      { x: w * 0.35, y: h * 0.56, r: 28 },
+      { x: w * 0.52, y: h * 0.52, r: 34 },
+      { x: w * 0.86, y: h * 0.58, r: 38 },
+      { x: w * 0.94, y: h * 0.64, r: 30 }
+    ];
+    for (const t of menuTrees) {
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(t.x - 5, t.y, 10, 24);
+      ctx.fillStyle = '#166534';
+      ctx.beginPath();
+      ctx.arc(t.x, t.y - 10, t.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#052e16';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+    }
+
+    // Sparkling Pond
+    const pondX = w * 0.65;
+    const pondY = h * 0.82;
+    const pondR1 = w * 0.38;
+    const pondR2 = h * 0.22;
+
+    ctx.beginPath();
+    ctx.ellipse(pondX, pondY, pondR1 + 16, pondR2 + 14, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#16a34a';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.ellipse(pondX, pondY, pondR1, pondR2, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#0284c7';
+    ctx.fill();
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 8;
+    ctx.stroke();
+
+    // Water Ripples
+    for (const r of this.ripples) {
+      ctx.save();
+      ctx.globalAlpha = r.alpha;
+      ctx.strokeStyle = '#7dd3fc';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(r.x, r.y, r.r * 1.8, r.r, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Lilies
+    ctx.fillStyle = '#15803d';
+    ctx.beginPath();
+    ctx.arc(pondX - 60, pondY - 20, 18, 0, Math.PI * 1.8);
+    ctx.lineTo(pondX - 60, pondY - 20);
+    ctx.fill();
+    ctx.fillStyle = '#f472b6';
+    ctx.beginPath();
+    ctx.arc(pondX - 58, pondY - 24, 7, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#15803d';
+    ctx.beginPath();
+    ctx.arc(pondX + 90, pondY + 30, 20, 0, Math.PI * 1.8);
+    ctx.lineTo(pondX + 90, pondY + 30);
+    ctx.fill();
+    ctx.fillStyle = '#facc15';
+    ctx.beginPath();
+    ctx.arc(pondX + 92, pondY + 26, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Bobbing Duck on Water
+    const bobY = pondY + Math.sin(this.time * 2.5) * 8;
+    const tilt = Math.cos(this.time * 2.5) * 0.08;
+    drawDuckModel(ctx, pondX + 20, bobY, 'quacker', tilt, 0, 1.0, 24);
+
+    // Reeds
+    for (let i = 0; i < 6; i++) {
+      const sway = Math.sin(this.time * 2 + i) * 6;
+      ctx.strokeStyle = '#15803d';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(pondX - pondR1 * 0.7 + i * 8, pondY + 20);
+      ctx.quadraticCurveTo(pondX - pondR1 * 0.7 + i * 8 + sway, pondY - 20, pondX - pondR1 * 0.7 + i * 8 + sway * 1.5, pondY - 45);
+      ctx.stroke();
+    }
+
+    // Drifting Balloons
+    for (const b of this.balloons) {
+      const sway = Math.sin(b.swayOffset) * 18;
+      ctx.save();
+      ctx.translate(b.x + sway, b.y);
+
+      ctx.beginPath();
+      ctx.moveTo(0, b.size);
+      ctx.lineTo(0, b.size + 10);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, b.size, b.size * 1.18, 0, 0, Math.PI * 2);
+      ctx.fillStyle = b.color;
+      ctx.fill();
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Flying Ace Plane Duck
+    drawDuckModel(ctx, this.planeX, this.planeY, 'plane_duck', 0.08, 0, 0.95, 26);
+  }
+}
+
+/* =========================================================================
    MAIN GAME ENGINE CLASS
    ========================================================================= */
 class Game {
@@ -1539,6 +1786,9 @@ class Game {
     this.canvas = document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
     this.canvasWrap = document.getElementById('canvas-wrap');
+
+    // Menu Animated Background
+    this.menuBg = new MenuBackground(document.getElementById('menu-canvas'));
 
     // Progression: Level & Total Pops System
     this.playerLevel = parseInt(localStorage.getItem('duckTD_lvl') || '1');
@@ -2398,7 +2648,6 @@ class Game {
   update(dt) {
     if (this.isGameOver) return;
 
-    // Spawner
     if (this.inWave && this.waveSpawnQueue.length > 0) {
       this.spawnTimer -= dt;
       if (this.spawnTimer <= 0) {
@@ -2410,7 +2659,6 @@ class Game {
       this.endWave();
     }
 
-    // Update Balloons
     for (let i = this.balloons.length - 1; i >= 0; i--) {
       const b = this.balloons[i];
 
@@ -2453,7 +2701,6 @@ class Game {
         }
       }
 
-      // Check Road Items Collision
       for (let j = this.roadItems.length - 1; j >= 0; j--) {
         const item = this.roadItems[j];
         const dist = Math.hypot(b.x - item.x, b.y - item.y);
@@ -2497,11 +2744,9 @@ class Game {
       }
     }
 
-    // Update Towers
     for (const tower of this.towers) {
       if (tower.cooldown > 0) tower.cooldown -= dt;
 
-      // Flying Plane Duck Orbit
       if (tower.type === 'plane_duck') {
         tower.flightAngle = (tower.flightAngle || 0) + dt * 1.6;
         const flightRadiusX = 180;
@@ -2617,7 +2862,6 @@ class Game {
       }
     }
 
-    // Accurate Projectiles
     for (let i = this.projectiles.length - 1; i >= 0; i--) {
       const p = this.projectiles[i];
 
@@ -2747,7 +2991,6 @@ class Game {
       }
     }
 
-    // Particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const pt = this.particles[i];
       pt.x += pt.vx * dt;
@@ -2756,7 +2999,6 @@ class Game {
       if (pt.alpha <= 0) this.particles.splice(i, 1);
     }
 
-    // Floating Numbers
     for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
       const ft = this.floatingTexts[i];
       ft.y -= dt * 35;
@@ -3304,10 +3546,8 @@ class Game {
 
   /* ================= EVENTS & CONTROLS ================= */
   initEvents() {
-    // Console command resetall
     window.resetall = () => this.resetAllProgress();
 
-    // Menu Difficulty Selection
     document.querySelectorAll('.diff-card').forEach(card => {
       card.onclick = () => {
         document.querySelectorAll('.diff-card').forEach(c => c.classList.remove('selected'));
@@ -3505,7 +3745,10 @@ class Game {
     const rawDt = Math.min((timestamp - this.lastTime) / 1000, 0.1);
     this.lastTime = timestamp;
 
-    if (!document.getElementById('menu-screen').classList.contains('active')) {
+    if (document.getElementById('menu-screen').classList.contains('active')) {
+      this.menuBg.update(rawDt);
+      this.menuBg.render();
+    } else {
       const dt = rawDt * this.gameSpeed;
       this.update(dt);
       this.render();
