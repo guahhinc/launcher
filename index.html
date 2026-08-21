@@ -1,2259 +1,941 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="miniOS">
-    <link rel="apple-touch-icon" href="https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Settings.png">
-    <title>miniOS</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <style>
-        :root {
-            --font: 'Inter Tight', sans-serif;
-            --glass-bg: rgba(255, 255, 255, 0.12);
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pod Store</title>
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/guahhinc/launcher/main/Pod_Store_Icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
-        html, body {
-            margin: 0; padding: 0; width: 100vw; 
-            height: 100dvh; /* Unified, single Dynamic Viewport Height setting */
-            font-family: var(--font); background: #000; color: #fff;
-            overflow: hidden; user-select: none; -webkit-user-select: none;
-            overscroll-behavior: none; font-weight: 200;
-        }
+  <style>
+    :root {
+      --bg: #0c0e14;
+      --card-bg: #141722;
+      --card-hover: #1c2030;
+      --sidebar-bg: #090b10;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --green: #10b981;
+      --green-hover: #059669;
+      --blue-update: #2563eb;
+      --blue-update-hover: #1d4ed8;
+      --text: #f3f4f6;
+      --text-muted: #8b92a5;
+      --border: #23283a;
+      --radius: 6px;
+    }
 
-        #screen { 
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            width: 100vw; height: 100dvh; 
-            overflow: hidden; background: #000;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        #wallpaper {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
-            background-size: cover; background-position: center;
-            filter: blur(0px);
-            transition: filter 0.55s cubic-bezier(0.32, 0.72, 0, 1);
-            will-change: filter;
-            backface-visibility: hidden;
-            transform: none !important;
-        }
-        #wallpaper.app-open { filter: blur(15px); transform: none !important; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
 
-        .layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; }
-        
-        .glass { 
-            background: rgba(255, 255, 255, 0.12) !important; 
-            backdrop-filter: blur(25px) !important; 
-            -webkit-backdrop-filter: blur(25px) !important; 
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        }
-        .dark-glass { 
-            background: rgba(10, 10, 10, 0.55) !important; 
-            backdrop-filter: blur(35px) !important; 
-            -webkit-backdrop-filter: blur(35px) !important; 
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        }
+    /* Sidebar */
+    aside {
+      width: 260px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 16px;
+      flex-shrink: 0;
+    }
 
-        /* --- SETUP SCREEN --- */
-        #setup {
-            background: #fff; color: #000; z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.5s;
-        }
-        #setup h1 { font-weight: 200; font-size: 50px; margin-bottom: 10px; }
-        .btn { background: #007AFF; color: white; padding: 15px 30px; border-radius: 25px; font-size: 18px; margin-top: 20px; text-align: center; width: 250px; font-weight: 300; cursor: pointer; }
-        input[type="file"] { display: none; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding: 0 6px;
+      cursor: pointer;
+    }
 
-        /* --- HOME SCREEN --- */
-        #home { 
-            z-index: 20; display: flex; flex-direction: column; justify-content: space-between; 
-            transition: transform 0.55s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease; 
-            will-change: transform, opacity;
-        }
-        #home.app-open { opacity: 0; pointer-events: none; }
-        
-        /* --- REORDERABLE INVISIBLE SPACER TARGETS --- */
-        .empty-slot {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 20px;
-            border: none !important;
-            background: transparent !important;
-        }
+    .brand img {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius);
+      object-fit: contain;
+    }
 
-        /* --- DOCK CONTAINER (MORE TRANSPARENT) --- */
-        #dock { 
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: calc(130px + env(safe-area-inset-bottom, 15px)); width: 100%; 
-            display: flex; justify-content: space-around; align-items: center;
-            padding: 10px 15px calc(15px + env(safe-area-inset-bottom, 15px)); 
-            border-top: 1px solid rgba(255, 255, 255, 0.2) !important; 
-            background: rgba(255, 255, 255, 0.08) !important;
-            backdrop-filter: blur(35px) !important;
-            -webkit-backdrop-filter: blur(35px) !important;
-            z-index: 25;
-            transform: translate3d(0,0,0);
-            will-change: transform, opacity;
-            transition: transform 0.55s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease;
-        }
-        #dock.app-open { opacity: 0; pointer-events: none; }
-        
-        .app { display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 1; width: 100%; will-change: transform; }
-        #dock .app { width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        
-        /* App icons made slightly bigger */
-        .app-icon { 
-            width: 84px; height: 80px; margin: 0 auto; border-radius: 18px; 
-            background-size: contain; background-repeat: no-repeat; background-position: center; 
-            transition: filter 0.1s ease; will-change: transform; 
-            box-shadow: none !important; border: none;
-        }
-        .app-icon:active { filter: brightness(0.5); }
-        .app-label { margin-top: 6px; font-size: 13px; font-weight: 300; text-shadow: none !important; text-align: center; width: 100%; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .brand h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-        .editing .app-icon { animation: jiggle 0.3s infinite; }
-        .editing .app-icon:nth-child(even) { animation: jiggle2 0.3s infinite; }
-        @keyframes jiggle { 0% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } 100% { transform: rotate(-2deg); } }
-        @keyframes jiggle2 { 0% { transform: rotate(2deg); } 50% { transform: rotate(-2deg); } 100% { transform: rotate(2deg); } }
+    .nav-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin: 14px 0 6px 6px;
+    }
 
-        .sortable-drag .app-icon, .sortable-ghost .app-icon, .sortable-chosen .app-icon {
-            animation: none !important;
-            filter: brightness(0.5) !important;
-            box-shadow: none !important;
-            outline: none !important;
-        }
+    nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-        /* --- SPOTLIGHT SEARCH --- */
-        #spotlight { 
-            z-index: 40; visibility: hidden; 
-            transition: opacity 0.3s, visibility 0.3s; 
-            opacity: 0; padding-top: calc(30px + env(safe-area-inset-top, 20px)); pointer-events: none; 
-            display: flex; flex-direction: column;
-        }
-        #spotlight.active { opacity: 1; pointer-events: auto; visibility: visible; }
-        
-        #spotlight-tabs { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; font-size: 18px; }
-        .sp-tab { cursor: pointer; transition: color 0.2s, font-weight 0.2s; padding: 15px 25px; margin: -10px; }
-        
-        #search-bar { width: 90%; margin: 0 auto; background: rgba(255,255,255,0.25); padding: 12px 15px; border-radius: 12px; display: flex; border: 1px solid rgba(255,255,255,0.1); }
-        #search-bar input { border: none; background: transparent; width: 100%; font-size: 18px; outline: none; color: #fff; font-family: var(--font); font-weight: 300; }
-        #search-bar input::placeholder { color: rgba(255,255,255,0.6); }
-        
-        #spotlight-results { width: 90%; margin: 20px auto; max-height: calc(100vh - 200px); overflow-y: auto; }
-        .search-result { padding: 15px; background: rgba(255,255,255,0.15); border-radius: 12px; margin-bottom: 10px; font-size: 18px; font-weight: 300; cursor: pointer; }
-        .search-result small { display: block; font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      border-radius: 5px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+      width: 100%;
+    }
 
-        #sp-notif-view { width: 90%; margin: 0 auto; max-height: calc(100vh - 120px); overflow-y: auto; overflow-x: hidden; display: none; padding-bottom: 30px; }
-        .sp-notif { 
-            background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.1); color: #fff;
-            padding: 15px; border-radius: 14px; margin-bottom: 12px; display:flex; align-items:center; cursor: pointer;
-            will-change: transform, opacity;
-        }
+    .nav-btn:hover {
+      background: var(--card-bg);
+      color: var(--text);
+    }
 
-        /* --- APP CONTAINER --- */
-        #app-container {
-            z-index: 80; background: #fff; color: #000;
-            position: absolute; overflow: hidden; pointer-events: none; opacity: 0; visibility: hidden;
-            box-shadow: none !important; transform: translate3d(0,0,0);
-            will-change: transform, opacity, width, height, top, left;
-        }
-        #app-container.open { pointer-events: auto; visibility: visible; }
-        #app-ui { height: 100%; width: 100%; overflow-y: auto; overflow-x: hidden; position: relative; }
+    .nav-btn.active {
+      background: var(--card-bg);
+      color: #fff;
+      border-color: var(--border);
+    }
 
-        #app-edge-handle {
-            position: absolute; top: 0; left: 0; width: 45px; height: 100%; z-index: 9999;
-            background: transparent; pointer-events: auto;
-        }
+    .badge-update {
+      margin-left: auto;
+      background: var(--blue-update);
+      color: white;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
 
-        /* --- EDGE SWIPE HOME BUBBLE (FLAT DESIGN) --- */
-        #home-bubble {
-            position: absolute;
-            top: 50%;
-            left: -80px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #007AFF;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: none !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            transform: translateY(-50%) scale(0.5);
-            transition: transform 0.1s ease, left 0.1s ease, opacity 0.1s ease;
-            z-index: 99999;
-            pointer-events: none;
-            opacity: 0;
-        }
+    .sidebar-games-scroll {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      overflow-y: auto;
+      flex: 1;
+      margin-top: 2px;
+    }
 
-        /* --- LIGHT IOS KEYBOARD STYLE --- */
-        #custom-keyboard {
-            display: none; position: fixed; bottom: 0; left: 0; width: 100vw; 
-            background: rgba(240, 243, 248, 0.96);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            z-index: 10000; 
-            padding: 8px 5px calc(25px + env(safe-area-inset-bottom, 15px)); 
-            border-top: 1px solid rgba(0, 0, 0, 0.12); 
-            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); 
-            transform: translateY(100%);
-        }
-        #keyboard-suggestions-bar {
-            display: flex; justify-content: space-around; width: 100%; margin-bottom: 8px; height: 38px; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 6px;
-        }
-        .kb-suggestion {
-            flex: 1; text-align: center; font-size: 15px; color: #000; font-weight: 500;
-            cursor: pointer; padding: 6px 0; border-right: 1px solid rgba(0,0,0,0.1);
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
-        .kb-suggestion:last-child { border-right: none; }
-        .kb-suggestion:active { background: rgba(0,0,0,0.08); }
+    .empty-sidebar-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      padding: 8px 10px;
+      font-style: italic;
+    }
 
-        .sp-tab-active { font-weight: 500; color: white !important; }
-        .sp-tab-inactive { font-weight: 300; color: rgba(255,255,255,0.5) !important; }
+    /* Main Container */
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 40px;
+      position: relative;
+    }
 
-        .kb-grid { display: flex; flex-direction: column; gap: 8px; max-width: 500px; margin: 0 auto; }
-        .kb-row { display: flex; justify-content: center; gap: 5px; width: 100%; }
-        .kb-key { 
-            flex: 1; height: 46px; border-radius: 6px; background: #ffffff; 
-            color: #000; display: flex; align-items: center; justify-content: center; 
-            font-size: 19px; font-weight: 400; cursor: pointer; transition: background 0.08s; 
-            user-select: none; -webkit-user-select: none;
-            box-shadow: none !important; border: 1px solid rgba(0,0,0,0.08);
-        }
-        .kb-key:active { background: #d0d4dc !important; }
-        .kb-key.wide { flex: 1.5; background: #abb1bc; font-size: 14px; }
-        .kb-key.space { flex: 4; background: #ffffff; }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
 
-        /* --- TOASTS & IOS UI (FLATTENED DESIGN) --- */
-        .toast { 
-            position: absolute; top: calc(15px + env(safe-area-inset-top, 20px)); left: 5%; width: 90%; border-radius: 14px; padding: 12px; z-index: 1000; 
-            transform: translateY(-150%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
-            background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); color: #fff;
-            font-size: 16px; box-shadow: none !important; font-weight: 300; display:flex; align-items:center;
-        }
-        .toast.show { transform: translateY(0); }
+    .header-bar h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
 
-        .ios-list { background: #fff; border-radius: 12px; margin-bottom: 20px; box-shadow: none !important; border: 1px solid #ddd; overflow: hidden;}
-        .ios-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; color: #000; font-size: 18px; cursor: pointer;}
-        .ios-item:last-child { border-bottom: none; }
-        .ios-item:active { background: #f0f0f0; }
-        .ios-title { color: #000; font-weight: 400; margin-bottom: 20px; font-size: 30px;}
-        .ios-nav { display: flex; align-items: center; padding: calc(45px + env(safe-area-inset-top, 20px)) 20px 10px; background: #f8f8f8; border-bottom: 1px solid #ddd; }
-        .ios-back { color: #007AFF; font-size: 18px; cursor: pointer; display:flex; align-items:center; }
+    /* Store Banner */
+    .featured-banner {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 32px;
+      height: 300px;
+      display: flex;
+      align-items: flex-end;
+      padding: 32px;
+      background-size: cover;
+      background-position: center;
+      border: 1px solid var(--border);
+    }
 
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 85px; gap: 4px; padding: 4px; background: #000; align-content: end; padding-bottom: calc(30px + env(safe-area-inset-bottom, 15px));}
-        .calc-btn { display: flex; justify-content: center; align-items: center; font-size: 35px; font-weight: 300; border-radius: 0; color: #fff; background: #333; cursor: pointer; transition: filter 0.1s; box-shadow: none !important; border: none; }
-        .calc-btn:active { filter: brightness(1.5); }
-        .calc-btn.op { background: #FF9F0A; color: #fff; }
-        .calc-btn.op:active { filter: brightness(1.2); }
-        .calc-btn.top { background: #A5A5A5; color: #000; }
-        .calc-btn.top:active { filter: brightness(0.8); }
-        .calc-btn.zero { grid-column: span 2; justify-content: flex-start; padding-left: 30px; }
-        .calc-screen { display: flex; justify-content: flex-end; align-items: flex-end; padding: 10px 20px 30px; font-size: 85px; color: #fff; font-weight: 200; overflow: hidden; height: calc(180px + env(safe-area-inset-top, 20px)); }
+    .featured-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(12, 14, 20, 0.1) 0%, rgba(12, 14, 20, 0.92) 100%);
+    }
 
-        .filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px; background: #000; border-top: 1px solid #333; }
-        .filter-btn { padding: 8px 12px; background: #222; color: #fff; border: 1px solid #444; font-family: var(--font); cursor: pointer; border-radius: 6px; white-space: nowrap; }
-        .filter-btn.active { background: #007AFF; border-color: #007AFF; }
-        .mirrored { transform: scaleX(-1) !important; }
+    .featured-content {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+    }
 
-        /* --- IMMERSIVE OVERLAY FOR SYSTEM ALERTS (Z-INDEX SUPERIOR) --- */
-        #ios-alert-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
-            display: none; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.45); z-index: 999999 !important;
-            opacity: 0; transition: opacity 0.25s ease; visibility: hidden;
-        }
+    .tag {
+      display: inline-block;
+      padding: 4px 8px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
 
-        /* --- HIGH-VISIBILITY FLOATING PAGE INDICATORS (MOVED EXACTLY ABOVE THE DOCK) --- */
-        #page-indicator {
-            position: absolute;
-            bottom: calc(135px + env(safe-area-inset-bottom, 15px)); /* Float exactly above the dock height */
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            height: 10px;
-            z-index: 30;
-            pointer-events: auto;
-        }
-    </style>
+    .featured-title {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .featured-desc {
+      color: #cbd5e1;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+
+    /* Buttons */
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 5px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      border: none;
+      transition: background 0.15s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-download {
+      background: var(--green);
+      color: #fff;
+    }
+    .btn-download:hover {
+      background: var(--green-hover);
+    }
+
+    .btn-update {
+      background: var(--blue-update);
+      color: #fff;
+    }
+    .btn-update:hover {
+      background: var(--blue-update-hover);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .btn-icon {
+      padding: 9px 12px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+    .btn-icon:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Dropdown Menu (More Options) */
+    .dropdown-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      min-width: 190px;
+      padding: 4px;
+      display: none;
+      flex-direction: column;
+      z-index: 100;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .dropdown-menu.show {
+      display: flex;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      text-align: left;
+      border-radius: 4px;
+      transition: background 0.1s ease;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .dropdown-item.danger {
+      color: #ef4444;
+    }
+    .dropdown-item.danger:hover {
+      background: rgba(239, 68, 68, 0.15);
+    }
+
+    /* Game Detail Fullpage Layout */
+    .game-page-container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    /* Thumbnail Hero Banner with title & buttons integrated inside */
+    .game-page-hero-banner {
+      position: relative;
+      width: 100%;
+      height: 340px;
+      border-radius: var(--radius);
+      background-size: cover;
+      background-position: center;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: flex-end;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+    }
+
+    .game-page-hero-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(12, 14, 20, 0.05) 0%, rgba(12, 14, 20, 0.92) 100%);
+      border-radius: var(--radius);
+    }
+
+    .game-page-hero-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .game-page-hero-title h1 {
+      font-size: 2.3rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    .game-details-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .game-main-info {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .section-heading {
+      font-size: 1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text);
+    }
+
+    .game-description-text {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .game-meta-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+
+    .meta-label {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .meta-value {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    /* Store & Library Grid */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .game-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .game-card:hover {
+      background: var(--card-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .card-thumb {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      background-color: #1a1e2d;
+    }
+
+    .card-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 14px;
+      flex: 1;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state svg {
+      width: 50px;
+      height: 50px;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #191e2b;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      font-weight: 600;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 2000;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
 </head>
 <body>
 
-<div id="screen">
-    <div id="wallpaper"></div>
-
-    <div id="setup" class="layer">
-        <h1>miniOS</h1>
-        <p style="font-size: 18px; color: #555;">Welcome to your new experience.</p>
-        <div class="btn" onclick="startSetup()">Set Up as New</div>
-        <label class="btn" style="background:#fff; color:#007AFF; border: 1px solid #007AFF;">
-            Restore from Backup
-            <input type="file" accept=".json" onchange="restoreBackup(event)">
-        </label>
+  <!-- Sidebar -->
+  <aside>
+    <div class="brand" onclick="switchView('store')">
+      <img src="https://raw.githubusercontent.com/guahhinc/launcher/main/Pod_Store_Icon.png" alt="Pod Store Logo" />
+      <h1>Pod Store</h1>
     </div>
 
-    <!-- HOME SCREEN -->
-    <div id="home" class="layer">
-        <!-- HORIZONTAL PAGES VIEWPORT -->
-        <div id="pages-viewport" style="position: relative; width: 100%; height: calc(100% - (145px + env(safe-area-inset-bottom, 15px))); overflow: hidden;">
-            <div id="pages-container" style="display: flex; width: 100%; height: 100%; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform;"></div>
-        </div>
-        <!-- PAGE DOT INDICATOR (REPOSITIONED TO FLOAT PERFECTLY ON TOP of THE WALLPAPER VIEWPORT) -->
-        <div id="page-indicator"></div>
+    <div class="nav-label">Menu</div>
+    <nav>
+      <button class="nav-btn active" id="nav-store" onclick="switchView('store')">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        Store
+      </button>
+      <button class="nav-btn" id="nav-library" onclick="switchView('library')">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        My Library
+        <!-- Only shown when updates are available -->
+        <span class="badge-update" id="library-update-badge" style="display: none;">UPDATE</span>
+      </button>
+    </nav>
+
+    <!-- My Games List in Sidebar -->
+    <div class="nav-label">My Games</div>
+    <div class="sidebar-games-scroll" id="sidebar-games-list">
+      <!-- Injected via JS -->
     </div>
-    
-    <!-- REPOSITIONED DOCK DIRECTLY SIBLING TO WALLPAPER -->
-    <div id="dock"></div>
+  </aside>
 
-    <!-- SPOTLIGHT OVERLAY -->
-    <div id="spotlight" class="layer dark-glass">
-        <div id="spotlight-tabs">
-            <span id="tab-search" class="sp-tab sp-tab-active" onclick="switchSpTab('search')">Search</span>
-            <span id="tab-notifs" class="sp-tab sp-tab-inactive" onclick="switchSpTab('notifs')">Notifications</span>
-        </div>
+  <!-- Main Content Area -->
+  <main id="main-content">
+    <!-- Rendered dynamically by JavaScript -->
+  </main>
 
-        <div id="sp-search-view">
-            <div id="search-bar">
-                <input type="text" id="search-input" placeholder="Search apps, notes, reminders...">
-            </div>
-            <div id="spotlight-results"></div>
-        </div>
+  <!-- Toast Notification -->
+  <div id="toast">Message here</div>
 
-        <div id="sp-notif-view"></div>
-    </div>
-
-    <!-- CUSTOM ON-SCREEN KEYBOARD -->
-    <div id="custom-keyboard">
-        <div id="keyboard-suggestions-bar"></div>
-        <div class="kb-grid" id="kb-grid-keys"></div>
-    </div>
-
-    <!-- APP OPEN CONTAINER -->
-    <div id="app-container" class="layer">
-        <div id="app-edge-handle"></div>
-        <div id="app-ui"></div>
-    </div>
-
-    <!-- EDGE HOME BUBBLE -->
-    <div id="home-bubble">
-        <span class="material-icons" style="font-size: 28px;">home</span>
-    </div>
-
-    <!-- CUSTOM NATIVE IOS POPUP OVERLAY (FLATTENED WHITE BACKDROP WITH NO SHADOWS) -->
-    <div id="ios-alert-overlay">
-        <div id="ios-alert" style="width:270px; border-radius:14px; color:#000; display:flex; flex-direction:column; overflow:hidden; background: #ffffff; box-shadow: none !important; transform:scale(1.2); transition:transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1.2); border: 1px solid rgba(0,0,0,0.15);">
-            <div style="padding:20px; text-align:center;">
-                <strong id="ios-alert-title" style="display:block; font-size:17px; font-weight:500; margin-bottom:5px;">Title</strong>
-                <span id="ios-alert-msg" style="font-size:13px; font-weight:300; display:block;">Message</span>
-            </div>
-            <div id="ios-alert-buttons" style="display:flex; border-top:1px solid rgba(0,0,0,0.1); width:100%;"></div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // --- APP DATA & ASSETS (ALL 256 RES UPGRADED FOR RETINA CRISPNESS) ---
-    const APP_DEFS = {
-        'Safari': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Safari.png',
-        'Weather': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Weather.png',
-        'Settings': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Settings.png',
-        'Reminders': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Reminders.png',
-        'Photos': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Photos.png',
-        'Notes': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Notes.png',
-        'Clock': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/clock.png',
-        'Calendar': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Calendar.png',
-        'Calculator': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Calculator.png',
-        'YouTube': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Trailers.png', 
-        'Contacts': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Contacts.png',
-        'Camera': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Camera.png',
-        'Photo Booth': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Photo%20Booth.png',
-        'Maps': 'https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Maps.png'
-    };
-
-    const WALLPAPERS = [
-        'https://raw.githubusercontent.com/SniperGER/iOS-Wallpapers/refs/heads/master/iPhone/5.8%22/iOS%2012/Stills/500.WWDC2018-375w-812h%403x%7Eiphone.jpg', 
-        'https://raw.githubusercontent.com/SniperGER/iOS-Wallpapers/refs/heads/master/iPhone/5.8%22/iOS%2011.1/Stills/330.Mars_HERO-375w-812h%403x%7Eiphone.jpg',
-        'https://raw.githubusercontent.com/SniperGER/iOS-Wallpapers/refs/heads/master/iPhone/5.8%22/iOS%2011.1/Stills/325.Waves_Hero-375w-812h%403x%7Eiphone.jpg',
-        'https://raw.githubusercontent.com/SniperGER/iOS-Wallpapers/refs/heads/master/iPhone/5.8%22/iOS%2011.1/Stills/335.EF_Flower_AECHMEA-375w-812h%403x%7Eiphone.jpg',
-        'https://raw.githubusercontent.com/SniperGER/iOS-Wallpapers/refs/heads/master/iPhone/5.8%22/iOS%2011.1/Stills/345.EF_Flower_AQUILEGIA-375w-812h%403x%7Eiphone.jpg',
-        'https://github.com/SniperGER/iOS-Wallpapers/blob/master/iPhone/5.8%22/iOS%2011.1/Stills/355.EF_Flower_MUSCARI-375w-812h@3x~iphone.jpg?raw=true',
-        'https://github.com/SniperGER/iOS-Wallpapers/blob/master/iPhone/5.8%22/iOS%2011.1/Stills/350.EF_Flower_FRITILLARIA-375w-812h@3x~iphone.jpg?raw=true',
-        'https://github.com/SniperGER/iOS-Wallpapers/blob/master/iPhone/5.8%22/iOS%2011.1/Stills/360.EF_Flower_HELLEBORUS-375w-812h@3x~iphone.jpg?raw=true'
+  <script>
+    // Game Catalog
+    const games = [
+      {
+        id: "duck-td",
+        title: "Duck TD",
+        version: "1.0.1",
+        tag: "Tower Defense",
+        developer: "Guahh Inc.",
+        desc: "Defend against waves of enemies with tactical feathered firepower in this action-packed tower defense game. Build, upgrade, and strategically place towers across multiple maps to survive the onslaught.",
+        bg: "https://raw.githubusercontent.com/guahhinc/launcher/main/Backgrounds/duck_td_background.png",
+        gameUrl: "https://raw.githubusercontent.com/guahhinc/launcher/main/Games/Duck_TD.html",
+        downloadFilename: "Duck_TD.html"
+      }
     ];
 
-    let state = {
-        version: 12, setupDone: false,
-        wallpaper: WALLPAPERS[0],
-        // Structure apps in 20-slot fixed page grids to allow placing them anywhere on the home screen
-        gridApps: [
-            ['Safari', 'Weather', 'Reminders', 'Clock', 'Calendar', 'Maps', 'Calculator', 'YouTube', 'Photo Booth', 'Settings', null, null, null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
-        ],
-        dockApps: ['Contacts', 'Camera', 'Photos', 'Notes'],
-        photos: [], reminders: [], contacts: [], notifications: [],
-        notes: [
-            { id: 1, title: "Welcome to miniOS", text: "Welcome to miniOS!\n\nThis app automatically saves what you type.", date: "6/30/26" }
-        ]
-    };
+    // Local Storage State
+    let library = JSON.parse(localStorage.getItem('pod_library') || '[]');
+    let installedVersions = JSON.parse(localStorage.getItem('pod_installed_versions') || '{}');
+    let currentView = 'store'; // 'store', 'library', or 'game:<id>'
 
-    const DICTIONARY = [
-        "the", "receive", "address", "apple", "color", "miniOS", "calendar", "reminder", 
-        "hello", "weather", "messages", "settings", "photos", "camera", "contacts", 
-        "calculator", "clock", "maps", "please", "thanks", "about", "update", 
-        "cancel", "delete", "today", "tomorrow", "tonight", "yesterday", "welcome", 
-        "experience", "beautiful"
-    ];
-
-    // YouTube Default Visual Tracks
-    const DEFAULT_YT_LINKS = [
-        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        "https://www.youtube.com/watch?v=9bZkp7q19f0",
-        "https://www.youtube.com/watch?v=kJQP7kiw5Fk"
-    ];
-
-    const YT_MOCK_METADATA = {
-        "dQw4w9WgXcQ": { title: "Rick Astley - Never Gonna Give You Up" },
-        "9bZkp7q19f0": { title: "PSY - GANGNAM STYLE(강남스타일)" },
-        "kJQP7kiw5Fk": { title: "Luis Fonsi - Despacito ft. Daddy Yankee" }
-    };
-
-    // Custom built-in keyboard parameters
-    let activeInput = null;
-    let kbLayout = 'abc'; 
-    let kbShift = false;
-
-    const KEYBOARD_LAYOUTS = {
-        abc: [
-            ['q','w','e','r','t','y','u','i','o','p'],
-            ['a','s','d','f','g','h','j','k','l'],
-            ['SHIFT', 'z','x','c','v','b','n','m', 'BACKSPACE'],
-            ['123', 'SPACE', 'DONE']
-        ],
-        abc_shift: [
-            ['Q','W','E','R','T','Y','U','I','O','P'],
-            ['A','S','D','F','G','H','J','K','L'],
-            ['SHIFT_ACTIVE', 'Z','X','C','V','B','N','M', 'BACKSPACE'],
-            ['123', 'SPACE', 'DONE']
-        ],
-        num: [
-            ['1','2','3','4','5','6','7','8','9','0'],
-            ['-','/',':',';','(',')','$','&','@','"'],
-            ['#+=', '.',',','?','!',"'", 'BACKSPACE'],
-            ['ABC', 'SPACE', 'DONE']
-        ],
-        sym: [
-            ['[',']','{','}','#','%','^','*','+','='],
-            ['_','\\','|','~','<','>','€','£','¥','•'],
-            ['123', '.',',','?','!',"'", 'BACKSPACE'],
-            ['ABC', 'SPACE', 'DONE']
-        ]
-    };
-
-    function showCustomKeyboard(targetInput) {
-        activeInput = targetInput;
-        const kb = document.getElementById('custom-keyboard');
-        kb.style.display = 'block';
-        setTimeout(() => {
-            kb.style.transform = 'translateY(0)';
-        }, 10);
-        renderKeyboard();
-        
-        let start = activeInput.selectionStart;
-        let words = activeInput.value.substring(0, start).split(/\s+/);
-        evaluateAutocorrect(words[words.length - 1]);
+    function saveState() {
+      localStorage.setItem('pod_library', JSON.stringify(library));
+      localStorage.setItem('pod_installed_versions', JSON.stringify(installedVersions));
+      updateUpdateBadges();
+      renderSidebarGames();
     }
 
-    function hideCustomKeyboard() {
-        const kb = document.getElementById('custom-keyboard');
-        kb.style.transform = 'translateY(100%)';
-        setTimeout(() => {
-            kb.style.display = 'none';
-        }, 300);
-        if (activeInput) {
-            activeInput.blur();
-            activeInput = null;
-        }
-        const sugBar = document.getElementById('keyboard-suggestions-bar');
-        if (sugBar) sugBar.innerHTML = '';
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    function renderKeyboard() {
-        const container = document.getElementById('kb-grid-keys');
-        container.innerHTML = '';
-        
-        let activeKey = kbLayout;
-        if (kbLayout === 'abc' && kbShift) {
-            activeKey = 'abc_shift';
-        }
-        
-        const rows = KEYBOARD_LAYOUTS[activeKey];
-        rows.forEach((row, rowIndex) => {
-            const rowDiv = document.createElement('div');
-            rowDiv.className = 'kb-row';
-            
-            // Proportional layout adjustment for Row 2 keys to align symmetrically
-            if ((activeKey === 'abc' || activeKey === 'abc_shift') && rowIndex === 1) {
-                const leftSpacer = document.createElement('div');
-                leftSpacer.style.flex = '0.5';
-                rowDiv.appendChild(leftSpacer);
-            }
-            
-            row.forEach(key => {
-                const btn = document.createElement('button');
-                btn.className = 'kb-key';
-                
-                if (['SHIFT', 'SHIFT_ACTIVE', 'BACKSPACE', '123', 'ABC', '#+=', 'DONE'].includes(key)) {
-                    btn.classList.add('wide');
-                }
-                if (key === 'SPACE') {
-                    btn.classList.add('space');
-                }
-                
-                if (key === 'SHIFT') {
-                    btn.innerHTML = '<span class="material-icons" style="font-size: 20px;">arrow_upward</span>';
-                } else if (key === 'SHIFT_ACTIVE') {
-                    btn.innerHTML = '<span class="material-icons" style="font-size: 20px; color: #007AFF;">arrow_upward</span>';
-                } else if (key === 'BACKSPACE') {
-                    btn.innerHTML = '<span class="material-icons" style="font-size: 20px;">backspace</span>';
-                } else if (key === 'SPACE') {
-                    btn.innerText = 'space';
-                } else {
-                    btn.innerText = key;
-                }
-                
-                btn.addEventListener('touchstart', e => { e.preventDefault(); handleKeyboardPress(key); });
-                btn.addEventListener('mousedown', e => { e.preventDefault(); handleKeyboardPress(key); });
-                
-                rowDiv.appendChild(btn);
-            });
-
-            // Append matching right spacer to middle row
-            if ((activeKey === 'abc' || activeKey === 'abc_shift') && rowIndex === 1) {
-                const rightSpacer = document.createElement('div');
-                rightSpacer.style.flex = '0.5';
-                rowDiv.appendChild(rightSpacer);
-            }
-
-            container.appendChild(rowDiv);
-        });
+    function isInLibrary(id) {
+      return library.includes(id);
     }
 
-    function handleKeyboardPress(key) {
-        if (!activeInput) return;
-        
-        let start = activeInput.selectionStart;
-        let end = activeInput.selectionEnd;
-        let val = activeInput.value;
+    function getUpdateStatus(gameId) {
+      const game = games.find(g => g.id === gameId);
+      if (!game) return { hasUpdate: false, isDownloaded: false, installedVer: null };
+      
+      const installedVer = installedVersions[gameId] || null;
+      const isDownloaded = Boolean(installedVer);
+      const hasUpdate = isDownloaded && installedVer !== game.version;
+      return { hasUpdate, isDownloaded, installedVer };
+    }
 
-        if (key === 'DONE') {
-            hideCustomKeyboard();
-            return;
-        }
-        if (key === 'SHIFT' || key === 'SHIFT_ACTIVE') {
-            kbShift = !kbShift;
-            renderKeyboard();
-            return;
-        }
-        if (key === '123') {
-            kbLayout = 'num';
-            renderKeyboard();
-            return;
-        }
-        if (key === 'ABC') {
-            kbLayout = 'abc';
-            renderKeyboard();
-            return;
-        }
-        if (key === '#+=') {
-            kbLayout = 'sym';
-            renderKeyboard();
-            return;
-        }
-        
-        if (key === 'BACKSPACE') {
-            if (start === end) {
-                if (start > 0) {
-                    activeInput.value = val.substring(0, start - 1) + val.substring(end);
-                    activeInput.setSelectionRange(start - 1, start - 1);
-                }
-            } else {
-                activeInput.value = val.substring(0, start) + val.substring(end);
-                activeInput.setSelectionRange(start, start);
-            }
-        } else if (key === 'SPACE') {
-            activeInput.value = val.substring(0, start) + ' ' + val.substring(end);
-            activeInput.setSelectionRange(start + 1, start + 1);
+    function updateUpdateBadges() {
+      const updateCount = library.filter(id => getUpdateStatus(id).hasUpdate).length;
+      const badge = document.getElementById('library-update-badge');
+      if (badge) {
+        if (updateCount > 0) {
+          badge.style.display = 'inline-block';
+          badge.textContent = updateCount > 1 ? `${updateCount} UPDATES` : 'UPDATE';
         } else {
-            activeInput.value = val.substring(0, start) + key + val.substring(end);
-            activeInput.setSelectionRange(start + 1, start + 1);
-            
-            if (kbShift && kbLayout === 'abc') {
-                kbShift = false;
-                renderKeyboard();
-            }
+          badge.style.display = 'none';
         }
-        
-        activeInput.dispatchEvent(new Event('input', { bubbles: true }));
-        
-        let words = activeInput.value.substring(0, activeInput.selectionStart).split(/\s+/);
-        let lastWord = words[words.length - 1];
-        evaluateAutocorrect(lastWord);
+      }
     }
 
-    function evaluateAutocorrect(word) {
-        const sugBar = document.getElementById('keyboard-suggestions-bar');
-        if (!sugBar) return;
-        
-        // Strictly do not show any suggestions if nothing is typed or if input is empty
-        if (!word || word.trim().length === 0) {
-            sugBar.innerHTML = '';
-            return;
-        }
-        
-        // Act as a word finisher - filter dictionary words that start with typed characters
-        let candidates = DICTIONARY.filter(w => w.toLowerCase().startsWith(word.toLowerCase()) && w.toLowerCase() !== word.toLowerCase());
-        candidates.sort((a,b) => a.length - b.length);
-        
-        if (candidates.length < 3) {
-            let fuzzyMatches = [];
-            for (let target of DICTIONARY) {
-                if (candidates.includes(target)) continue;
-                let dist = calcLevenshtein(word.toLowerCase(), target.toLowerCase());
-                if (dist <= 2) {
-                    fuzzyMatches.push({ word: target, dist });
-                }
-            }
-            fuzzyMatches.sort((a,b) => a.dist - b.dist);
-            fuzzyMatches.forEach(item => {
-                if (candidates.length < 3) candidates.push(item.word);
-            });
-        }
-        
-        candidates = candidates.slice(0, 3);
-        renderSuggestions(candidates);
-    }
-
-    function renderSuggestions(list) {
-        const sugBar = document.getElementById('keyboard-suggestions-bar');
-        if (!sugBar) return;
-        sugBar.innerHTML = '';
-        list.forEach(word => {
-            const item = document.createElement('div');
-            item.className = 'kb-suggestion';
-            item.innerText = `${word}`;
-            item.addEventListener('touchstart', e => { e.preventDefault(); applyCompletion(word); });
-            item.addEventListener('mousedown', e => { e.preventDefault(); applyCompletion(word); });
-            sugBar.appendChild(item);
-        });
-    }
-
-    function applyCompletion(completedWord) {
-        if (!activeInput) return;
-        let val = activeInput.value;
-        let start = activeInput.selectionStart;
-        
-        let beforeCursor = val.substring(0, start);
-        let afterCursor = val.substring(start);
-        
-        let words = beforeCursor.split(/\s+/);
-        words[words.length - 1] = completedWord;
-        
-        let newBefore = words.join(' ') + ' ';
-        activeInput.value = newBefore + afterCursor;
-        
-        let newCursorPos = newBefore.length;
-        activeInput.setSelectionRange(newCursorPos, newCursorPos);
-        
-        activeInput.dispatchEvent(new Event('input', { bubbles: true }));
-        evaluateAutocorrect('');
-    }
-
-    function calcLevenshtein(a, b) {
-        if (a.length === 0) return b.length;
-        if (b.length === 0) return a.length;
-        let mat = [];
-        for (let i = 0; i <= b.length; i++) mat[i] = [i];
-        for (let j = 0; j <= a.length; j++) mat[0][j] = j;
-        for (let i = 1; i <= b.length; i++) {
-            for (let j = 1; j <= a.length; j++) {
-                if (b.charAt(i - 1) === a.charAt(j - 1)) {
-                    mat[i][j] = mat[i - 1][j - 1];
-                } else {
-                    mat[i][j] = Math.min(
-                        mat[i - 1][j - 1] + 1, 
-                        mat[i][j - 1] + 1,     
-                        mat[i - 1][j] + 1      
-                    );
-                }
-            }
-        }
-        return mat[b.length][a.length];
-    }
-
-    // Capture focus events globally to intercept browser keyboard activation
-    document.addEventListener('focus', e => {
-        if (e.target && e.target.tagName && (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea')) {
-            const type = e.target.type ? e.target.type.toLowerCase() : '';
-            if (type !== 'time' && type !== 'file') {
-                e.target.setAttribute('inputmode', 'none');
-                e.target.setAttribute('autocorrect', 'off');
-                e.target.setAttribute('autocapitalize', 'off');
-                e.target.setAttribute('spellcheck', 'false');
-            }
-        }
-    }, true);
-
-    document.addEventListener('DOMContentLoaded', () => {
-        document.body.addEventListener('focusin', e => {
-            const tag = e.target.tagName.toLowerCase();
-            const type = e.target.type ? e.target.type.toLowerCase() : '';
-            if (tag === 'textarea' || (tag === 'input' && ['text', 'email', 'tel', 'search', 'password'].includes(type))) {
-                activeInput = e.target;
-                showCustomKeyboard(e.target);
-            }
-        });
-
-        document.body.addEventListener('click', e => {
-            if (activeInput && !e.target.closest('#custom-keyboard') && !e.target.closest('input') && !e.target.closest('textarea')) {
-                hideCustomKeyboard();
-            }
-        });
-
-        const searchInput = document.getElementById('search-input');
-        if (searchInput) {
-            searchInput.addEventListener('input', handleSearch);
-        }
-        
-        // Multi-page touch swipe navigation controls with robust rubber-banding physics
-        const viewport = document.getElementById('pages-viewport');
-        const pagesContainer = document.getElementById('pages-container');
-        let swipeTouchStartX = 0;
-        let swipeTouchStartY = 0;
-        let isPageSwiping = false;
-        let swipeHasMoved = false;
-
-        viewport.addEventListener('touchstart', e => {
-            if (isEditing) return;
-            swipeTouchStartX = e.touches[0].clientX;
-            swipeTouchStartY = e.touches[0].clientY;
-            isPageSwiping = true;
-            swipeHasMoved = false;
-        }, { passive: true });
-
-        viewport.addEventListener('touchmove', e => {
-            if (!isPageSwiping) return;
-            let dx = e.touches[0].clientX - swipeTouchStartX;
-            let dy = e.touches[0].clientY - swipeTouchStartY;
-            
-            // Throttle and filter out accidental tiny movements (<10px) to allow clean app clicks to register
-            if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
-                swipeHasMoved = true;
-                pagesContainer.style.transition = 'none'; // Lock animations while finger dragging
-            } else {
-                return;
-            }
-            
-            if (Math.abs(dy) > Math.abs(dx)) {
-                isPageSwiping = false;
-                scrollToPage(currentPageIndex);
-                return;
-            }
-            
-            // Panning position with edge rubber-band resistance math
-            let targetOffset = -currentPageIndex * window.innerWidth + dx;
-            
-            if (currentPageIndex === 0 && dx > 0) {
-                targetOffset = Math.pow(dx, 0.75); // Safe non-linear resistance curves
-            } else if (currentPageIndex === visiblePages.length - 1 && dx < 0) {
-                targetOffset = -currentPageIndex * window.innerWidth - Math.pow(Math.abs(dx), 0.75);
-            }
-            
-            pagesContainer.style.transform = `translate3d(${targetOffset}px, 0, 0)`;
-        }, { passive: true });
-
-        viewport.addEventListener('touchend', e => {
-            if (!isPageSwiping) return;
-            isPageSwiping = false;
-            
-            if (!swipeHasMoved) {
-                // Ignore layout transformations on simple touch taps to let native openApp clicks fire flawlessly
-                return;
-            }
-            
-            let dx = e.changedTouches[0].clientX - swipeTouchStartX;
-            if (dx > 50 && currentPageIndex > 0) {
-                scrollToPage(currentPageIndex - 1);
-            } else if (dx < -50 && currentPageIndex < visiblePages.length - 1) {
-                scrollToPage(currentPageIndex + 1);
-            } else {
-                scrollToPage(currentPageIndex); // Snap back automatically on aborts
-            }
-        }, { passive: true });
-
-        // Auto Page-Flip Edge Detection when dragging icons
-        function handleDragOverEdge(clientX) {
-            if (!isEditing) return;
-            const threshold = 40;
-            const width = window.innerWidth;
-            if (clientX < threshold) {
-                if (!pageFlipTimeout) {
-                    pageFlipTimeout = setTimeout(() => {
-                        if (currentPageIndex > 0) scrollToPage(currentPageIndex - 1);
-                    }, 800);
-                }
-            } else if (clientX > width - threshold) {
-                if (!pageFlipTimeout) {
-                    pageFlipTimeout = setTimeout(() => {
-                        // Dynamically append new blank pages to the grid context if sliding off the last page
-                        if (currentPageIndex === state.gridApps.length - 1 && state.gridApps.length < 10) {
-                            state.gridApps.push(Array(20).fill(null));
-                            renderHome();
-                        }
-                        if (currentPageIndex < state.gridApps.length - 1) scrollToPage(currentPageIndex + 1);
-                    }, 800);
-                }
-            } else {
-                clearPageFlip();
-            }
-        }
-
-        document.addEventListener('touchmove', e => {
-            if (isEditing && e.touches.length > 0) {
-                handleDragOverEdge(e.touches[0].clientX);
-            }
-        }, { passive: true });
-
-        document.addEventListener('dragover', e => {
-            if (isEditing) {
-                handleDragOverEdge(e.clientX);
-            }
-        });
-
-        window.addEventListener('touchend', () => { 
-            setTimeout(() => isDragging = false, 100); 
-            clearPageFlip();
-        });
-        window.addEventListener('mouseup', () => { 
-            clearPageFlip();
-        });
-    });
-
-    // --- CUSTOM NATIVE IOS ALERT OVERLAYS (HIGH LAYER Z-INDEX SUPERIORITY) ---
-    function showiOSAlert(title, message, buttons) {
-        const overlay = document.getElementById('ios-alert-overlay');
-        const alertBox = document.getElementById('ios-alert');
-        const titleEl = document.getElementById('ios-alert-title');
-        const msgEl = document.getElementById('ios-alert-msg');
-        const btnContainer = document.getElementById('ios-alert-buttons');
-
-        titleEl.innerText = title;
-        msgEl.innerText = message;
-        btnContainer.innerHTML = '';
-
-        buttons.forEach(btn => {
-            const b = document.createElement('button');
-            b.style.cssText = `
-                flex: 1;
-                padding: 14px;
-                background: transparent;
-                border: none;
-                border-left: 1px solid rgba(0,0,0,0.1);
-                font-size: 16px;
-                font-family: var(--font);
-                color: ${btn.color || '#007AFF'};
-                font-weight: ${btn.bold ? '600' : '400'};
-                cursor: pointer;
-                outline: none;
-            `;
-            b.innerText = btn.text;
-            b.onclick = () => {
-                hideiOSAlert();
-                if (btn.onClick) btn.onClick();
-            };
-            btnContainer.appendChild(b);
-        });
-
-        if (btnContainer.firstChild) {
-            btnContainer.firstChild.style.borderLeft = 'none';
-        }
-
-        overlay.style.display = 'flex';
-        overlay.style.visibility = 'visible';
-        setTimeout(() => {
-            overlay.style.opacity = '1';
-            alertBox.style.transform = 'scale(1)';
-        }, 10);
-    }
-
-    function hideiOSAlert() {
-        const overlay = document.getElementById('ios-alert-overlay');
-        const alertBox = document.getElementById('ios-alert');
-        overlay.style.opacity = '0';
-        alertBox.style.transform = 'scale(0.85)';
-        setTimeout(() => {
-            overlay.style.display = 'none';
-            overlay.style.visibility = 'hidden';
-        }, 250);
-    }
-
-    // --- SETUP STATE MANAGERS ---
-    let lastSpotlightCloseTime = 0;
-    let currentPageIndex = 0;
-    let pageFlipTimeout = null;
-    let visiblePages = [];
-
-    function clearPageFlip() {
-        if (pageFlipTimeout) {
-            clearTimeout(pageFlipTimeout);
-            pageFlipTimeout = null;
-        }
-    }
-
-    function scrollToPage(index, instant = false) {
-        const container = document.getElementById('pages-container');
-        const totalPages = visiblePages.length;
-        if (index < 0) index = 0;
-        if (index >= totalPages) index = totalPages - 1;
-        currentPageIndex = index;
-        container.style.transition = instant ? 'none' : 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-        container.style.transform = `translate3d(-${currentPageIndex * 100}%, 0, 0)`;
-        
-        updatePageDots();
-    }
-
-    function updatePageDots() {
-        const indicator = document.getElementById('page-indicator');
-        indicator.innerHTML = '';
-        if (visiblePages.length >= 2) {
-            indicator.style.display = 'flex';
-            visiblePages.forEach((page, pageIdx) => {
-                const dot = document.createElement('span');
-                dot.style.cssText = `
-                    width: 8px; height: 8px; border-radius: 50%;
-                    background: ${pageIdx === currentPageIndex ? '#fff' : 'rgba(255,255,255,0.4)'};
-                    transition: background 0.3s;
-                    cursor: pointer;
-                `;
-                dot.onclick = () => scrollToPage(pageIdx);
-                indicator.appendChild(dot);
-            });
-        } else {
-            indicator.style.display = 'none';
-        }
-    }
-
-    function loadState() {
-        let saved = localStorage.getItem('minios_state');
-        if (saved) {
-            let parsed = JSON.parse(saved);
-            if (parsed.version !== 12) { 
-                parsed.version = 12; 
-                parsed.gridApps = state.gridApps; 
-                parsed.dockApps = state.dockApps; 
-                delete parsed.emails;
-                delete parsed.chats;
-                parsed.contacts = parsed.contacts || [
-                    {first: "Craig", last: "Federighi", phone: "555-456-7890"},
-                    {first: "Steve", last: "Jobs", phone: "555-197-6200"}
-                ];
-                parsed.notes = parsed.notes || [
-                    { id: 1, title: "Welcome to miniOS", text: "Welcome to miniOS!\n\nThis app automatically saves what you type.", date: "6/30/26" }
-                ];
-                parsed.notifications = parsed.notifications || [];
-            }
-            if (!Array.isArray(parsed.gridApps[0])) {
-                let legacyApps = [...parsed.gridApps];
-                while(legacyApps.length < 20) legacyApps.push(null);
-                parsed.gridApps = [legacyApps.slice(0, 20), Array(20).fill(null)];
-            }
-            if (parsed.gridApps) {
-                parsed.gridApps = parsed.gridApps.map(page => page.filter(app => app !== 'Music'));
-            }
-            if (parsed.dockApps) {
-                parsed.dockApps = parsed.dockApps.filter(app => app !== 'Music');
-            }
-            state = parsed;
-        }
-        applyState();
-        renderSpotlightNotifications();
-    }
-    
-    function saveState() { localStorage.setItem('minios_state', JSON.stringify(state)); }
-
-    function applyState() {
-        document.getElementById('wallpaper').style.backgroundImage = `url('${state.wallpaper}')`;
-        const setupEl = document.getElementById('setup');
-        if (state.setupDone) { 
-            setupEl.style.display = 'none'; 
-            if (document.getElementById('pages-container').children.length === 0) renderHome();
-        } else { 
-            setupEl.style.display = 'flex'; 
-        }
-    }
-
-    function startSetup() { state.setupDone = true; saveState(); applyState(); }
-    
-    function confirmBackup() {
-        showiOSAlert("Backup Data", "Save a copy of your miniOS data?", [
-            { text: "Cancel", color: "#888" },
-            { text: "Backup", bold: true, onClick: createBackup }
-        ]);
-    }
-    function createBackup() {
-        let a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-        a.download = "minios_backup.json"; a.click();
-    }
-    
-    function restoreBackup(e) {
-        let reader = new FileReader();
-        reader.onload = function(evt) {
-            try { let parsed = JSON.parse(evt.target.result); parsed.version = 12; state = parsed; saveState(); window.location.reload(); } 
-            catch(err) { showiOSAlert("Restore Error", "Invalid backup JSON file."); }
-        }; reader.readAsText(e.target.files[0]);
-    }
-
-    // --- RENDER HOME SCREEN & NATIVE REARRANGE ---
-    let isEditing = false;
-    let isDragging = false, lastDragEndTime = 0;
-    let sortableOptions = { 
-        animation: 150, 
-        delay: 500, 
-        delayOnTouchOnly: true, 
-        forceFallback: true, 
-        fallbackTolerance: 3, 
-        group: 'shared', 
-        onStart: function() { isDragging = true; enableEditMode(); },
-        onEnd: function() { 
-            setTimeout(() => isDragging = false, 50); 
-            lastDragEndTime = Date.now(); 
-            clearPageFlip();
-            saveOrder(); 
-        }
-    };
-
-    function renderHome() {
-        const container = document.getElementById('pages-container');
-        container.innerHTML = '';
-        
-        // Setup initial trailing empty pages only when layout is actively edited
-        let lastPage = state.gridApps[state.gridApps.length - 1];
-        let lastHasApp = lastPage.some(app => app !== null);
-        if (isEditing && lastHasApp && state.gridApps.length < 10) {
-            state.gridApps.push(Array(20).fill(null));
-        }
-
-        // Only build and render visible occupied pages when not in edit mode
-        visiblePages = [];
-        state.gridApps.forEach((page, idx) => {
-            let hasApp = page.some(app => app !== null);
-            if (hasApp || idx === 0 || isEditing) {
-                visiblePages.push(page);
-            }
-        });
-
-        if (currentPageIndex >= visiblePages.length) {
-            currentPageIndex = visiblePages.length - 1;
-        }
-        
-        visiblePages.forEach((page, pageIdx) => {
-            const pageDiv = document.createElement('div');
-            pageDiv.className = 'app-page';
-            pageDiv.dataset.pageIndex = pageIdx;
-            pageDiv.style.cssText = `
-                min-width: 100%;
-                width: 100%;
-                height: 100%;
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                grid-template-rows: repeat(5, 1fr);
-                justify-items: center;
-                align-content: start;
-                gap: 15px 5px;
-                padding: calc(20px + env(safe-area-inset-top, 20px)) 10px 0;
-                box-sizing: border-box;
-            `;
-            
-            page.forEach((appName, slotIdx) => {
-                if (appName) {
-                    pageDiv.appendChild(createAppIcon(appName, false, pageIdx, slotIdx));
-                } else {
-                    pageDiv.appendChild(createEmptySlot(pageIdx, slotIdx));
-                }
-            });
-            
-            container.appendChild(pageDiv);
-        });
-
-        updatePageDots();
-        
-        const dock = document.getElementById('dock');
-        dock.innerHTML = '';
-        state.dockApps.forEach((app, idx) => {
-            if (app) dock.appendChild(createAppIcon(app, true, -1, idx));
-        });
-        
-        scrollToPage(currentPageIndex, true);
-        bindAllSortables();
-    }
-
-    function createEmptySlot(pageIdx, slotIdx) {
-        const div = document.createElement('div');
-        div.className = 'empty-slot';
-        div.dataset.page = pageIdx;
-        div.dataset.slot = slotIdx;
-        return div;
-    }
-
-    function bindAllSortables() {
-        const pages = document.querySelectorAll('.app-page');
-        pages.forEach(page => {
-            new Sortable(page, sortableOptions);
-        });
-        const dock = document.getElementById('dock');
-        new Sortable(dock, sortableOptions);
-    }
-
-    function createAppIcon(appName, isDock = false, pageIdx = -1, slotIdx = -1) {
-        let div = document.createElement('div'); div.className = 'app'; div.dataset.id = appName;
-        if (!isDock) {
-            div.dataset.page = pageIdx;
-            div.dataset.slot = slotIdx;
-        }
-        div.innerHTML = `<div class="app-icon" style="background-image: url('${APP_DEFS[appName]}')"></div><div class="app-label">${appName}</div>`;
-        
-        div.addEventListener('click', (e) => {
-            if (isEditing || isDragging || (Date.now() - lastDragEndTime < 300) || (Date.now() - lastSpotlightCloseTime < 300)) { 
-                e.preventDefault(); 
-                return; 
-            }
-            openApp(appName, div.querySelector('.app-icon'));
-        });
-        return div;
-    }
-
-    window.addEventListener('touchend', () => { setTimeout(() => isDragging = false, 100); });
-
-    function enableEditMode() { 
-        if(isEditing) return;
-        isEditing = true; 
-        document.body.classList.add('editing'); 
-        
-        // Dynamically append trailing empty page nodes on edit start without causing active drag conflicts
-        const lastPage = state.gridApps[state.gridApps.length - 1];
-        const lastHasApp = lastPage.some(app => app !== null);
-        if (lastHasApp && state.gridApps.length < 10) {
-            state.gridApps.push(Array(20).fill(null));
-            const container = document.getElementById('pages-container');
-            const pageIdx = state.gridApps.length - 1;
-            const pageDiv = document.createElement('div');
-            pageDiv.className = 'app-page';
-            pageDiv.dataset.pageIndex = pageIdx;
-            pageDiv.style.cssText = `
-                min-width: 100%;
-                width: 100%;
-                height: 100%;
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                grid-template-rows: repeat(5, 1fr);
-                justify-items: center;
-                align-content: start;
-                gap: 15px 5px;
-                padding: calc(20px + env(safe-area-inset-top, 20px)) 10px 0;
-                box-sizing: border-box;
-            `;
-            for (let i = 0; i < 20; i++) {
-                pageDiv.appendChild(createEmptySlot(pageIdx, i));
-            }
-            container.appendChild(pageDiv);
-            new Sortable(pageDiv, sortableOptions);
-            visiblePages.push(state.gridApps[pageIdx]);
-            updatePageDots();
-        }
-    }
-    
-    function disableEditMode() { 
-        if(!isEditing) return;
-        isEditing = false; 
-        document.body.classList.remove('editing'); 
-        saveOrder(); 
-    }
-    
-    document.getElementById('home').addEventListener('click', (e) => { if(isEditing && !e.target.closest('.app')) disableEditMode(); });
-
-    function saveOrder() {
-        const pages = document.querySelectorAll('.app-page');
-        let tempGridPages = Array.from(pages).map(pageDiv => {
-            return Array.from(pageDiv.children).map(child => {
-                return child.classList.contains('empty-slot') ? null : child.dataset.id;
-            });
-        });
-        
-        // Filter out empty pages from home screen automatically when saving layout configs
-        let filteredPages = [];
-        tempGridPages.forEach((page, idx) => {
-            let hasApp = page.some(app => app !== null);
-            if (hasApp || idx === 0) {
-                filteredPages.push(page);
-            }
-        });
-        
-        state.gridApps = filteredPages;
-        
-        if (currentPageIndex >= state.gridApps.length) {
-            currentPageIndex = state.gridApps.length - 1;
-        }
-        
-        state.dockApps = Array.from(document.getElementById('dock').children).map(c => {
-            return c.classList.contains('empty-slot') ? null : c.dataset.id;
-        }).filter(Boolean);
-        
+    function addToLibrary(id) {
+      if (!library.includes(id)) {
+        library.push(id);
         saveState();
-        renderHome();
+        showToast('Added to your Library!');
+        render();
+      }
     }
 
-    document.addEventListener('keydown', e => {
-        if (e.code === 'Space' && state.setupDone) {
-            if (appContainer.classList.contains('open')) {
-                e.preventDefault(); closeApp();
-            }
-        }
-    });
-
-    // --- SPOTLIGHT & NOTIFICATIONS LOGIC ---
-    let homeStartY = 0; const spotlight = document.getElementById('spotlight');
-    const homeEl = document.getElementById('home');
-    homeEl.addEventListener('touchstart', e => { if(!isEditing) homeStartY = e.touches[0].clientY; });
-    homeEl.addEventListener('touchend', e => {
-        if(!isEditing && (e.changedTouches[0].clientY - homeStartY) > 60) {
-            spotlight.classList.add('active'); 
-            if (document.getElementById('sp-search-view').style.display !== 'none') {
-                document.getElementById('search-input').focus();
-            }
-        }
-    });
-    
-    spotlight.addEventListener('touchstart', e => {
-        if(e.target === spotlight) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeSpotlight();
-        }
-    });
-    
-    function closeSpotlight() { 
-        spotlight.classList.remove('active'); 
-        document.getElementById('search-input').value = ''; 
-        document.getElementById('spotlight-results').innerHTML = ''; 
-        lastSpotlightCloseTime = Date.now();
-        hideCustomKeyboard();
+    function removeFromLibrary(id) {
+      library = library.filter(item => item !== id);
+      delete installedVersions[id];
+      saveState();
+      showToast('Removed from Library');
+      switchView('library');
     }
 
-    function switchSpTab(tab) {
-        document.getElementById('sp-search-view').style.display = tab === 'search' ? 'block' : 'none';
-        document.getElementById('sp-notif-view').style.display = tab === 'notifs' ? 'block' : 'none';
-        
-        const searchTab = document.getElementById('tab-search');
-        const notifTab = document.getElementById('tab-notifs');
-        
-        if (tab === 'search') {
-            searchTab.className = 'sp-tab sp-tab-active';
-            notifTab.className = 'sp-tab sp-tab-inactive';
-            document.getElementById('search-input').focus();
-        } else {
-            searchTab.className = 'sp-tab sp-tab-inactive';
-            notifTab.className = 'sp-tab sp-tab-active';
-            hideCustomKeyboard();
-        }
-    }
-    
-    function handleSearch() {
-        let q = document.getElementById('search-input').value.toLowerCase(); let resDiv = document.getElementById('spotlight-results');
-        if(!q) { resDiv.innerHTML = ''; return; }
-        let results = [];
-        Object.keys(APP_DEFS).forEach(a => { if(a.toLowerCase().includes(q)) results.push({type: 'App', text: a, icon: APP_DEFS[a]}); });
-        state.notes.forEach(n => { if(n.text.toLowerCase().includes(q)) results.push({type: 'Note', text: n.title, noteId: n.id}); });
-        state.reminders.forEach(r => { if(r.text.toLowerCase().includes(q)) results.push({type: 'Reminder', text: r.text}); });
-        
-        resDiv.innerHTML = results.map(r => {
-            let clickAction = '';
-            if (r.type === 'App') {
-                clickAction = `openApp('${r.text}')`;
-            } else if (r.type === 'Note') {
-                clickAction = `openApp('Notes', null, { noteId: ${r.noteId} })`; // Deep links search directly into corresponding Note
-            } else {
-                clickAction = `openApp('${r.type}s')`;
-            }
-            return `
-                <div class="search-result" onclick="closeSpotlight(); ${clickAction}">
-                    <div style="display:flex; align-items:center;">
-                        ${r.type === 'App' ? `<img src="${r.icon}" style="width:34px; height:34px; margin-right:15px; border-radius:8px;">` : `<span class="material-icons" style="margin-right:15px; opacity:0.8; font-size:30px;">${r.type==='Note'?'description':'check_circle'}</span>`}
-                        <div>
-                            <strong style="display:block;">${r.text}</strong>
-                            <small style="margin-top:2px;">${r.type}</small>
-                        </div>
-                    </div>
-                </div>`;
-        }).join('');
-    }
+    // Direct Download and Version Tracker
+    function downloadGame(gameId) {
+      const game = games.find(g => g.id === gameId);
+      if (!game) return;
 
-    let notifStartX = 0;
-    let swipedNotif = null;
-    const spNotifContainer = document.getElementById('sp-notif-view');
+      showToast(`Downloading ${game.title}...`);
 
-    function renderSpotlightNotifications() {
-        spNotifContainer.innerHTML = state.notifications.length ? state.notifications.map((n, idx) => {
-            let iconUrl = APP_DEFS[n.title] || APP_DEFS['Settings'];
-            return `
-                <div class="sp-notif" data-id="${idx}" data-app="${n.title}">
-                    <img src="${iconUrl}" style="width:42px; height:42px; border-radius:10px; margin-right:14px;">
-                    <div style="flex:1;">
-                        <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:2px;">
-                            <strong style="font-size:16px; font-weight:500;">${n.title}</strong>
-                            <span style="font-size:12px; opacity:0.6; font-weight:300;">${n.date}</span>
-                        </div>
-                        <span style="font-size:14px; font-weight:300; opacity:0.9;">${n.body}</span>
-                    </div>
-                </div>`;
-        }).join('') : '<div style="text-align:center; padding: 40px; color:rgba(255,255,255,0.5); font-weight:300;">No Recent Notifications</div>';
-    }
+      fetch(game.gameUrl)
+        .then(res => res.text())
+        .then(html => {
+          const blob = new Blob([html], { type: 'text/html' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = game.downloadFilename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
 
-    spNotifContainer.addEventListener('touchstart', e => {
-        const notif = e.target.closest('.sp-notif');
-        if (notif) {
-            swipedNotif = notif;
-            notifStartX = e.touches[0].clientX;
-            notif.style.transition = 'none';
-        }
-    });
-
-    spNotifContainer.addEventListener('touchmove', e => {
-        if (swipedNotif) {
-            let dx = e.touches[0].clientX - notifStartX;
-            if (dx < 0) { 
-                e.stopPropagation(); 
-                swipedNotif.style.transform = `translateX(${dx}px)`;
-                swipedNotif.style.opacity = 1 - Math.abs(dx)/200;
-            }
-        }
-    });
-
-    spNotifContainer.addEventListener('touchend', e => {
-        if (swipedNotif) {
-            let dx = e.changedTouches[0].clientX - notifStartX;
-            if (dx < -70) {
-                e.stopPropagation();
-                swipedNotif.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-                swipedNotif.style.transform = `translateX(-120%)`;
-                swipedNotif.style.opacity = '0';
-                const idx = parseInt(swipedNotif.dataset.id);
-                setTimeout(() => {
-                    state.notifications.splice(idx, 1);
-                    saveState();
-                    renderSpotlightNotifications();
-                }, 300);
-            } else if (Math.abs(dx) < 10) {
-                const appName = swipedNotif.dataset.app;
-                if (APP_DEFS[appName] || appName === 'Notes' || appName === 'Reminders') {
-                    closeSpotlight();
-                    setTimeout(() => openApp(appName), 100);
-                }
-            } else {
-                swipedNotif.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-                swipedNotif.style.transform = 'translateX(0)';
-                swipedNotif.style.opacity = '1';
-            }
-            swipedNotif = null;
-        }
-    });
-
-    // --- APP CONTAINER & STATE MANAGER ---
-    const appContainer = document.getElementById('app-container');
-    let activeAppId = null;
-    let isAppTransitioning = false;
-
-    function openApp(id, iconElement, extraData) {
-        if (isAppTransitioning || appContainer.classList.contains('open')) return;
-        if (!APP_DEFS[id] && id !== 'Notes' && id !== 'Reminders') return;
-        
-        isAppTransitioning = true;
-        activeAppId = id;
-        
-        const ui = document.getElementById('app-ui');
-        ui.innerHTML = '';
-
-        document.getElementById('wallpaper').classList.add('app-open');
-        document.getElementById('home').classList.add('app-open');
-        document.getElementById('dock').classList.add('app-open');
-
-        let rect = iconElement ? iconElement.getBoundingClientRect() : { top: window.innerHeight/2, left: window.innerWidth/2, width: 0, height: 0 };
-        
-        // Symmetrical target square animations (pad reduces scaling factors by 0.15 for an ideal balanced size)
-        const pad = rect.width * 0.15;
-        const targetTop = rect.top + pad / 2;
-        const targetLeft = rect.left + pad / 2;
-        const targetWidth = rect.width - pad;
-        const targetHeight = rect.height - pad;
-
-        appContainer.style.visibility = 'visible';
-        appContainer.style.transition = 'none';
-        appContainer.style.top = targetTop + 'px';
-        appContainer.style.left = targetLeft + 'px';
-        appContainer.style.width = targetWidth + 'px';
-        appContainer.style.height = targetHeight + 'px';
-        appContainer.style.borderRadius = '18px';
-        appContainer.style.opacity = '1';
-        appContainer.style.transform = 'translate3d(0,0,0)';
-
-        buildAppUI(id, ui, extraData);
-
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                appContainer.style.transition = 'all 0.55s cubic-bezier(0.32, 0.72, 0, 1)';
-                appContainer.style.top = '0px'; appContainer.style.left = '0px';
-                appContainer.style.width = '100vw'; appContainer.style.height = '100dvh';
-                appContainer.style.borderRadius = '0px';
-                appContainer.classList.add('open');
-                
-                setTimeout(() => { isAppTransitioning = false; }, 600);
-            });
+          // Update installed version record
+          installedVersions[gameId] = game.version;
+          saveState();
+          showToast(`Downloaded ${game.title}!`);
+          render();
+        })
+        .catch(() => {
+          window.open(game.gameUrl, '_blank');
+          installedVersions[gameId] = game.version;
+          saveState();
+          render();
         });
     }
 
-    let appSwipeStartX = 0, appSwipeStartY = 0, isSwipingApp = false;
-    const edgeHandle = document.getElementById('app-edge-handle');
+    function openGamePage(id) {
+      currentView = `game:${id}`;
+      render();
+    }
 
-    edgeHandle.addEventListener('touchstart', e => {
-        if (isAppTransitioning) return;
-        appSwipeStartX = e.touches[0].clientX; appSwipeStartY = e.touches[0].clientY;
-        isSwipingApp = true; appContainer.style.transition = 'none';
-        
-        const bubble = document.getElementById('home-bubble');
-        bubble.style.transition = 'none';
-        bubble.style.opacity = '1';
-    });
-    
-    edgeHandle.addEventListener('touchmove', e => {
-        if(isSwipingApp) {
-            let dx = e.touches[0].clientX - appSwipeStartX;
-            if (dx > 0) { 
-                e.preventDefault(); 
-                appContainer.style.transform = `translate3d(${dx * 0.15}px,0,0)`; 
-                
-                const bubble = document.getElementById('home-bubble');
-                let targetLeft = Math.min(dx - 60, 40); 
-                bubble.style.left = targetLeft + 'px';
-                
-                // Enhanced Home Swipe physics scale
-                let targetScale = Math.min(0.6 + (dx / 60), 1.8);
-                bubble.style.transform = `translateY(-50%) scale(${targetScale})`;
-            }
-        }
-    });
-    
-    edgeHandle.addEventListener('touchend', e => {
-        if(isSwipingApp) {
-            isSwipingApp = false;
-            let dx = e.changedTouches[0].clientX - appSwipeStartX;
-            
-            const bubble = document.getElementById('home-bubble');
-            bubble.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1), left 0.3s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease';
-            bubble.style.left = '-80px';
-            bubble.style.transform = 'translateY(-50%) scale(0.5)';
-            bubble.style.opacity = '0';
+    function switchView(view) {
+      currentView = view;
+      render();
+    }
 
-            if(dx > 95) { 
-                appContainer.style.transform = 'translate3d(0,0,0)'; 
-                closeApp(); 
-            } else { 
-                appContainer.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)'; 
-                appContainer.style.transform = 'translate3d(0,0,0)'; 
-            }
-        }
+    function toggleDropdown(event) {
+      event.stopPropagation();
+      const menu = document.getElementById('options-dropdown');
+      if (menu) menu.classList.toggle('show');
+    }
+
+    // Close dropdown on outside click
+    window.addEventListener('click', () => {
+      const menu = document.getElementById('options-dropdown');
+      if (menu) menu.classList.remove('show');
     });
 
-    function closeApp() {
-        if (isAppTransitioning) return;
-        isAppTransitioning = true;
-        
-        if(window.cameraStream) { window.cameraStream.getTracks().forEach(t => t.stop()); window.cameraStream = null; }
+    function renderSidebarGames() {
+      const list = document.getElementById('sidebar-games-list');
+      if (library.length === 0) {
+        list.innerHTML = `<div class="empty-sidebar-note">No games yet</div>`;
+        return;
+      }
 
-        document.getElementById('wallpaper').classList.remove('app-open');
-        document.getElementById('home').classList.remove('app-open');
-        document.getElementById('dock').classList.remove('app-open');
+      list.innerHTML = library.map(id => {
+        const game = games.find(g => g.id === id);
+        if (!game) return '';
+        const { hasUpdate } = getUpdateStatus(id);
+        const isActive = currentView === `game:${id}`;
 
-        if (activeAppId) {
-            let activeAppElement = document.querySelector(`.app[data-id="${activeAppId}"] .app-icon`);
-            if (activeAppElement) {
-                const rect = activeAppElement.getBoundingClientRect();
-                
-                // Perfect centered coordinates starting/ending slightly larger (pad reduces scale reduction factor by 0.15)
-                const pad = rect.width * 0.15;
-                const targetTop = rect.top + pad / 2;
-                const targetLeft = rect.left + pad / 2;
-                const targetWidth = rect.width - pad;
-                const targetHeight = rect.height - pad;
-
-                appContainer.style.transition = 'top 0.55s cubic-bezier(0.32, 0.72, 0, 1), left 0.55s cubic-bezier(0.32, 0.72, 0, 1), width 0.55s cubic-bezier(0.32, 0.72, 0, 1), height 0.55s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.55s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.16s cubic-bezier(0.32, 0.72, 0, 1) 0.39s';
-                appContainer.style.top = targetTop + 'px'; appContainer.style.left = targetLeft + 'px';
-                appContainer.style.width = targetWidth + 'px'; appContainer.style.height = targetHeight + 'px';
-                appContainer.style.borderRadius = '18px';
-                appContainer.style.opacity = '0';
-            }
-        }
-        
-        setTimeout(() => { 
-            appContainer.classList.remove('open'); 
-            appContainer.style.visibility = 'hidden';
-            document.getElementById('app-ui').innerHTML = ''; 
-            activeAppId = null; 
-            isAppTransitioning = false;
-            hideCustomKeyboard();
-        }, 570);
-    }
-
-    // --- APP UI BUILDERS ---
-    function buildAppUI(id, ui, extraData) {
-        if (id === 'Settings') {
-            preloadWallpapers();
-            ui.style.background = '#f2f2f6'; renderSettingsPage('main');
-        } else if (id === 'Notes') {
-            ui.style.background = '#fff'; renderNotesPage('list', null, extraData);
-        } else if (id === 'Reminders') {
-            ui.style.background = '#fff';
-            ui.innerHTML = `
-                <div style="padding: calc(60px + env(safe-area-inset-top, 20px)) 20px 20px;">
-                    <h1 class="ios-title" style="color: #007AFF;">Reminders</h1>
-                    <div style="display:flex; margin-bottom:20px;">
-                        <input type="text" id="remText" placeholder="Remind me to..." style="flex:1; padding:12px; font-size:16px; border:1px solid #eee; border-radius:10px 0 0 10px; font-family:var(--font); color:#000; outline:none;">
-                        <input type="time" id="remTime" style="padding:12px; border:1px solid #eee; border-left:none; font-family:var(--font); color:#000; outline:none;">
-                        <button onclick="addReminder()" style="background:#007AFF; color:#fff; border:none; padding:12px 20px; border-radius:0 10px 10px 0; font-family:var(--font); cursor:pointer;">Add</button>
-                    </div>
-                    <div id="remList" style="color: #000;"></div>
-                </div>`;
-            renderReminders();
-        } else if (id === 'Camera') {
-            ui.style.background = '#000';
-            ui.innerHTML = `
-                <div style="display:flex; height:100%; flex-direction:column;">
-                    <div style="flex-grow:1; background:#111; position:relative;">
-                        <video id="camera-feed" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
-                    </div>
-                    <div style="height:140px; background:#000; display:flex; justify-content:space-around; align-items:center; padding-bottom:20px;">
-                        <div style="width:50px;"></div>
-                        <div onclick="capturePhoto()" style="width:75px; height:75px; border-radius:50%; background:#fff; border:5px solid #ccc; cursor:pointer;"></div>
-                        <div onclick="toggleCameraFacing()" style="color:#fff; cursor:pointer; width:50px; text-align:center;"><span class="material-icons" style="font-size:32px;">cached</span></div>
-                    </div>
-                </div>`;
-            startCamera();
-        } else if (id === 'Photos') {
-            ui.style.background = '#fff';
-            ui.innerHTML = `
-                <div style="padding: calc(60px + env(safe-area-inset-top, 20px)) 5px 0;">
-                    <h1 class="ios-title" style="margin-left: 15px;">Photos</h1>
-                    ${state.photos.length ? `<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:3px;">${state.photos.map(p => `<img src="${p}" onclick="fullscreenPhoto('${p}')" style="width:100%; aspect-ratio:1; object-fit:cover; cursor:pointer;">`).join('')}</div>` : `<p style="text-align:center; color:#888; margin-top:50px;">No Photos Yet</p>`}
-                </div>`;
-        } else if (id === 'Weather') {
-            ui.style.background = 'linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%)';
-            ui.innerHTML = `
-                <div style="padding-top: calc(80px + env(safe-area-inset-top, 20px)); color: #fff;">
-                    <h1 style="text-align:center; font-weight:300; font-size: 38px; margin-bottom: 0;">Melbourne</h1>
-                    <div id="weather-temp" style="font-size: 90px; font-weight: 100; text-align: center; margin-top: 10px; letter-spacing: -3px;">--°</div>
-                    <p id="weather-desc" style="text-align:center; font-size: 20px; margin-top: 10px; font-weight: 300;">Loading...</p>
-                </div>`;
-            fetch('https://api.open-meteo.com/v1/forecast?latitude=-37.81&longitude=144.96&current_weather=true')
-                .then(r => r.json()).then(d => {
-                    document.getElementById('weather-temp').innerText = `${Math.round(d.current_weather.temperature)}°`;
-                    document.getElementById('weather-desc').innerText = `Wind: ${d.current_weather.windspeed} km/h`;
-                }).catch(() => document.getElementById('weather-desc').innerText = "Offline");
-        } else if (id === 'Contacts') {
-            ui.style.background = '#fff'; renderContactsPage('list');
-        } else if (id === 'Calculator') {
-            ui.style.background = '#000'; renderCalculator();
-        } else if (id === 'Calendar') {
-            ui.style.background = '#fff'; ui.innerHTML = renderCalendar();
-        } else if (id === 'Clock') {
-            ui.style.background = '#000'; ui.innerHTML = renderClockApp();
-        } else if (id === 'Photo Booth') {
-            ui.style.background = '#000'; renderPhotoBooth();
-        } else if (id === 'YouTube') {
-            ui.style.background = '#f2f2f6';
-            ui.innerHTML = `
-                <div style="display: flex; flex-direction: column; height: 100%; background: #f2f2f6; color: #000;">
-                    <!-- Sleek unified iOS 7 App Header Design -->
-                    <div style="display:flex; align-items:center; padding: calc(45px + env(safe-area-inset-top, 20px)) 20px 10px; border-bottom: 1px solid #ddd; background:#f8f8f8; color:#000;">
-                        <!-- Custom Expanded Hitbox Back Button -->
-                        <span onclick="closeYouTubeWatch()" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin: -10px; margin-right: 5px;">
-                            <span class="material-icons" style="color:#ff3b30; font-size:28px;">play_circle_filled</span>
-                        </span>
-                        <span style="font-size: 20px; font-weight: 500; letter-spacing: -0.5px;">YouTube</span>
-                    </div>
-                    <div id="yt-video-list" style="flex: 1; overflow-y: auto; padding: 15px 20px 30px;">
-                        <div style="text-align:center; padding-top:40px; color:#888;">Loading feed...</div>
-                    </div>
-                </div>`;
-            loadYouTubeVideos();
-        } else if (id === 'Safari') {
-            ui.style.background = '#f8f8f8';
-            ui.innerHTML = `
-                <div style="display:flex; flex-direction:column; height:100%; background:#f8f8f8;">
-                    <div style="background:#f8f8f8; border-bottom:1px solid #c8c7cc; padding: calc(45px + env(safe-area-inset-top, 20px)) 10px 10px; display:flex; flex-direction:column; gap:8px;">
-                        <div style="display:flex; align-items:center; gap:10px; width:100%;">
-                            <span id="safari-back-btn" onclick="safariGoBack()" style="cursor:pointer; color:#007AFF; display:flex; align-items:center;"><span class="material-icons" style="font-size:28px;">chevron_left</span></span>
-                            <span id="safari-forward-btn" onclick="safariGoForward()" style="cursor:pointer; color:#007AFF; display:flex; align-items:center;"><span class="material-icons" style="font-size:28px;">chevron_right</span></span>
-                            <div style="flex:1; background:#fff; border:1px solid #dcdcdc; border-radius:8px; display:flex; align-items:center; padding:6px 12px; gap:6px; border: 1px solid #dcdcdc;">
-                                <span class="material-icons" style="font-size:16px; color:#4cd964;">lock</span>
-                                <input id="safari-url-bar" type="text" value="en.m.wikipedia.org" style="flex:1; border:none; background:transparent; font-size:14px; font-family:var(--font); outline:none; color:#000;" onkeydown="if(event.key==='Enter') safariNavigate()">
-                                <span class="material-icons" style="font-size:18px; color:#8e8e93; cursor:pointer;" onclick="safariReload()">refresh</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="flex:1; background:#fff; position:relative; overflow:hidden;">
-                        <iframe id="safari-iframe" src="https://en.m.wikipedia.org/" style="width:100%; height:100%; border:none;" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
-                    </div>
-                </div>`;
-        } else if (id === 'Maps') {
-            ui.style.background = '#fff';
-            ui.innerHTML = `
-                <div style="height:100%; width:100%; display:flex; flex-direction:column;">
-                    <iframe src="https://maps.google.com/maps?q=Melbourne&t=&z=13&ie=UTF8&iwloc=&output=embed" style="flex-grow:1; border:none; width:100%; height:100%;"></iframe>
-                </div>`;
-        } else {
-            ui.style.background = '#fff';
-            ui.innerHTML = `<div style="text-align:center; padding-top:100px; font-size:26px; color:#000; font-weight:300;">${id}<br><span style="font-size:18px; color:#888;">Coming Soon</span></div>`;
-        }
-    }
-
-    // --- APP LOGIC (YOUTUBE APP) ---
-    function loadYouTubeVideos() {
-        fetch('yt.txt')
-            .then(res => {
-                if(!res.ok) throw new Error();
-                return res.text();
-            })
-            .then(text => {
-                const links = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                renderYTList(links.length > 0 ? links : DEFAULT_YT_LINKS);
-            })
-            .catch(() => {
-                renderYTList(DEFAULT_YT_LINKS);
-            });
-    }
-
-    function renderYTList(links) {
-        const container = document.getElementById('yt-video-list');
-        if(!container) return;
-        
-        let html = '';
-        links.forEach((line, idx) => {
-            // Support "URL Description" line structures inside custom files
-            let parts = line.split(/\s+/);
-            let url = parts[0];
-            let descriptionTitle = parts.slice(1).join(' ').trim();
-            const id = getYouTubeId(url);
-            if(id) {
-                const tempTitle = descriptionTitle || (YT_MOCK_METADATA[id] ? YT_MOCK_METADATA[id].title : "Loading video title... e.g. " + id);
-                const thumb = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-                
-                // Classic unrounded (border-radius: 0) iOS 7 Cards - only displays title
-                html += `
-                    <div onclick="watchYouTubeVideo('${id}')" style="display:flex; flex-direction:column; margin-bottom:20px; cursor:pointer; background:#fff; overflow:hidden; border:1px solid #ddd; border-radius:0 !important;">
-                        <div style="position:relative; width:100%; aspect-ratio:16/9; background:#000; border-radius:0 !important;">
-                            <img src="${thumb}" style="width:100%; height:100%; object-fit:cover; border-radius:0 !important;">
-                            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center;">
-                                <span class="material-icons" style="color:#fff; font-size:36px;">play_arrow</span>
-                            </div>
-                        </div>
-                        <div style="padding:15px; background: #fff;">
-                            <div id="yt-title-${id}-${idx}" style="font-weight:400; font-size:16px; line-height:1.4; color:#000;">${tempTitle}</div>
-                        </div>
-                    </div>`;
-                    
-                // Dynamically fetch live title from URL oembed endpoint if description parameter wasn't provided
-                if (!descriptionTitle) {
-                    fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`)
-                        .then(r => r.json())
-                        .then(data => {
-                            const el = document.getElementById(`yt-title-${id}-${idx}`);
-                            if (el && data && data.title) {
-                                el.innerText = data.title;
-                            }
-                        })
-                        .catch(() => {
-                            const el = document.getElementById(`yt-title-${id}-${idx}`);
-                            if (el && el.innerText === "Loading video title...") {
-                                el.innerText = `YouTube Video`;
-                            }
-                        });
-                }
-            }
-        });
-        
-        container.innerHTML = html || `<p style="text-align:center; color:#888;">No valid videos found.</p>`;
-    }
-
-    function getYouTubeId(url) {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : null;
-    }
-
-    function watchYouTubeVideo(id) {
-        const overlay = document.createElement('div');
-        overlay.id = 'yt-watch-overlay';
-        overlay.style.cssText = `
-            position: absolute; top:0; left:0; width:100%; height:100%; 
-            background:#000; z-index:100; display:flex; flex-direction:column;
-            opacity:0; transition:opacity 0.3s ease;
-        `;
-        overlay.innerHTML = `
-            <div style="height: calc(75px + env(safe-area-inset-top, 20px)); background: #000; display: flex; align-items: flex-end; padding: 0 20px 15px; z-index: 101; box-sizing: border-box;">
-                <!-- Expanded hitbox targets on active system back button views -->
-                <span onclick="closeYouTubeWatch()" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin: -10px; margin-right: 5px;">
-                    <span class="material-icons" style="color: #fff; font-size: 30px;">arrow_back</span>
-                </span>
-                <span style="color:#fff; font-size:18px; margin-left:15px; font-weight:500; padding-bottom: 2px;">Now Playing</span>
-            </div>
-            <div style="flex:1; display:flex; justify-content:center; align-items:center;">
-                <iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" style="width:100%; height:56.25vw; max-height:80%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-            </div>
-        `;
-        document.getElementById('app-ui').appendChild(overlay);
-        requestAnimationFrame(() => overlay.style.opacity = '1');
-    }
-
-    function closeYouTubeWatch() {
-        const overlay = document.getElementById('yt-watch-overlay');
-        if (overlay) {
-            overlay.style.opacity = '0';
-            setTimeout(() => overlay.remove(), 300);
-        }
-    }
-
-    // --- APP LOGIC (SAFARI BROWSER) ---
-    function safariGoBack() {
-        const iframe = document.getElementById('safari-iframe');
-        if (iframe && iframe.contentWindow) {
-            try { iframe.contentWindow.history.back(); } catch(e) {}
-        }
-    }
-    function safariGoForward() {
-        const iframe = document.getElementById('safari-iframe');
-        if (iframe && iframe.contentWindow) {
-            try { iframe.contentWindow.history.forward(); } catch(e) {}
-        }
-    }
-    function safariReload() {
-        const iframe = document.getElementById('safari-iframe');
-        if (iframe) {
-            iframe.src = iframe.src;
-        }
-    }
-    function safariNavigate() {
-        const input = document.getElementById('safari-url-bar');
-        const iframe = document.getElementById('safari-iframe');
-        if (input && iframe) {
-            let url = input.value.trim();
-            if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                if (url.includes('.') && !url.includes(' ')) {
-                    url = 'https://' + url;
-                } else {
-                    url = 'https://en.m.wikipedia.org/wiki/Special:Search?search=' + encodeURIComponent(url);
-                }
-            }
-            iframe.src = url;
-        }
-    }
-
-    // --- APP LOGIC (PHOTOS FULLSCREEN & DELETION) ---
-    function fullscreenPhoto(src) {
-        const overlay = document.createElement('div');
-        overlay.id = 'photo-fullscreen-overlay';
-        overlay.style.cssText = `
-            position: absolute; top:0; left:0; width:100%; height:100%; 
-            background:#000; z-index:100; display:flex; flex-direction:column;
-            justify-content:center; align-items:center; opacity:0; transition:opacity 0.3s ease;
-        `;
-        overlay.innerHTML = `
-            <img src="${src}" style="max-width:100%; max-height:85%; object-fit:contain;">
-            <div style="position:absolute; bottom:40px; width:100%; display:flex; justify-content:center; gap:50px; z-index:101; pointer-events:auto;">
-                <div onclick="deleteFullscreenPhoto('${src}', event)" style="width:50px; height:50px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; cursor:pointer;">
-                    <span class="material-icons" style="color:#ff3b30; font-size:28px;">delete</span>
-                </div>
-                <div onclick="closeFullscreenPhoto(event)" style="width:50px; height:50px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; cursor:pointer;">
-                    <span class="material-icons" style="color:#fff; font-size:28px;">close</span>
-                </div>
-            </div>
-        `;
-        document.getElementById('app-ui').appendChild(overlay);
-        requestAnimationFrame(() => overlay.style.opacity = '1');
-    }
-
-    // --- APP LOGIC (PHOTOS FULLSCREEN & DELETION) ---
-    function deleteFullscreenPhoto(src, event) {
-        event.stopPropagation();
-        showiOSAlert("Delete Photo", "Are you sure you want to delete this photo?", [
-            { text: "Cancel", color: "#888" },
-            { text: "Delete", color: "#ff3b30", bold: true, onClick: () => {
-                state.photos = state.photos.filter(p => p !== src);
-                saveState();
-                closeFullscreenPhoto();
-                buildAppUI('Photos', document.getElementById('app-ui'));
-            }}
-        ]);
-    }
-
-    function closeFullscreenPhoto(event) {
-        if(event) event.stopPropagation();
-        const overlay = document.getElementById('photo-fullscreen-overlay');
-        if(overlay) {
-            overlay.style.opacity = '0';
-            setTimeout(() => overlay.remove(), 300);
-        }
-    }
-
-    // --- APP LOGIC (SETTINGS) ---
-    function preloadWallpapers() {
-        WALLPAPERS.forEach(url => {
-            const img = new Image();
-            img.src = url;
-        });
-    }
-
-    function renderSettingsPage(page) {
-        const ui = document.getElementById('app-ui');
-        if (page === 'main') {
-            ui.innerHTML = `
-                <div style="padding: calc(60px + env(safe-area-inset-top, 20px)) 20px 20px;">
-                    <h1 class="ios-title">Settings</h1>
-                    <div class="ios-list">
-                        <div class="ios-item" onclick="renderSettingsPage('wallpapers')"><span>Wallpapers</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:18px;">chevron_right</span></span></div>
-                        <div class="ios-item" onclick="renderSettingsPage('reset')"><span>Reset</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:18px;">chevron_right</span></span></div>
-                        <div class="ios-item" onclick="confirmBackup()"><span>Backup Data</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:18px;">chevron_right</span></span></div>
-                        <div class="ios-item" onclick="renderSettingsPage('about')"><span>About</span> <span style="color:#aaa;"><span class="material-icons" style="font-size:18px;">chevron_right</span></span></div>
-                    </div>
-                </div>`;
-        } else if (page === 'wallpapers') {
-            ui.innerHTML = `
-                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')"><span class="material-icons">chevron_left</span>Settings</span><span style="font-size:18px; font-weight:400; color:#000; margin-left:20px;">Wallpapers</span></div>
-                <div style="padding: 20px; display:flex; flex-wrap:wrap; gap:10px;">
-                    ${WALLPAPERS.map(w => `<div onclick="setWallpaper('${w}')" style="width:calc(50% - 5px); height:250px; background:url('${w}') center/cover; border-radius:12px; cursor:pointer; ${state.wallpaper===w?'border:4px solid #007AFF':''}"></div>`).join('')}
-                </div>`;
-        } else if (page === 'reset') {
-            ui.innerHTML = `
-                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')"><span class="material-icons">chevron_left</span>Settings</span><span style="font-size:18px; font-weight:400; color:#000; margin-left:20px;">Reset Options</span></div>
-                <div style="padding: 20px;">
-                    <div class="ios-list">
-                        <div class="ios-item" onclick="resetHomeLayout()" style="color:#007AFF; font-weight:400;">Reset Home Screen Layout</div>
-                        <div class="ios-item" onclick="factoryReset()" style="color:#ff3b30; font-weight:400;">Erase All Content (Factory Reset)</div>
-                    </div>
-                </div>`;
-        } else if (page === 'about') {
-            ui.innerHTML = `
-                <div class="ios-nav"><span class="ios-back" onclick="renderSettingsPage('main')"><span class="material-icons">chevron_left</span>Settings</span><span style="font-size:18px; font-weight:400; color:#000; margin-left:20px;">About</span></div>
-                <div style="padding: 30px 20px; text-align:center; color:#000;">
-                    <div style="width:100px; height:100px; background:url('https://www.icons101.com/icons/4/iOS_7_by_dtafalonso/256/Settings.png') center/cover; margin:0 auto 20px; border-radius:22px;"></div>
-                    <h2 style="font-weight:300; margin-bottom:5px;">miniOS</h2>
-                    <p style="color:#666; margin-top:0;">Version 12.0</p>
-                    <div class="ios-list" style="margin-top:40px;">
-                        <div class="ios-item" onclick="window.location.reload()" style="color:#007AFF; font-weight:400; justify-content:center;">Check for Updates (Reload)</div>
-                    </div>
-                </div>`;
-        }
-    }
-    
-    function setWallpaper(url) { state.wallpaper = url; saveState(); applyState(); renderSettingsPage('wallpapers'); }
-    
-    function resetHomeLayout() {
-        showiOSAlert("Reset Layout", "Are you sure you want to restore the default home screen layout?", [
-            { text: "Cancel", color: "#888" },
-            { text: "Reset", color: "#007AFF", bold: true, onClick: () => {
-                state.gridApps = [
-                    ['Safari', 'Weather', 'Reminders', 'Clock', 'Calendar', 'Maps', 'Calculator', 'YouTube', 'Photo Booth', 'Settings', null, null, null, null, null, null, null, null, null, null],
-                    [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
-                ];
-                state.dockApps = ['Contacts', 'Camera', 'Photos', 'Notes'];
-                saveState(); window.location.reload();
-            }}
-        ]);
-    }
-    
-    function factoryReset() {
-        showiOSAlert("Factory Reset", "Factory Resetting will permanently delete all photos, contacts, notes, reminders, and settings. Continue?", [
-            { text: "Cancel", color: "#888" },
-            { text: "Erase Everything", color: "#ff3b30", bold: true, onClick: () => {
-                localStorage.removeItem('minios_state'); window.location.reload();
-            }}
-        ]);
-    }
-
-    // --- APP LOGIC (CONTACTS) ---
-    function renderContactsPage(page) {
-        const ui = document.getElementById('app-ui');
-        if (page === 'list') {
-            ui.innerHTML = `
-                <div style="padding: calc(60px + env(safe-area-inset-top, 20px)) 20px 20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <h1 class="ios-title" style="margin:0;">Contacts</h1>
-                        <span onclick="renderContactsPage('add')" style="cursor:pointer; display:flex; align-items:center;"><span class="material-icons" style="font-size:30px; color:#007AFF;">add</span></span>
-                    </div>
-                    <div class="ios-list" style="margin-top:20px;">
-                        ${state.contacts.length ? state.contacts.map((c, i) => `<div class="ios-item" onclick="showContactDetails(${i})">${c.first} ${c.last}</div>`).join('') : `<div style="padding:30px; text-align:center; color:#888;">No Contacts</div>`}
-                    </div>
-                </div>`;
-        } else if (page === 'add') {
-            ui.innerHTML = `
-                <div class="ios-nav">
-                    <span class="ios-back" onclick="renderContactsPage('list')">Cancel</span>
-                    <span style="font-size:18px; font-weight:400; color:#000; flex-grow:1; text-align:center;">New Contact</span>
-                    <span class="ios-back" onclick="saveContact()" style="padding:0;">Done</span>
-                </div>
-                <div style="padding: 20px;">
-                    <div class="ios-list">
-                        <input id="c-first" type="text" placeholder="First Name" style="width:100%; border:none; border-bottom:1px solid #eee; padding:15px; font-size:18px; font-family:var(--font); outline:none;">
-                        <input id="c-last" type="text" placeholder="Last Name" style="width:100%; border:none; border-bottom:1px solid #eee; padding:15px; font-size:18px; font-family:var(--font); outline:none;">
-                        <input id="c-phone" type="tel" placeholder="Phone" style="width:100%; border:none; padding:15px; font-size:18px; font-family:var(--font); outline:none;">
-                    </div>
-                </div>`;
-        }
-    }
-    function showContactDetails(idx) {
-        const c = state.contacts[idx];
-        showiOSAlert(`${c.first} ${c.last}`, `Phone: ${c.phone}`, [
-            { text: "OK" }
-        ]);
-    }
-    function saveContact() {
-        let first = document.getElementById('c-first').value; let last = document.getElementById('c-last').value; let phone = document.getElementById('c-phone').value;
-        if(first || last) { state.contacts.push({first, last, phone}); state.contacts.sort((a,b) => a.first.localeCompare(b.first)); saveState(); renderContactsPage('list'); }
-    }
-
-    // --- APP LOGIC (CALCULATOR) ---
-    let calcState = { prev: '', curr: '0', op: null, reset: false };
-    function renderCalculator() {
-        calcState = { prev: '', curr: '0', op: null, reset: false };
-        document.getElementById('app-ui').innerHTML = `
-            <div style="display:flex; flex-direction:column; height:100%;">
-                <div style="flex-grow:1;"></div>
-                <div id="calc-screen" class="calc-screen">0</div>
-                <div class="calc-grid">
-                    <div class="calc-btn top" onclick="cBtn('C')">C</div><div class="calc-btn top" onclick="cBtn('±')">±</div><div class="calc-btn top" onclick="cBtn('%')">%</div><div class="calc-btn op" onclick="cBtn('÷')">÷</div>
-                    <div class="calc-btn" onclick="cBtn('7')">7</div><div class="calc-btn" onclick="cBtn('8')">8</div><div class="calc-btn" onclick="cBtn('9')">9</div><div class="calc-btn op" onclick="cBtn('×')">×</div>
-                    <div class="calc-btn" onclick="cBtn('4')">4</div><div class="calc-btn" onclick="cBtn('5')">5</div><div class="calc-btn" onclick="cBtn('6')">6</div><div class="calc-btn op" onclick="cBtn('-')">-</div>
-                    <div class="calc-btn" onclick="cBtn('1')">1</div><div class="calc-btn" onclick="cBtn('2')">2</div><div class="calc-btn" onclick="cBtn('3')">3</div><div class="calc-btn op" onclick="cBtn('+')">+</div>
-                    <div class="calc-btn zero" onclick="cBtn('0')">0</div><div class="calc-btn" onclick="cBtn('.')">.</div><div class="calc-btn op" onclick="cBtn('=')">=</div>
-                </div>
-            </div>`;
-    }
-    function cBtn(val) {
-        if (['+','-','×','÷'].includes(val)) { calcState.op = val; calcState.prev = calcState.curr; calcState.reset = true; }
-        else if (val === '=') { 
-            if(calcState.op && calcState.prev) { 
-                let p = parseFloat(calcState.prev), c = parseFloat(calcState.curr), r = 0;
-                if(calcState.op==='+') r = p+c; if(calcState.op==='-') r = p-c; if(calcState.op==='×') r = p*c; if(calcState.op==='÷') r = p/c;
-                calcState.curr = String(r).substring(0,10); calcState.op = null; calcState.reset = true;
-            }
-        }
-        else if (val === 'C') { calcState.curr = '0'; calcState.prev = ''; calcState.op = null; }
-        else if (val === '±') { calcState.curr = calcState.curr.startsWith('-') ? calcState.curr.substring(1) : '-' + calcState.curr; }
-        else if (val === '%') { calcState.curr = String(parseFloat(calcState.curr) / 100); }
-        else {
-            if(calcState.reset) { calcState.curr = val; calcState.reset = false; }
-            else { calcState.curr = calcState.curr === '0' && val !== '.' ? val : calcState.curr + val; }
-        }
-        document.getElementById('calc-screen').innerText = calcState.curr;
-    }
-
-    // --- APP LOGIC (CALENDAR) ---
-    function renderCalendar() {
-        let d = new Date(); let month = d.toLocaleString('default', { month: 'long' }); let year = d.getFullYear();
-        let html = `<div style="padding:calc(60px + env(safe-area-inset-top, 20px)) 20px 20px; background:#fff; height:100%; color:#000;">`;
-        html += `<h1 class="ios-title" style="color:#ff3b30;">${month} ${year}</h1>`;
-        html += `<div style="display:grid; grid-template-columns:repeat(7, 1fr); gap:15px 10px; text-align:center; font-size: 20px;">`;
-        ['S','M','T','W','T','F','S'].forEach(day => html += `<div style="font-weight:400; color:#888;">${day}</div>`);
-        let firstDay = new Date(year, d.getMonth(), 1).getDay(); let numDays = new Date(year, d.getMonth()+1, 0).getDate(); let today = d.getDate();
-        for(let i=0; i<firstDay; i++) html += `<div></div>`;
-        for(let i=1; i<=numDays; i++) {
-            let isToday = (i === today); let bg = isToday ? '#ff3b30' : 'transparent'; let col = isToday ? '#fff' : '#000';
-            html += `<div style="display:flex; justify-content:center; align-items:center;"><span style="display:flex; justify-content:center; align-items:center; width:38px; height:38px; border-radius:50%; background:${bg}; color:${col};">${i}</span></div>`;
-        }
-        html += `</div></div>`; return html;
-    }
-
-    // --- APP LOGIC (CLOCK IN 12 HOUR TIME - COMPACT) ---
-    function renderClockApp() {
-        let d = new Date();
-        let options = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
-        let cleanTime = d.toLocaleTimeString('en-US', options).replace(/\s*[AP]M\s*$/i, ''); // Strictly strip AM/PM
         return `
-            <div style="display:flex; flex-direction:column; height:100%; background:#000; color:#fff;">
-                <div style="flex-grow:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-                    <div id="clock-live-display" data-active="true" style="font-size:75px; font-weight:100; letter-spacing: 2px;">${cleanTime}</div>
-                    <div style="color:#aaa; font-size:20px; margin-top:10px; font-weight: 300;">${d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'})}</div>
-                </div>
-            </div>`;
+          <button class="nav-btn ${isActive ? 'active' : ''}" onclick="openGamePage('${game.id}')">
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${game.title}</span>
+            ${hasUpdate ? `<span class="badge-update">UPDATE</span>` : ''}
+          </button>
+        `;
+      }).join('');
     }
 
-    // --- APP LOGIC (PHOTO BOOTH) ---
-    function renderPhotoBooth() {
-        pbFilter = 'none'; const ui = document.getElementById('app-ui');
-        ui.innerHTML = `
-            <div style="display:flex; height:100%; flex-direction:column; background:#000;">
-                <div style="flex-grow:1; background:#111; position:relative; overflow:hidden;">
-                    <video id="photobooth-feed" autoplay playsinline style="width:100%; height:100%; object-fit:cover; transition: filter 0.1s;"></video>
-                </div>
-                <div class="filter-row">
-                    <button class="filter-btn active" id="f-none" onclick="setPBFilter('none')">Normal</button>
-                    <button class="filter-btn" id="f-noir" onclick="setPBFilter('noir')">Noir</button>
-                    <button class="filter-btn" id="f-thermal" onclick="setPBFilter('thermal')">Thermal</button>
-                    <button class="filter-btn" id="f-acid" onclick="setPBFilter('acid')">Neon Acid</button>
-                    <button class="filter-btn" id="f-xray" onclick="setPBFilter('xray')">X-Ray Solarize</button>
-                    <button class="filter-btn" id="f-vintage" onclick="setPBFilter('vintage')">Vintage Gold</button>
-                    <button class="filter-btn" id="f-ultra" onclick="setPBFilter('ultra')">Ultra Purple</button>
-                </div>
-                <div style="height:140px; background:#000; display:flex; justify-content:center; align-items:center; padding-bottom:20px;">
-                    <div onclick="capturePBPhoto()" style="width:75px; height:75px; border-radius:50%; background:#fff; border:5px solid #ccc; cursor:pointer;"></div>
-                </div>
-            </div>`;
-        startCameraPB();
-    }
-    
-    function startCameraPB() {
-        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            // Immersive Full-Sensor Capture Stream Settings (4K/UHD constraints)
-            navigator.mediaDevices.getUserMedia({ 
-                video: { 
-                    facingMode: 'user',
-                    width: { ideal: 4096 },
-                    height: { ideal: 2160 }
-                } 
-            }).then(stream => { 
-                window.cameraStream = stream; 
-                const feed = document.getElementById('photobooth-feed');
-                if (feed) {
-                    feed.srcObject = stream; 
-                    feed.classList.add('mirrored');
+    function render() {
+      const main = document.getElementById('main-content');
+
+      // Update sidebar active highlights
+      document.getElementById('nav-store').classList.toggle('active', currentView === 'store');
+      document.getElementById('nav-library').classList.toggle('active', currentView === 'library');
+      updateUpdateBadges();
+      renderSidebarGames();
+
+      if (currentView === 'store') {
+        const featured = games[0];
+        const isOwned = isInLibrary(featured.id);
+        const { hasUpdate } = getUpdateStatus(featured.id);
+
+        main.innerHTML = `
+          <div class="header-bar">
+            <h2>Store Catalog</h2>
+          </div>
+
+          <!-- Featured Game Banner -->
+          <div class="featured-banner" style="background-image: url('${featured.bg}');">
+            <div class="featured-content">
+              <span class="tag">${featured.tag}</span>
+              <h2 class="featured-title">${featured.title}</h2>
+              <p class="featured-desc">${featured.desc}</p>
+              <div class="btn-group">
+                ${isOwned 
+                  ? `
+                    ${hasUpdate 
+                      ? `<button class="btn btn-update" onclick="downloadGame('${featured.id}')">⬆ Update</button>`
+                      : `<button class="btn btn-download" onclick="downloadGame('${featured.id}')">⬇ Download</button>`
+                    }
+                    <button class="btn btn-secondary" onclick="openGamePage('${featured.id}')">View Details</button>
+                  `
+                  : `<button class="btn btn-primary" onclick="addToLibrary('${featured.id}')">+ Add to Library</button>
+                     <button class="btn btn-secondary" onclick="openGamePage('${featured.id}')">View Details</button>`
                 }
-            }).catch(err => {
-                const feed = document.getElementById('photobooth-feed');
-                if (feed) feed.parentElement.innerHTML = '<p style="color:#fff; text-align:center; margin-top:50px;">Front Camera disabled.</p>';
-            });
-        }
-    }
+              </div>
+            </div>
+          </div>
 
-    function setPBFilter(filter) {
-        pbFilter = filter;
-        const feed = document.getElementById('photobooth-feed');
-        if (feed) {
-            feed.style.filter = getCSSFilterString(filter);
-        }
-        const btns = document.querySelectorAll('.filter-row .filter-btn');
-        btns.forEach(btn => btn.classList.remove('active'));
-        const activeBtn = document.getElementById(`f-${filter}`);
-        if (activeBtn) activeBtn.classList.add('active');
-    }
+          <!-- Store Grid -->
+          <h3 style="font-size: 1.15rem; margin-bottom: 16px; font-weight: 700;">All Games</h3>
+          <div class="games-grid">
+            ${games.map(game => {
+              const owned = isInLibrary(game.id);
+              const { hasUpdate } = getUpdateStatus(game.id);
 
-    function getCSSFilterString(filter) {
-        if (filter === 'noir') return 'grayscale(1) contrast(1.4)';
-        if (filter === 'thermal') return 'hue-rotate(180deg) saturate(3) contrast(1.2)';
-        if (filter === 'acid') return 'hue-rotate(90deg) saturate(5) invert(0.1)';
-        if (filter === 'xray') return 'invert(1) grayscale(1) contrast(1.5)';
-        if (filter === 'vintage') return 'sepia(0.8) contrast(0.95) saturate(1.1) hue-rotate(-10deg)';
-        if (filter === 'ultra') return 'hue-rotate(280deg) saturate(4) contrast(1.1)';
-        return 'none';
-    }
-
-    function capturePBPhoto() {
-        const v = document.getElementById('photobooth-feed'); if(!v||!v.videoWidth) return;
-        const c = document.createElement('canvas'); 
-        
-        // Take photos in raw sensor resolution
-        c.width = v.videoWidth; 
-        c.height = v.videoHeight;
-        const ctx = c.getContext('2d');
-        
-        ctx.translate(c.width, 0); 
-        ctx.scale(-1, 1);
-        ctx.filter = getCSSFilterString(pbFilter);
-        
-        ctx.drawImage(v, 0, 0, c.width, c.height); 
-        state.photos.unshift(c.toDataURL('image/jpeg', 0.95)); 
-        saveState(); 
-        notify("Photo Booth", "Photo captured with style.");
-        
-        const flash = document.createElement('div'); 
-        flash.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:#fff;z-index:99;transition:opacity 0.4s; pointer-events:none;';
-        document.getElementById('app-ui').appendChild(flash); 
-        setTimeout(() => flash.style.opacity = '0', 50); 
-        setTimeout(() => flash.remove(), 450);
-    }
-
-    // --- APP LOGIC (NOTES) ---
-    function renderNotesPage(page = 'list', noteId = null, extraData = null) {
-        const ui = document.getElementById('app-ui');
-        if (extraData && extraData.noteId) {
-            page = 'edit';
-            noteId = extraData.noteId;
-        }
-        if (page === 'list') {
-            ui.innerHTML = `
-                <div style="padding: calc(60px + env(safe-area-inset-top, 20px)) 20px 20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                        <h1 class="ios-title" style="margin:0;">Notes</h1>
-                        <span onclick="createNewNote()" style="color:#007AFF; cursor:pointer; display:flex; align-items:center;"><span class="material-icons">note_add</span></span>
+              return `
+                <div class="game-card" onclick="openGamePage('${game.id}')">
+                  <img class="card-thumb" src="${game.bg}" alt="${game.title}" />
+                  <div class="card-body">
+                    <span class="tag" style="width: fit-content;">${game.tag}</span>
+                    <h4 class="card-title">
+                      <span>${game.title}</span>
+                      ${hasUpdate ? `<span class="badge-update">UPDATE</span>` : ''}
+                    </h4>
+                    <p class="card-desc">${game.desc}</p>
+                    <div class="btn-group" onclick="event.stopPropagation()">
+                      ${owned 
+                        ? `<button class="btn btn-secondary" style="flex:1;" onclick="openGamePage('${game.id}')">In Library ✓</button>`
+                        : `<button class="btn btn-primary" style="flex:1;" onclick="addToLibrary('${game.id}')">+ Add to Library</button>`
+                      }
                     </div>
-                    <div class="ios-list">
-                        ${state.notes.length ? state.notes.map(n => `
-                            <div class="ios-item" onclick="renderNotesPage('edit', ${n.id})" style="flex-direction:column; align-items:flex-start;">
-                                <strong style="color:#000; font-size:18px; font-weight:500;">${n.title || "New Note"}</strong>
-                                <span style="color:#888; font-size:13px; font-weight:300; margin-top:2px;">${n.date} - ${n.text.substring(0, 40) || "No additional text"}</span>
-                            </div>
-                        `).join('') : `<div style="padding:40px; text-align:center; color:#999;">No Notes</div>`}
-                    </div>
-                </div>`;
-        } else if (page === 'edit') {
-            const n = state.notes.find(x => x.id === noteId);
-            if (!n) {
-                renderNotesPage('list');
-                return;
-            }
-            ui.innerHTML = `
-                <div class="ios-nav">
-                    <span class="ios-back" onclick="renderNotesPage('list')"><span class="material-icons">chevron_left</span>Notes</span>
-                    <span style="flex-grow:1;"></span>
-                    <span onclick="deleteNote(${n.id})" style="color:#ff3b30; cursor:pointer; display:flex; align-items:center; padding-right:15px;"><span class="material-icons">delete</span></span>
+                  </div>
                 </div>
-                <div style="padding: 20px; height: calc(100% - 100px); background:#fffcf0;">
-                    <textarea id="note-body-textarea" placeholder="Start typing..." oninput="updateNoteText(${n.id})" style="width:100%; height:100%; border:none; outline:none; font-size:20px; font-family:var(--font); font-weight:300; resize:none; background:transparent; color:#333; line-height:1.5;">${n.text}</textarea>
-                </div>`;
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else if (currentView === 'library') {
+        const ownedGames = games.filter(g => isInLibrary(g.id));
+
+        if (ownedGames.length === 0) {
+          main.innerHTML = `
+            <div class="header-bar">
+              <h2>My Library</h2>
+            </div>
+            <div class="empty-state">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+              <h3 style="margin-bottom: 8px;">Your library is empty</h3>
+              <p style="margin-bottom: 16px;">Add games from the store to start downloading them.</p>
+              <button class="btn btn-primary" onclick="switchView('store')">Browse Store</button>
+            </div>
+          `;
+          return;
         }
-    }
-    function createNewNote() {
-        const id = Date.now();
-        const newNote = {
-            id, title: "New Note", text: "",
-            date: new Date().toLocaleDateString([], {month: 'numeric', day: 'numeric', year: '2-digit'})
-        };
-        state.notes.unshift(newNote); saveState(); renderNotesPage('edit', id);
-    }
-    function updateNoteText(id) {
-        const textarea = document.getElementById('note-body-textarea');
-        const n = state.notes.find(x => x.id === id);
-        if (n) {
-            n.text = textarea.value;
-            const lines = n.text.split('\n');
-            n.title = lines[0].trim() || "New Note";
-            saveState();
-        }
-    }
-    function deleteNote(id) {
-        showiOSAlert("Delete Note", "Are you sure you want to delete this note?", [
-            { text: "Cancel", color: "#888" },
-            { text: "Delete", color: "#ff3b30", bold: true, onClick: () => {
-                state.notes = state.notes.filter(x => x.id !== id);
-                saveState(); renderNotesPage('list');
-            }}
-        ]);
+
+        main.innerHTML = `
+          <div class="header-bar">
+            <h2>My Library</h2>
+          </div>
+          <div class="games-grid">
+            ${ownedGames.map(game => {
+              const { hasUpdate } = getUpdateStatus(game.id);
+
+              return `
+                <div class="game-card" onclick="openGamePage('${game.id}')">
+                  <img class="card-thumb" src="${game.bg}" alt="${game.title}" />
+                  <div class="card-body">
+                    <span class="tag" style="width: fit-content;">${game.tag}</span>
+                    <h4 class="card-title">
+                      <span>${game.title}</span>
+                      ${hasUpdate ? `<span class="badge-update">UPDATE</span>` : ''}
+                    </h4>
+                    <p class="card-desc">${game.desc}</p>
+                    <div class="btn-group" onclick="event.stopPropagation()">
+                      ${hasUpdate
+                        ? `<button class="btn btn-update" style="flex:1;" onclick="downloadGame('${game.id}')">⬆ Update</button>`
+                        : `<button class="btn btn-download" style="flex:1;" onclick="downloadGame('${game.id}')">⬇ Download</button>`
+                      }
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else if (currentView.startsWith('game:')) {
+        // Full Game Page with title, download/update & more options inside the hero area
+        const gameId = currentView.replace('game:', '');
+        const game = games.find(g => g.id === gameId);
+        if (!game) return switchView('store');
+
+        const isOwned = isInLibrary(game.id);
+        const status = getUpdateStatus(game.id);
+
+        main.innerHTML = `
+          <div class="game-page-container">
+            <!-- Hero Thumbnail Background with Title & Buttons inside -->
+            <div class="game-page-hero-banner" style="background-image: url('${game.bg}');">
+              <div class="game-page-hero-content">
+                <div class="game-page-hero-title">
+                  <h1>${game.title}</h1>
+                </div>
+
+                <div class="btn-group">
+                  ${isOwned ? `
+                    ${status.hasUpdate 
+                      ? `<button class="btn btn-update" onclick="downloadGame('${game.id}')">⬆ Update</button>`
+                      : `<button class="btn btn-download" onclick="downloadGame('${game.id}')">⬇ Download</button>`
+                    }
+
+                    <!-- More Options Dropdown -->
+                    <div class="dropdown-container">
+                      <button class="btn btn-icon" onclick="toggleDropdown(event)" title="More Options">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="12" r="2"/></svg>
+                      </button>
+                      <div class="dropdown-menu" id="options-dropdown">
+                        <button class="dropdown-item danger" onclick="removeFromLibrary('${game.id}')">
+                          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                          Remove from Library
+                        </button>
+                      </div>
+                    </div>
+                  ` : `
+                    <button class="btn btn-primary" onclick="addToLibrary('${game.id}')">+ Add to Library</button>
+                  `}
+                </div>
+              </div>
+            </div>
+
+            <!-- Details Layout: Description & Meta Panel under the thumbnail -->
+            <div class="game-details-layout">
+              <div class="game-main-info">
+                <h3 class="section-heading">About</h3>
+                <p class="game-description-text">${game.desc}</p>
+              </div>
+
+              <div class="game-meta-panel">
+                <h3 class="section-heading">Details</h3>
+
+                <div class="meta-row">
+                  <span class="meta-label">Genre</span>
+                  <span class="meta-value">${game.tag}</span>
+                </div>
+
+                <div class="meta-row">
+                  <span class="meta-label">Version</span>
+                  <span class="meta-value">v${game.version}</span>
+                </div>
+
+                ${isOwned && status.installedVer ? `
+                  <div class="meta-row">
+                    <span class="meta-label">Installed</span>
+                    <span class="meta-value">v${status.installedVer}</span>
+                  </div>
+                ` : ''}
+
+                <div class="meta-row">
+                  <span class="meta-label">Developer</span>
+                  <span class="meta-value">${game.developer}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
     }
 
-    // --- APP LOGIC (MISC) ---
-    function addReminder() { let t = document.getElementById('remText').value, tm = document.getElementById('remTime').value; if(t&&tm){state.reminders.push({text:t, time:tm, notified:false}); saveState(); renderReminders();} }
-    function renderReminders() {
-        document.getElementById('remList').innerHTML = state.reminders.map((r,i) => `
-            <div style="padding:15px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:18px;">${r.text}</span> <span style="color:#888; margin-left:auto; margin-right:15px;">${r.time}</span>
-                <button onclick="state.reminders.splice(${i},1); saveState(); renderReminders();" style="background:#ff3b30; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">X</button>
-            </div>`).join('');
-    }
-
-    let cameraFacingMode = 'environment';
-    function startCamera() {
-        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            // Immersive Full-Sensor Capture Stream Settings (UHD/Ideal back/front camera specs)
-            navigator.mediaDevices.getUserMedia({ 
-                video: { 
-                    facingMode: cameraFacingMode,
-                    width: { ideal: 4096 },
-                    height: { ideal: 2160 }
-                } 
-            }).then(stream => { 
-                window.cameraStream = stream; 
-                const feed = document.getElementById('camera-feed');
-                if (feed) {
-                    feed.srcObject = stream; 
-                    if (cameraFacingMode === 'user') feed.classList.add('mirrored');
-                    else feed.classList.remove('mirrored');
-                }
-            }).catch(err => {
-                const feed = document.getElementById('camera-feed');
-                if (feed) feed.parentElement.innerHTML = '<p style="color:#fff; text-align:center; margin-top:50px;">Camera disabled.</p>';
-            });
-        }
-    }
-    function toggleCameraFacing() {
-        cameraFacingMode = cameraFacingMode === 'environment' ? 'user' : 'environment';
-        if (window.cameraStream) { window.cameraStream.getTracks().forEach(t => t.stop()); }
-        startCamera();
-    }
-    function capturePhoto() {
-        const v = document.getElementById('camera-feed'); if(!v||!v.videoWidth) return;
-        const c = document.createElement('canvas'); 
-        
-        // Take photos in full native stream resolution with no downscaling loss
-        c.width = v.videoWidth; 
-        c.height = v.videoHeight;
-        const ctx = c.getContext('2d');
-        if (cameraFacingMode === 'user') { ctx.translate(c.width, 0); ctx.scale(-1, 1); } 
-        ctx.drawImage(v, 0, 0, c.width, c.height); 
-        state.photos.unshift(c.toDataURL('image/jpeg', 0.95)); saveState(); notify("Camera", "Saved to Photos.");
-        const flash = document.createElement('div'); flash.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:#fff;z-index:99;transition:opacity 0.4s; pointer-events:none;';
-        document.getElementById('app-ui').appendChild(flash); setTimeout(() => flash.style.opacity = '0', 50); setTimeout(() => flash.remove(), 450);
-    }
-
-    function notify(title, body) {
-        let iconUrl = APP_DEFS[title] || APP_DEFS['Settings']; 
-        
-        state.notifications.unshift({ title, body, date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-        if (state.notifications.length > 20) state.notifications.pop();
-        saveState();
-
-        renderSpotlightNotifications();
-
-        let toast = document.createElement('div'); toast.className = 'toast';
-        toast.innerHTML = `
-            <img src="${iconUrl}" style="width:38px; height:38px; border-radius:8px; margin-right:12px;">
-            <div style="flex:1;">
-                <strong style="display:block; font-size:14px; font-weight:500; color:#fff;">${title}</strong>
-                <span style="font-size:13px; font-weight:300; color:#eee;">${body}</span>
-            </div>`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.classList.add('show'), 100); 
-        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 4000);
-    }
-
-    setInterval(() => {
-        let d = new Date(), hrs = d.getHours().toString().padStart(2, '0'), mins = d.getMinutes().toString().padStart(2, '0');
-        let options = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
-        let cleanTime = d.toLocaleTimeString('en-US', options).replace(/\s*[AP]M\s*$/i, ''); // Strictly strip AM/PM
-        let liveClock = document.getElementById('clock-live-display'); 
-        if(liveClock) liveClock.innerText = cleanTime;
-        let t = `${hrs}:${mins}`;
-        state.reminders.forEach(r => { if(r.time === t && !r.notified) { notify("Reminder", r.text); r.notified = true; saveState(); } });
-    }, 1000);
-
-    loadState();
-</script>
+    // Initialize
+    saveState();
+    render();
+  </script>
 </body>
 </html>
