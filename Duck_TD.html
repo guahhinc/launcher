@@ -1,0 +1,3524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duck TD</title>
+<style>
+  /* =========================================================================
+     LOCAL ASSETS & FONTS CONFIGURATION
+     ========================================================================= */
+  @font-face {
+    font-family: 'Noto Sans';
+    src: url('Librarys/NotoSans-VariableFont_wdth,wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Noto Sans';
+    src: url('Librarys/NotoSans-Italic-VariableFont_wdth,wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: italic;
+  }
+
+  :root {
+    --bg-dark: #0a0f18;
+    --panel-bg: #151f30;
+    --panel-sub: #0d1522;
+    --panel-border: #334661;
+    --primary: #f59e0b;
+    --green: #16a34a;
+    --green-hover: #15803d;
+    --red: #dc2626;
+    --red-hover: #b91c1c;
+    --blue: #2563eb;
+    --blue-hover: #1d4ed8;
+    --yellow: #facc15;
+    --yellow-hover: #eab308;
+    --purple: #9333ea;
+    --text: #f8fafc;
+    --text-muted: #94a3b8;
+  }
+
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Sans', Arial, Helvetica, sans-serif;
+  }
+
+  html, body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: var(--bg-dark);
+    color: var(--text);
+    cursor: default;
+  }
+
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+  }
+
+  .screen.active {
+    display: flex;
+  }
+
+  /* =========================================================================
+     MAIN MENU: STATIC BG WITH SMOOTH MULTI-STOP DARK FADE
+     ========================================================================= */
+  #menu-screen {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0b1424;
+    background-image: url('Icons/duck_td_background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+  }
+
+  #menu-ui-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    pointer-events: none;
+  }
+
+  /* Smooth Multi-Stop Black Scrim Fade */
+  .menu-sidebar-scrim {
+    width: 560px;
+    height: 100%;
+    background: linear-gradient(
+      to right,
+      rgba(9, 14, 23, 0.98) 0%,
+      rgba(9, 14, 23, 0.95) 45%,
+      rgba(9, 14, 23, 0.85) 65%,
+      rgba(9, 14, 23, 0.60) 80%,
+      rgba(9, 14, 23, 0.25) 92%,
+      rgba(9, 14, 23, 0) 100%
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 65px;
+    gap: 20px;
+    pointer-events: auto;
+    box-sizing: border-box;
+  }
+
+  /* Logo */
+  .menu-logo-wrapper {
+    text-align: left;
+    margin-bottom: 10px;
+  }
+
+  .menu-logo-img {
+    max-width: 420px;
+    width: 100%;
+    max-height: 180px;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 0 rgba(0, 0, 0, 0.65));
+    display: block;
+  }
+
+  .menu-fallback-title {
+    font-size: 4.5rem;
+    font-weight: 900;
+    color: var(--yellow);
+    letter-spacing: 3px;
+    text-shadow: 4px 4px 0 #000;
+  }
+
+  /* Profile Card */
+  .menu-profile-card {
+    background: rgba(13, 21, 34, 0.95);
+    border: 3px solid var(--panel-border);
+    border-radius: 4px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  .menu-avatar-badge {
+    width: 50px;
+    height: 50px;
+    background: #1e293b;
+    border: 2px solid var(--yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--yellow);
+    border-radius: 3px;
+  }
+
+  .profile-text-group {
+    flex: 1;
+  }
+
+  .profile-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--yellow);
+    margin-bottom: 2px;
+  }
+
+  .profile-sub {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .menu-xp-track {
+    width: 100%;
+    height: 10px;
+    background: #1e293b;
+    border: 1px solid #475569;
+    overflow: hidden;
+  }
+
+  .menu-xp-fill {
+    height: 100%;
+    background: var(--yellow);
+    width: 0%;
+  }
+
+  /* Menu Action Buttons */
+  .menu-action-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 3px;
+    border: 2px solid #000;
+    font-size: 1.15rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-transform: uppercase;
+    transition: transform 0.05s ease;
+  }
+
+  .btn:active {
+    transform: translateY(2px);
+  }
+
+  .btn-resume {
+    background: var(--purple);
+    color: #fff;
+    border-color: #581c87;
+  }
+  .btn-resume:hover { background: #7e22ce; }
+
+  .btn-play {
+    background: var(--green);
+    color: #fff;
+    border-color: #052e16;
+  }
+  .btn-play:hover { background: var(--green-hover); }
+
+  .btn-secondary {
+    background: #334155;
+    color: var(--text);
+    border-color: #1e293b;
+  }
+  .btn-secondary:hover { background: #475569; }
+
+  /* DIFFICULTY SELECTION POPUP */
+  .diff-modal-box {
+    background: var(--panel-bg);
+    border: 4px solid var(--panel-border);
+    border-radius: 4px;
+    padding: 26px;
+    width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .diff-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .diff-card {
+    background: #0d1522;
+    border: 2px solid #334661;
+    border-radius: 3px;
+    padding: 16px 8px;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .diff-card:hover {
+    border-color: var(--yellow);
+    background: #1a2538;
+  }
+
+  .diff-card.selected {
+    border-color: var(--yellow);
+    background: #253349;
+  }
+
+  .diff-card-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--yellow);
+    margin-bottom: 4px;
+  }
+
+  .diff-card-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  /* FULLSCREEN GAME CONTAINER */
+  #game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    background: #000;
+    overflow: hidden;
+  }
+
+  #canvas-wrap {
+    position: relative;
+    flex: 1;
+    height: 100vh;
+    background: #22c55e;
+    overflow: hidden;
+  }
+
+  canvas {
+    display: block;
+    cursor: default;
+  }
+
+  /* TOP HUD BAR */
+  #top-hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 56px;
+    background: #090e17;
+    border-bottom: 3px solid var(--panel-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 5;
+  }
+
+  .hud-stats-group {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .hud-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 1.25rem;
+  }
+
+  .hud-stat.cash { color: var(--yellow); }
+  .hud-stat.lives { color: #ef4444; }
+  .hud-stat.wave { color: #60a5fa; }
+  .hud-stat.pops-tracker { color: #a78bfa; font-size: 1.05rem; }
+
+  .hud-controls {
+    display: flex;
+    gap: 8px;
+  }
+
+  .hud-btn {
+    background: #1e293b;
+    border: 2px solid #334155;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .hud-btn:hover { background: #334661; }
+
+  /* SIDEBAR UI */
+  #sidebar {
+    width: 330px;
+    height: 100vh;
+    background: var(--panel-bg);
+    border-left: 4px solid var(--panel-border);
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    z-index: 6;
+    overflow-y: auto;
+  }
+
+  .section-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin: 10px 0 8px 0;
+    font-weight: bold;
+    border-bottom: 2px solid var(--panel-border);
+    padding-bottom: 4px;
+  }
+
+  .shop-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .shop-card {
+    background: #0d1522;
+    border: 2px solid #2c3b52;
+    border-radius: 3px;
+    padding: 8px 4px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .shop-card:hover:not(.locked):not(.disabled) {
+    border-color: var(--yellow);
+    background: #1e2a3d;
+  }
+
+  .shop-card.selected {
+    border-color: var(--yellow);
+    background: #283952;
+  }
+
+  .shop-card.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .shop-card.locked {
+    filter: grayscale(1);
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .shop-card .lock-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 15, 24, 0.92);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: var(--yellow);
+    text-align: center;
+  }
+
+  .shop-thumb {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 4px;
+  }
+
+  .shop-name {
+    font-size: 0.82rem;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+
+  .shop-cost {
+    font-size: 0.85rem;
+    color: var(--yellow);
+    font-weight: bold;
+  }
+
+  /* BIG BOTTOM BAR */
+  #bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 180px;
+    background: #090e17;
+    border-top: 4px solid var(--panel-border);
+    display: none;
+    padding: 16px 24px;
+    z-index: 7;
+    gap: 25px;
+    align-items: center;
+  }
+
+  .bb-portrait-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 150px;
+    border-right: 2px solid var(--panel-border);
+    padding-right: 20px;
+  }
+
+  .bb-portrait {
+    width: 70px;
+    height: 70px;
+    background: #151f30;
+    border: 2px solid #334661;
+  }
+
+  .bb-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--yellow);
+    text-align: center;
+  }
+
+  .bb-level-badge {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #38bdf8;
+  }
+
+  .bb-stats-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 220px;
+    border-right: 2px solid var(--panel-border);
+    padding-right: 20px;
+  }
+
+  .bb-stat-item {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+  }
+  .bb-stat-item b {
+    color: #fff;
+  }
+
+  .bb-targeting {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
+
+  .bb-target-btn {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 2px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .bb-target-btn.active {
+    background: var(--yellow);
+    color: #000;
+    border-color: #ca8a04;
+  }
+
+  .bb-upgrade-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .bb-upg-title {
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .bb-upg-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    min-height: 26px;
+  }
+
+  .bb-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .bb-btn-upgrade {
+    flex: 2;
+    padding: 12px;
+    background: var(--blue);
+    border: 2px solid #000;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.05rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .bb-btn-upgrade:hover:not(:disabled) { background: var(--blue-hover); }
+  .bb-btn-upgrade:disabled {
+    background: #334155;
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .bb-btn-sell {
+    flex: 1;
+    padding: 12px;
+    background: #1e293b;
+    border: 2px solid var(--red);
+    color: #fca5a5;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  .bb-btn-sell:hover {
+    background: var(--red);
+    color: #fff;
+  }
+
+  .bb-close {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.6rem;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .bb-close:hover { color: #fff; }
+
+  /* MODALS */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.78);
+    z-index: 50;
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal.active {
+    display: flex;
+  }
+
+  .modal-content {
+    background: var(--panel-bg);
+    border: 4px solid var(--panel-border);
+    border-radius: 4px;
+    width: 680px;
+    max-height: 85vh;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--panel-border);
+    padding-bottom: 10px;
+  }
+
+  .modal-header h2 {
+    color: var(--yellow);
+    font-size: 1.6rem;
+  }
+
+  .close-modal {
+    background: #1e293b;
+    border: 1px solid #475569;
+    color: var(--text);
+    font-size: 1.3rem;
+    padding: 3px 10px;
+    cursor: pointer;
+  }
+
+  .modal-body {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .codex-entry {
+    display: flex;
+    gap: 14px;
+    background: var(--panel-sub);
+    padding: 12px;
+    border: 2px solid var(--panel-border);
+    border-radius: 3px;
+    align-items: center;
+  }
+
+  .codex-thumb {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+  }
+
+  .codex-info h4 {
+    color: var(--yellow);
+    font-size: 1.05rem;
+    margin-bottom: 3px;
+  }
+
+  .codex-info p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  /* TOAST */
+  .toast {
+    position: absolute;
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0a0f18;
+    border: 3px solid var(--yellow);
+    padding: 10px 22px;
+    border-radius: 3px;
+    font-weight: bold;
+    color: var(--yellow);
+    z-index: 100;
+    pointer-events: none;
+    font-size: 1.05rem;
+  }
+
+  .win-title { color: #4ade80; }
+  .lose-title { color: #f87171; }
+</style>
+</head>
+<body>
+
+<!-- MAIN MENU WITH STATIC BG & SIDEBAR SCRIM -->
+<div id="menu-screen" class="screen active">
+  <div id="menu-ui-overlay">
+    <div class="menu-sidebar-scrim">
+      <!-- Big Logo -->
+      <div class="menu-logo-wrapper">
+        <img src="Icons/duck_td_logo.png" alt="DUCK TD" class="menu-logo-img" onerror="this.style.display='none'; document.getElementById('menu-text-logo').style.display='block';">
+        <h1 id="menu-text-logo" class="menu-fallback-title" style="display:none;">DUCK TD</h1>
+      </div>
+
+      <!-- Commander Profile Card -->
+      <div class="menu-profile-card">
+        <div class="menu-avatar-badge" id="menu-avatar-badge">1</div>
+        <div class="profile-text-group">
+          <div class="profile-title" id="menu-lvl-label">Commander Level 1</div>
+          <div class="profile-sub" id="menu-pops-label">0 / 120 Pops to Level 2</div>
+          <div class="menu-xp-track">
+            <div class="menu-xp-fill" id="menu-xp-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="menu-action-panel">
+        <button class="btn btn-resume" id="btn-resume-game" style="display:none;">Resume Game (Wave 1)</button>
+        <button class="btn btn-play" id="btn-open-diff-modal">Play Battle</button>
+        <button class="btn btn-secondary" id="btn-codex">Duck & Item Codex</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DIFFICULTY SELECTION MODAL -->
+<div class="modal" id="diff-modal">
+  <div class="diff-modal-box">
+    <div class="modal-header">
+      <h2>Select Difficulty</h2>
+      <button class="close-modal" id="btn-close-diff">&times;</button>
+    </div>
+    
+    <div class="diff-cards-grid">
+      <div class="diff-card selected" data-diff="easy">
+        <div class="diff-card-title">Easy</div>
+        <div class="diff-card-sub">200 Lives<br>+30% Cash<br>30 Waves</div>
+      </div>
+      <div class="diff-card" data-diff="medium">
+        <div class="diff-card-title">Medium</div>
+        <div class="diff-card-sub">150 Lives<br>Standard Cash<br>40 Waves</div>
+      </div>
+      <div class="diff-card" data-diff="hard">
+        <div class="diff-card-title">Hard</div>
+        <div class="diff-card-sub">80 Lives<br>-10% Cash<br>50 Waves</div>
+      </div>
+    </div>
+
+    <div class="diff-desc" id="diff-description">
+      Easy: 200 Lives, +30% Cash, 30 Waves. Casual pacing.
+    </div>
+
+    <button class="btn btn-play" id="btn-start-new-battle">Start New Game</button>
+  </div>
+</div>
+
+<!-- FULLSCREEN GAME CONTAINER -->
+<div id="game-container" style="display:none;">
+  <div id="canvas-wrap">
+    <!-- Top HUD Bar -->
+    <div id="top-hud">
+      <div class="hud-stats-group">
+        <div class="hud-stat cash">💰 $<span id="hud-cash">750</span></div>
+        <div class="hud-stat lives">❤️ <span id="hud-lives">200</span></div>
+        <div class="hud-stat wave">🌊 Wave <span id="hud-wave">1</span>/<span id="hud-max-wave">30</span></div>
+        <div class="hud-stat pops-tracker">🎯 Next Lvl: <span id="hud-pops-prog">0/120</span> Pops</div>
+      </div>
+      
+      <div class="hud-controls">
+        <button class="hud-btn" id="btn-speed">2x</button>
+        <button class="hud-btn" id="btn-sound">🔊</button>
+        <button class="hud-btn" id="btn-menu-back">Menu</button>
+      </div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- BIG BOTTOM BAR (INSPECTOR / UPGRADES) -->
+    <div id="bottom-bar">
+      <button class="bb-close" id="bb-btn-close">&times;</button>
+      
+      <div class="bb-portrait-col">
+        <canvas class="bb-portrait" id="bb-avatar" width="70" height="70"></canvas>
+        <div class="bb-name" id="bb-name">Darter Mallard</div>
+        <div class="bb-level-badge" id="bb-tier">Tier 0 / 3</div>
+      </div>
+
+      <div class="bb-stats-col">
+        <div class="bb-stat-item">Pops: <b id="bb-pops">0</b> | Dmg: <b id="bb-dmg">0</b></div>
+        <div class="bb-stat-item">Range: <b id="bb-range">170</b></div>
+        <div class="bb-targeting">
+          <span>Target:</span>
+          <button class="bb-target-btn active" data-mode="first">First</button>
+          <button class="bb-target-btn" data-mode="last">Last</button>
+          <button class="bb-target-btn" data-mode="strong">Strong</button>
+          <button class="bb-target-btn" data-mode="close">Close</button>
+        </div>
+      </div>
+
+      <div class="bb-upgrade-col">
+        <div class="bb-upg-title" id="bb-upg-title">Next Upgrade: Sharp Bill</div>
+        <div class="bb-upg-desc" id="bb-upg-desc">+1 Damage, +15 Range</div>
+        <div class="bb-actions">
+          <button class="bb-btn-upgrade" id="bb-upg-btn">
+            <span id="bb-upg-label">Upgrade</span>
+            <span id="bb-upg-cost">$100</span>
+          </button>
+          <button class="bb-btn-sell" id="bb-sell-btn">Sell (+$140)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="section-title">Duck Towers</div>
+    <div class="shop-grid" id="shop-ducks-grid"></div>
+
+    <div class="section-title">Road Traps</div>
+    <div class="shop-grid" id="shop-items-grid"></div>
+
+    <button class="btn btn-play" id="btn-next-wave" style="margin-top:auto; padding:12px; font-size:1.05rem;">
+      Start Wave
+    </button>
+  </div>
+</div>
+
+<!-- CODEX MODAL -->
+<div class="modal" id="codex-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Duck TD Codex</h2>
+      <button class="close-modal" id="btn-close-codex">&times;</button>
+    </div>
+    <div class="modal-body" id="codex-list"></div>
+  </div>
+</div>
+
+<!-- GAME OVER MODAL -->
+<div class="modal" id="game-over-modal">
+  <div class="modal-content" style="text-align:center; align-items:center;">
+    <h2 id="go-title" class="win-title">VICTORY</h2>
+    <p id="go-message" style="color:var(--text-muted); margin-bottom:12px; font-size:1rem;"></p>
+    <div style="background:var(--panel-sub); padding:14px; border:2px solid var(--panel-border); width:80%; margin-bottom:16px; text-align:left; font-size:0.95rem;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+        <span>Balloons Popped:</span> <b id="go-pops">0</b>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+        <span>Waves Cleared:</span> <b id="go-waves">0</b>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span>Total Lifetime Pops:</span> <b id="go-total-pops" style="color:var(--yellow);">0</b>
+      </div>
+    </div>
+    <button class="btn btn-play" id="btn-go-replay" style="width:80%;">Play Again</button>
+    <button class="btn btn-secondary" id="btn-go-menu" style="width:80%;">Main Menu</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   AUDIO SYNTHESIZER
+   ========================================================================= */
+class SoundEngine {
+  constructor() {
+    this.ctx = null;
+    this.muted = false;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioCtx();
+    }
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  playQuack(pitch = 1.0) {
+    if (this.muted || !this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(340 * pitch, t);
+      osc.frequency.exponentialRampToValueAtTime(140 * pitch, t + 0.14);
+
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(800, t);
+      filter.Q.setValueAtTime(3.5, t);
+
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.14);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.14);
+    } catch(e) {}
+  }
+
+  playPop(freq = 600) {
+    if (this.muted || !this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+      osc.frequency.exponentialRampToValueAtTime(80, t + 0.05);
+
+      gain.gain.setValueAtTime(0.18, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.05);
+    } catch(e) {}
+  }
+
+  playFreeze() {
+    if (this.muted || !this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1100, t);
+      osc.frequency.exponentialRampToValueAtTime(250, t + 0.2);
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.2);
+    } catch(e) {}
+  }
+
+  playGlue() {
+    if (this.muted || !this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(220, t);
+      osc.frequency.linearRampToValueAtTime(440, t + 0.08);
+      osc.frequency.linearRampToValueAtTime(150, t + 0.15);
+      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.15);
+    } catch(e) {}
+  }
+
+  playShoot(type = 'peashooter') {
+    if (this.muted || !this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      if (type === 'boomerang' || type === 'shuriken') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(320, t);
+        osc.frequency.linearRampToValueAtTime(580, t + 0.08);
+        gain.gain.setValueAtTime(0.12, t);
+      } else if (type === 'magic') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, t);
+        osc.frequency.exponentialRampToValueAtTime(900, t + 0.1);
+        gain.gain.setValueAtTime(0.15, t);
+      } else if (type === 'fire') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(200, t);
+        osc.frequency.exponentialRampToValueAtTime(40, t + 0.1);
+        gain.gain.setValueAtTime(0.1, t);
+      } else if (type === 'sniper') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(850, t);
+        osc.frequency.exponentialRampToValueAtTime(100, t + 0.12);
+        gain.gain.setValueAtTime(0.2, t);
+      } else if (type === 'tesla') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(1200, t);
+        osc.frequency.exponentialRampToValueAtTime(300, t + 0.08);
+        gain.gain.setValueAtTime(0.12, t);
+      } else if (type === 'plane') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(250, t);
+        osc.frequency.exponentialRampToValueAtTime(150, t + 0.06);
+        gain.gain.setValueAtTime(0.1, t);
+      } else {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(460, t);
+        osc.frequency.exponentialRampToValueAtTime(150, t + 0.07);
+        gain.gain.setValueAtTime(0.12, t);
+      }
+
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.12);
+    } catch(e) {}
+  }
+
+  playExplosion() {
+    if (this.muted || !this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(140, t);
+      osc.frequency.exponentialRampToValueAtTime(20, t + 0.25);
+      gain.gain.setValueAtTime(0.3, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.25);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.25);
+    } catch(e) {}
+  }
+
+  playUpgrade() {
+    if (this.muted || !this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      [400, 550, 750].forEach((freq, i) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, t + i * 0.05);
+        gain.gain.setValueAtTime(0.15, t + i * 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + i * 0.05 + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t + i * 0.05);
+        osc.stop(t + i * 0.05 + 0.08);
+      });
+    } catch(e) {}
+  }
+}
+
+const audio = new SoundEngine();
+
+/* =========================================================================
+   ROSTER & WEAPONS DEFINITION
+   ========================================================================= */
+const DUCK_TYPES = {
+  peashooter: {
+    id: 'peashooter',
+    name: 'Darter Mallard',
+    cost: 190,
+    range: 170,
+    attackSpeed: 0.48,
+    damage: 1,
+    unlockLvl: 1,
+    description: 'Shoots fast beak darts.',
+    upgrades: [
+      { name: 'Sharp Bill', cost: 100, desc: '+1 Damage, +15 Range', apply: (t) => { t.damage += 1; t.range += 15; } },
+      { name: 'Twin Seeds', cost: 180, desc: 'Fires 2 darts at once', apply: (t) => { t.multiShot = 2; t.attackSpeed *= 0.85; } },
+      { name: 'Gatling Quack', cost: 380, desc: 'Extreme firing speed (+60%)', apply: (t) => { t.attackSpeed *= 0.45; t.range += 20; } }
+    ]
+  },
+  quacker: {
+    id: 'quacker',
+    name: 'Rubber Quacker',
+    cost: 240,
+    range: 145,
+    attackSpeed: 0.85,
+    damage: 1,
+    isAoE: true,
+    unlockLvl: 1,
+    description: 'Acoustic shockwaves pop all nearby balloons.',
+    upgrades: [
+      { name: 'Megaphone', cost: 130, desc: '+25 Range & +1 Damage', apply: (t) => { t.range += 25; t.damage += 1; } },
+      { name: 'Stun Quack', cost: 230, desc: 'Stuns balloons on hit', apply: (t) => { t.hasStun = true; } },
+      { name: 'Sonic Blast', cost: 440, desc: '+3 Dmg & huge pulse radius', apply: (t) => { t.damage += 3; t.range += 30; } }
+    ]
+  },
+  boomerang_duck: {
+    id: 'boomerang_duck',
+    name: 'Boomerang Duck',
+    cost: 290,
+    range: 210,
+    attackSpeed: 0.75,
+    damage: 1,
+    pierce: 6,
+    unlockLvl: 1,
+    description: 'Throws precise boomerangs that loop directly through targets.',
+    upgrades: [
+      { name: 'Sonic Curve', cost: 140, desc: '+3 Pierce, +30 Range', apply: (t) => { t.pierce += 3; t.range += 30; } },
+      { name: 'Glaive Bill', cost: 270, desc: 'Sharp blades: +2 Dmg, +5 Pierce', apply: (t) => { t.damage += 2; t.pierce += 5; } },
+      { name: 'Bionic Boomerang', cost: 540, desc: 'Plasma Boomerang: pops Lead & burns', apply: (t) => { t.canPopLead = true; t.burnDoT = true; t.damage += 3; t.attackSpeed *= 0.75; } }
+    ]
+  },
+  glue_duck: {
+    id: 'glue_duck',
+    name: 'Glue Shooter Duck',
+    cost: 250,
+    range: 180,
+    attackSpeed: 0.85,
+    damage: 0,
+    slowPct: 0.60,
+    slowDuration: 6.5,
+    unlockLvl: 2,
+    description: 'Coats balloons in sticky glue, slowing their speed by 60% for 6.5s.',
+    upgrades: [
+      { name: 'Stickier Glue', cost: 140, desc: 'Slows by 75% for 8.0 seconds', apply: (t) => { t.slowPct = 0.75; t.slowDuration = 8.0; } },
+      { name: 'Glue Splatter', cost: 250, desc: 'Impact bursts and glues 4 nearby balloons', apply: (t) => { t.splatter = true; } },
+      { name: 'Corrosive Acid', cost: 480, desc: 'Glue dissolves balloons (2 Dmg/sec & melts Lead)', apply: (t) => { t.acidGlue = true; t.canPopLead = true; } }
+    ]
+  },
+  plane_duck: {
+    id: 'plane_duck',
+    name: 'Ace Plane Duck',
+    cost: 420,
+    range: 9999,
+    attackSpeed: 0.35,
+    damage: 1,
+    isFlying: true,
+    unlockLvl: 2,
+    description: 'Flies in continuous figure-8 patrol orbits, spraying darts and dropping bread bombs!',
+    upgrades: [
+      { name: 'Twin Wing Guns', cost: 220, desc: 'Fires double dart streams from both wings', apply: (t) => { t.twinGuns = true; } },
+      { name: 'Carpet Bread Bombs', cost: 380, desc: 'Drops bread bombs twice as often with bigger blast', apply: (t) => { t.bombInterval = 1.0; t.bombRadius = 80; } },
+      { name: 'Sky Fortress Duck', cost: 750, desc: 'Heavy explosive payload & high speed darts (+2 Dmg)', apply: (t) => { t.damage += 2; t.skyFortress = true; } }
+    ]
+  },
+  bread_bomber: {
+    id: 'bread_bomber',
+    name: 'Bread Bomber',
+    cost: 330,
+    range: 240,
+    attackSpeed: 1.2,
+    damage: 3,
+    splashRadius: 90,
+    unlockLvl: 3,
+    description: 'Hurls exploding bread loaves dealing area damage.',
+    upgrades: [
+      { name: 'Sourdough Blast', cost: 160, desc: '+30px Explosion Radius, +1 Dmg', apply: (t) => { t.splashRadius += 30; t.damage += 1; } },
+      { name: 'Stale Crust', cost: 290, desc: 'Destroys Lead balloons & +2 Dmg', apply: (t) => { t.canPopLead = true; t.damage += 2; } },
+      { name: 'Cluster Loaves', cost: 520, desc: 'Bread cluster explosion', apply: (t) => { t.clusterBombs = true; t.attackSpeed *= 0.8; } }
+    ]
+  },
+  ninja_duck: {
+    id: 'ninja_duck',
+    name: 'Ninja Duck',
+    cost: 360,
+    range: 190,
+    attackSpeed: 0.55,
+    damage: 2,
+    pierce: 4,
+    unlockLvl: 3,
+    description: 'Throws 3 piercing ninja feather shurikens in a rapid fan spread.',
+    upgrades: [
+      { name: 'Sharp Feathers', cost: 170, desc: '+2 Pierce & +1 Damage', apply: (t) => { t.pierce += 2; t.damage += 1; } },
+      { name: '5-Way Shurikens', cost: 320, desc: 'Throws 5 shurikens simultaneously', apply: (t) => { t.shurikenCount = 5; } },
+      { name: 'Shadow Assassin', cost: 680, desc: 'Shreds Lead armor, crits deal 10x damage', apply: (t) => { t.canPopLead = true; t.ninjaCrits = true; } }
+    ]
+  },
+  sniper: {
+    id: 'sniper',
+    name: 'Sniper Mallard',
+    cost: 520,
+    range: 9999,
+    attackSpeed: 1.4,
+    damage: 6,
+    unlockLvl: 4,
+    description: 'High-power sharpshooter duck with unlimited map-wide range.',
+    upgrades: [
+      { name: 'Night Scope', cost: 220, desc: '+3 Damage, faster aim', apply: (t) => { t.damage += 3; t.attackSpeed *= 0.85; } },
+      { name: 'Heavy Caliber', cost: 420, desc: '+8 Damage, pops Lead/Ceramics', apply: (t) => { t.canPopLead = true; t.damage += 8; } },
+      { name: 'Golden Beak', cost: 850, desc: 'Deals 30 Damage per shot', apply: (t) => { t.damage = 30; } }
+    ]
+  },
+  wizard_duck: {
+    id: 'wizard_duck',
+    name: 'Wizard Duck',
+    cost: 440,
+    range: 200,
+    attackSpeed: 0.95,
+    damage: 3,
+    unlockLvl: 4,
+    description: 'Casts homing arcane bubbles that damage and teleport balloons backward along track.',
+    upgrades: [
+      { name: 'Arcane Surge', cost: 220, desc: '+2 Damage & faster bubbles', apply: (t) => { t.damage += 2; } },
+      { name: 'Time Warp', cost: 390, desc: '50% chance to teleport balloons 120px backward', apply: (t) => { t.teleportChance = 0.5; } },
+      { name: 'Archmage Duck', cost: 820, desc: 'Massive magic storm pops all layers & Lead', apply: (t) => { t.canPopLead = true; t.damage += 6; t.chainMagic = true; } }
+    ]
+  },
+  spike_dispenser: {
+    id: 'spike_dispenser',
+    name: 'Spike Dispenser',
+    cost: 410,
+    range: 170,
+    attackSpeed: 1.8,
+    damage: 1,
+    unlockLvl: 5,
+    description: 'Continuously drops piles of road spikes onto nearby track.',
+    upgrades: [
+      { name: 'Extra Barbs', cost: 190, desc: '+5 Spikes per pile (10 total)', apply: (t) => { t.pileCharges = 10; } },
+      { name: 'Rapid Dispenser', cost: 380, desc: 'Drops spikes twice as fast', apply: (t) => { t.attackSpeed *= 0.5; } },
+      { name: 'Hot Spikes', cost: 620, desc: 'Heated spikes pop Lead & burn', apply: (t) => { t.hotSpikes = true; } }
+    ]
+  },
+  fire_drake: {
+    id: 'fire_drake',
+    name: 'Fire Drake',
+    cost: 480,
+    range: 155,
+    attackSpeed: 0.1,
+    damage: 0.45,
+    canPopLead: true,
+    unlockLvl: 6,
+    description: 'Breathes flames that melt leads and burn balloons.',
+    upgrades: [
+      { name: 'Blue Flame', cost: 240, desc: 'Burns balloons over time (+DoT)', apply: (t) => { t.burnDoT = true; t.range += 20; } },
+      { name: 'Dragon Breath', cost: 440, desc: 'Wider cone & +50% Fire Damage', apply: (t) => { t.damage *= 1.5; } },
+      { name: 'Inferno', cost: 780, desc: 'Massive flame range and double damage', apply: (t) => { t.range += 40; t.damage *= 2; } }
+    ]
+  },
+  tesla: {
+    id: 'tesla',
+    name: 'Tesla Storm',
+    cost: 620,
+    range: 175,
+    attackSpeed: 0.8,
+    damage: 4,
+    chainCount: 5,
+    canPopLead: true,
+    unlockLvl: 7,
+    description: 'Zaps lightning that chains between balloons.',
+    upgrades: [
+      { name: 'Superconductor', cost: 320, desc: 'Chains to 9 targets', apply: (t) => { t.chainCount = 9; } },
+      { name: 'Shockwave', cost: 520, desc: '+3 Dmg & stuns balloons', apply: (t) => { t.damage += 3; t.hasStun = true; } },
+      { name: 'Thor Wrath', cost: 980, desc: '14 chains & +8 Damage', apply: (t) => { t.chainCount = 14; t.damage += 8; } }
+    ]
+  }
+};
+
+const ROAD_ITEMS = {
+  road_spike: {
+    id: 'road_spike',
+    name: 'Road Spikes',
+    cost: 25,
+    charges: 15,
+    unlockLvl: 1,
+    description: 'Pops 15 balloon layers before disappearing.'
+  },
+  glue: {
+    id: 'glue',
+    name: 'Glue',
+    cost: 30,
+    charges: 20,
+    slowPct: 0.65,
+    slowDuration: 6.5,
+    unlockLvl: 1,
+    description: 'Sticky puddle on track that slows balloons by 65% for 6.5 seconds.'
+  },
+  freeze_trap: {
+    id: 'freeze_trap',
+    name: 'Freeze Trap',
+    cost: 40,
+    radius: 90,
+    unlockLvl: 1,
+    description: 'Freezes all balloons in area for 4.0 seconds when touched.'
+  }
+};
+
+const BALLOON_TYPES = {
+  red: { hp: 1, speed: 1.15, color: '#ef4444', size: 20, reward: 1, next: null },
+  blue: { hp: 2, speed: 1.45, color: '#3b82f6', size: 22, reward: 2, next: 'red' },
+  green: { hp: 3, speed: 1.80, color: '#10b981', size: 24, reward: 3, next: 'blue' },
+  yellow: { hp: 4, speed: 2.70, color: '#facc15', size: 25, reward: 4, next: 'green' },
+  pink: { hp: 5, speed: 3.30, color: '#ec4899', size: 25, reward: 5, next: 'yellow' },
+  lead: { hp: 7, speed: 1.05, color: '#64748b', isLead: true, size: 27, reward: 8, next: 'pink' },
+  rainbow: { hp: 10, speed: 2.10, color: 'rainbow', isRainbow: true, size: 29, reward: 12, next: 'pink', splitCount: 2 },
+  ceramic: { hp: 20, speed: 2.00, color: '#b45309', isCeramic: true, size: 31, reward: 20, next: 'rainbow', splitCount: 2 },
+  blimp: { hp: 420, speed: 0.65, color: '#312e81', isBoss: true, size: 52, reward: 150, next: 'ceramic', splitCount: 4 }
+};
+
+const BASE_PATH = [
+  { x: -0.05, y: 0.18 },
+  { x: 0.18,  y: 0.18 },
+  { x: 0.23,  y: 0.28 },
+  { x: 0.23,  y: 0.52 },
+  { x: 0.14,  y: 0.62 },
+  { x: 0.14,  y: 0.82 },
+  { x: 0.36,  y: 0.82 },
+  { x: 0.42,  y: 0.70 },
+  { x: 0.42,  y: 0.25 },
+  { x: 0.54,  y: 0.14 },
+  { x: 0.70,  y: 0.14 },
+  { x: 0.76,  y: 0.26 },
+  { x: 0.76,  y: 0.58 },
+  { x: 0.62,  y: 0.70 },
+  { x: 0.62,  y: 0.88 },
+  { x: 1.05,  y: 0.88 }
+];
+
+/* =========================================================================
+   PROCEDURAL RENDERING HELPERS
+   ========================================================================= */
+function drawDuckModel(ctx, x, y, type, angle = 0, level = 0, opacity = 1.0, radius = 24) {
+  ctx.save();
+  ctx.globalAlpha = opacity;
+  ctx.translate(x, y);
+
+  if (level > 0) {
+    ctx.beginPath();
+    ctx.arc(0, 0, radius + 5, 0, Math.PI * 2);
+    ctx.strokeStyle = level === 3 ? '#ef4444' : level === 2 ? '#3b82f6' : '#22c55e';
+    ctx.lineWidth = 3.5;
+    ctx.stroke();
+  }
+
+  ctx.rotate(angle);
+
+  let bodyColor = '#facc15';
+  let beakColor = '#ea580c';
+
+  if (type === 'peashooter') {
+    bodyColor = '#15803d';
+    beakColor = '#facc15';
+  } else if (type === 'quacker') {
+    bodyColor = '#facc15';
+    beakColor = '#ea580c';
+  } else if (type === 'boomerang_duck') {
+    bodyColor = '#0284c7';
+    beakColor = '#f59e0b';
+  } else if (type === 'glue_duck') {
+    bodyColor = '#84cc16';
+    beakColor = '#65a30d';
+  } else if (type === 'plane_duck') {
+    bodyColor = '#e2e8f0';
+    beakColor = '#f97316';
+  } else if (type === 'bread_bomber') {
+    bodyColor = '#ca8a04';
+    beakColor = '#ea580c';
+  } else if (type === 'ninja_duck') {
+    bodyColor = '#1e1b4b';
+    beakColor = '#ef4444';
+  } else if (type === 'wizard_duck') {
+    bodyColor = '#7e22ce';
+    beakColor = '#38bdf8';
+  } else if (type === 'sniper') {
+    bodyColor = '#334155';
+    beakColor = '#64748b';
+  } else if (type === 'spike_dispenser') {
+    bodyColor = '#475569';
+    beakColor = '#f97316';
+  } else if (type === 'fire_drake') {
+    bodyColor = '#dc2626';
+    beakColor = '#fbbf24';
+  } else if (type === 'tesla') {
+    bodyColor = '#0284c7';
+    beakColor = '#e0f2fe';
+  }
+
+  // Circular Body
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, Math.PI * 2);
+  ctx.fillStyle = bodyColor;
+  ctx.fill();
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Pointy Beak
+  ctx.beginPath();
+  ctx.moveTo(radius * 0.65, -radius * 0.35);
+  ctx.lineTo(radius * 1.55, 0);
+  ctx.lineTo(radius * 0.65, radius * 0.35);
+  ctx.closePath();
+  ctx.fillStyle = beakColor;
+  ctx.fill();
+  ctx.stroke();
+
+  // Eye
+  ctx.beginPath();
+  ctx.arc(radius * 0.3, -radius * 0.35, radius * 0.2, 0, Math.PI * 2);
+  ctx.fillStyle = '#000';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(radius * 0.36, -radius * 0.4, radius * 0.08, 0, Math.PI * 2);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+
+  // Accessories
+  if (type === 'plane_duck') {
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillRect(-radius * 0.2, -radius * 0.8, radius * 0.8, radius * 0.4);
+    ctx.strokeStyle = '#000';
+    ctx.strokeRect(-radius * 0.2, -radius * 0.8, radius * 0.8, radius * 0.4);
+  } else if (type === 'wizard_duck') {
+    ctx.fillStyle = '#581c87';
+    ctx.beginPath();
+    ctx.moveTo(-radius * 0.5, -radius * 0.8);
+    ctx.lineTo(0, -radius * 1.8);
+    ctx.lineTo(radius * 0.5, -radius * 0.8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  } else if (type === 'ninja_duck') {
+    ctx.fillStyle = '#ef4444';
+    ctx.fillRect(-radius * 0.1, -radius * 0.7, radius * 0.6, radius * 1.4);
+  } else if (type === 'bread_bomber') {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(-radius * 0.6, -radius * 1.2, radius * 0.7, radius * 0.5);
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(-radius * 0.6, -radius * 1.2, radius * 0.7, radius * 0.5);
+  } else if (type === 'sniper') {
+    ctx.fillStyle = '#ef4444';
+    ctx.fillRect(-radius * 0.2, -radius * 0.7, radius * 0.4, radius * 1.4);
+  } else if (type === 'tesla') {
+    ctx.strokeStyle = '#facc15';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(0, -radius * 0.8);
+    ctx.lineTo(radius * 0.4, -radius * 1.4);
+    ctx.stroke();
+  } else if (type === 'fire_drake') {
+    ctx.fillStyle = '#7f1d1d';
+    ctx.beginPath();
+    ctx.moveTo(-radius * 0.4, -radius * 0.8);
+    ctx.lineTo(0, -radius * 1.5);
+    ctx.lineTo(radius * 0.3, -radius * 0.8);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+function drawRoadItemModel(ctx, x, y, type, radius = 18) {
+  ctx.save();
+  ctx.translate(x, y);
+  if (type === 'road_spike') {
+    ctx.fillStyle = '#94a3b8';
+    ctx.beginPath();
+    ctx.moveTo(0, -radius);
+    ctx.lineTo(radius * 0.6, radius * 0.6);
+    ctx.lineTo(-radius * 0.6, radius * 0.6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  } else if (type === 'glue') {
+    ctx.fillStyle = '#84cc16';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, radius * 1.1, radius * 0.75, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#365314';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  } else if (type === 'freeze_trap') {
+    ctx.fillStyle = '#38bdf8';
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 0.85, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/* =========================================================================
+   MAIN GAME ENGINE CLASS
+   ========================================================================= */
+class Game {
+  constructor() {
+    this.canvas = document.getElementById('gameCanvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.canvasWrap = document.getElementById('canvas-wrap');
+
+    // Progression: Level & Total Pops System
+    this.playerLevel = parseInt(localStorage.getItem('duckTD_lvl') || '1');
+    this.totalPopsEver = parseInt(localStorage.getItem('duckTD_total_pops') || '0');
+    this.popsAtCurrentLvl = parseInt(localStorage.getItem('duckTD_lvl_pops') || '0');
+    this.popsNeeded = this.calcPopsNeeded(this.playerLevel);
+
+    // DIFFICULTY CONFIG
+    this.difficulty = 'easy';
+    this.diffConfig = {
+      easy: { lives: 200, cash: 750, maxWave: 30, speedMult: 0.80, cashMult: 1.30 },
+      medium: { lives: 150, cash: 650, maxWave: 40, speedMult: 0.95, cashMult: 1.05 },
+      hard: { lives: 80, cash: 550, maxWave: 50, speedMult: 1.10, cashMult: 0.90 }
+    };
+
+    // Game Variables
+    this.cash = 750;
+    this.lives = 200;
+    this.wave = 0;
+    this.maxWave = 30;
+
+    // DEFAULT 2X SPEED
+    this.speedMultipliers = [1, 2, 4, 8];
+    this.speedIndex = 1;
+    this.gameSpeed = 2;
+
+    this.inWave = false;
+    this.isGameOver = false;
+
+    // Entities
+    this.towers = [];
+    this.roadItems = [];
+    this.balloons = [];
+    this.projectiles = [];
+    this.particles = [];
+    this.floatingTexts = [];
+    this.waveSpawnQueue = [];
+    this.spawnTimer = 0;
+
+    // Stats
+    this.totalPopsSession = 0;
+    this.totalDamage = 0;
+
+    // UI & Placement
+    this.selectedPlacement = null;
+    this.selectedTower = null;
+    this.mousePos = { x: 0, y: 0 };
+    this.isMouseOnCanvas = false;
+
+    this.pathPoints = [];
+
+    this.initResize();
+    this.initEvents();
+    this.updateProgressionUI();
+    this.renderCodex();
+    this.checkResumeAvailable();
+
+    this.lastTime = performance.now();
+    requestAnimationFrame(this.gameLoop.bind(this));
+  }
+
+  initResize() {
+    const handleResize = () => {
+      const w = this.canvasWrap.clientWidth;
+      const h = this.canvasWrap.clientHeight - 56;
+      this.canvas.width = Math.max(600, w);
+      this.canvas.height = Math.max(400, h);
+
+      this.pathPoints = BASE_PATH.map(p => ({
+        x: p.x * this.canvas.width,
+        y: p.y * this.canvas.height
+      }));
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+  }
+
+  calcPopsNeeded(lvl) {
+    return Math.floor(120 * Math.pow(1.35, lvl - 1));
+  }
+
+  addPops(amount = 1) {
+    this.totalPopsEver += amount;
+    this.totalPopsSession += amount;
+    this.popsAtCurrentLvl += amount;
+
+    let leveledUp = false;
+    while (this.popsAtCurrentLvl >= this.popsNeeded) {
+      this.popsAtCurrentLvl -= this.popsNeeded;
+      this.playerLevel++;
+      this.popsNeeded = this.calcPopsNeeded(this.playerLevel);
+      leveledUp = true;
+    }
+
+    localStorage.setItem('duckTD_lvl', this.playerLevel.toString());
+    localStorage.setItem('duckTD_total_pops', this.totalPopsEver.toString());
+    localStorage.setItem('duckTD_lvl_pops', this.popsAtCurrentLvl.toString());
+
+    this.updateProgressionUI();
+    if (leveledUp) {
+      audio.playUpgrade();
+      this.showToast(`Commander Level Up! Level ${this.playerLevel} Reached!`);
+      this.updateShopCards();
+    }
+  }
+
+  updateProgressionUI() {
+    document.getElementById('menu-avatar-badge').innerText = this.playerLevel;
+    document.getElementById('menu-lvl-label').innerText = `Commander Level ${this.playerLevel}`;
+    document.getElementById('menu-pops-label').innerText = `${this.popsAtCurrentLvl} / ${this.popsNeeded} Pops to Level ${this.playerLevel + 1}`;
+    const pct = Math.min(100, Math.floor((this.popsAtCurrentLvl / this.popsNeeded) * 100));
+    document.getElementById('menu-xp-fill').style.width = `${pct}%`;
+
+    const hudPopsProg = document.getElementById('hud-pops-prog');
+    if (hudPopsProg) hudPopsProg.innerText = `${this.popsAtCurrentLvl}/${this.popsNeeded}`;
+  }
+
+  showToast(msg) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerText = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2400);
+  }
+
+  /* ================= RESET ALL COMMAND ================= */
+  resetAllProgress() {
+    localStorage.removeItem('duckTD_lvl');
+    localStorage.removeItem('duckTD_total_pops');
+    localStorage.removeItem('duckTD_lvl_pops');
+    localStorage.removeItem('duckTD_saved_game');
+
+    this.playerLevel = 1;
+    this.totalPopsEver = 0;
+    this.popsAtCurrentLvl = 0;
+    this.popsNeeded = this.calcPopsNeeded(1);
+
+    this.updateProgressionUI();
+    this.updateShopCards();
+    this.checkResumeAvailable();
+
+    audio.playPop(150);
+    this.showToast("All game progress & save data have been reset!");
+    console.log("%c[Duck TD] All progress, level unlocks, and saved games have been completely reset!", "color: #facc15; font-size: 14px; font-weight: bold;");
+  }
+
+  /* ================= SAVE & RESUME ================= */
+  saveGame() {
+    if (this.isGameOver || this.lives <= 0) {
+      localStorage.removeItem('duckTD_saved_game');
+      return;
+    }
+    const state = {
+      difficulty: this.difficulty,
+      cash: this.cash,
+      lives: this.lives,
+      wave: this.wave,
+      maxWave: this.maxWave,
+      towers: this.towers.map(t => ({
+        id: t.id,
+        type: t.type,
+        name: t.name,
+        x: t.x,
+        y: t.y,
+        level: t.level,
+        range: t.range,
+        attackSpeed: t.attackSpeed,
+        damage: t.damage,
+        pierce: t.pierce,
+        slowPct: t.slowPct,
+        slowDuration: t.slowDuration,
+        canPopLead: t.canPopLead,
+        isAoE: t.isAoE,
+        splashRadius: t.splashRadius,
+        chainCount: t.chainCount,
+        pileCharges: t.pileCharges,
+        targetMode: t.targetMode,
+        costInvested: t.costInvested,
+        totalPops: t.totalPops,
+        totalDamage: t.totalDamage
+      })),
+      roadItems: this.roadItems,
+      totalPopsSession: this.totalPopsSession,
+      totalDamage: this.totalDamage
+    };
+    localStorage.setItem('duckTD_saved_game', JSON.stringify(state));
+    this.checkResumeAvailable();
+  }
+
+  checkResumeAvailable() {
+    const saved = localStorage.getItem('duckTD_saved_game');
+    const resumeBtn = document.getElementById('btn-resume-game');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.lives > 0) {
+          resumeBtn.style.display = 'flex';
+          resumeBtn.innerText = `Resume Game (Wave ${Math.max(1, parsed.wave)} - ${parsed.difficulty.toUpperCase()})`;
+          return;
+        }
+      } catch(e) {}
+    }
+    resumeBtn.style.display = 'none';
+  }
+
+  resumeGame() {
+    const saved = localStorage.getItem('duckTD_saved_game');
+    if (!saved) return;
+    try {
+      const data = JSON.parse(saved);
+      this.difficulty = data.difficulty;
+      this.cash = data.cash;
+      this.lives = data.lives;
+      this.wave = data.wave;
+      this.maxWave = data.maxWave;
+      this.totalPopsSession = data.totalPopsSession || 0;
+      this.totalDamage = data.totalDamage || 0;
+      this.speedIndex = 1;
+      this.gameSpeed = 2;
+      this.inWave = false;
+      this.isGameOver = false;
+
+      this.towers = (data.towers || []).map(t => {
+        const tmpl = DUCK_TYPES[t.type];
+        return {
+          ...t,
+          cooldown: 0,
+          angle: 0,
+          flightAngle: Math.random() * Math.PI * 2,
+          isFlying: !!tmpl.isFlying
+        };
+      });
+      this.roadItems = data.roadItems || [];
+      this.balloons = [];
+      this.projectiles = [];
+      this.particles = [];
+      this.floatingTexts = [];
+      this.waveSpawnQueue = [];
+
+      this.selectedPlacement = null;
+      this.selectTower(null);
+
+      document.getElementById('menu-screen').classList.remove('active');
+      document.getElementById('game-container').style.display = 'flex';
+      document.getElementById('hud-max-wave').innerText = this.maxWave;
+      document.getElementById('btn-speed').innerText = '2x';
+      document.getElementById('btn-next-wave').disabled = false;
+      document.getElementById('btn-next-wave').innerText = `Start Wave ${this.wave + 1}`;
+
+      this.initResize();
+      this.updateHUD();
+      this.updateShopCards();
+    } catch(e) {
+      console.error(e);
+      this.startNewGame(this.difficulty);
+    }
+  }
+
+  startNewGame(difficulty) {
+    this.difficulty = difficulty;
+    const cfg = this.diffConfig[difficulty];
+    this.cash = cfg.cash;
+    this.lives = cfg.lives;
+    this.maxWave = cfg.maxWave;
+    this.wave = 0;
+    this.speedIndex = 1;
+    this.gameSpeed = 2;
+    this.inWave = false;
+    this.isGameOver = false;
+
+    this.towers = [];
+    this.roadItems = [];
+    this.balloons = [];
+    this.projectiles = [];
+    this.particles = [];
+    this.floatingTexts = [];
+    this.waveSpawnQueue = [];
+
+    this.totalPopsSession = 0;
+    this.totalDamage = 0;
+
+    this.selectedPlacement = null;
+    this.selectTower(null);
+
+    document.getElementById('menu-screen').classList.remove('active');
+    document.getElementById('diff-modal').classList.remove('active');
+    document.getElementById('game-container').style.display = 'flex';
+    document.getElementById('hud-max-wave').innerText = this.maxWave;
+    document.getElementById('btn-speed').innerText = '2x';
+    document.getElementById('btn-next-wave').disabled = false;
+    document.getElementById('btn-next-wave').innerText = `Start Wave 1`;
+
+    this.initResize();
+    this.updateHUD();
+    this.updateShopCards();
+    this.saveGame();
+  }
+
+  updateHUD() {
+    document.getElementById('hud-cash').innerText = Math.floor(this.cash);
+    document.getElementById('hud-lives').innerText = this.lives;
+    document.getElementById('hud-wave').innerText = Math.max(1, this.wave);
+    this.updateProgressionUI();
+  }
+
+  updateShopCards() {
+    const ducksGrid = document.getElementById('shop-ducks-grid');
+    ducksGrid.innerHTML = '';
+
+    Object.values(DUCK_TYPES).forEach(duck => {
+      const locked = this.playerLevel < duck.unlockLvl;
+      const cantAfford = this.cash < duck.cost;
+
+      const card = document.createElement('div');
+      card.className = `shop-card ${locked ? 'locked' : ''} ${cantAfford ? 'disabled' : ''}`;
+      if (this.selectedPlacement && this.selectedPlacement.id === duck.id) card.classList.add('selected');
+
+      const canvas = document.createElement('canvas');
+      canvas.className = 'shop-thumb';
+      canvas.width = 48;
+      canvas.height = 48;
+      const thumbCtx = canvas.getContext('2d');
+      drawDuckModel(thumbCtx, 20, 24, duck.id, 0, 0, 1.0, 14);
+
+      card.appendChild(canvas);
+
+      const nameEl = document.createElement('div');
+      nameEl.className = 'shop-name';
+      nameEl.innerText = duck.name.split(' ')[0];
+      card.appendChild(nameEl);
+
+      const costEl = document.createElement('div');
+      costEl.className = 'shop-cost';
+      costEl.innerText = `$${duck.cost}`;
+      card.appendChild(costEl);
+
+      if (locked) {
+        const lockEl = document.createElement('div');
+        lockEl.className = 'lock-overlay';
+        lockEl.innerText = `Lvl ${duck.unlockLvl}`;
+        card.appendChild(lockEl);
+      }
+
+      card.onclick = () => {
+        if (locked) { this.showToast(`Unlocks permanently at Commander Level ${duck.unlockLvl}!`); return; }
+        if (cantAfford) { this.showToast(`Need $${duck.cost}`); return; }
+        if (this.selectedPlacement && this.selectedPlacement.id === duck.id) {
+          this.selectedPlacement = null;
+        } else {
+          this.selectedPlacement = { type: 'duck', id: duck.id };
+          this.selectTower(null);
+        }
+        this.updateShopCards();
+      };
+      ducksGrid.appendChild(card);
+    });
+
+    const itemsGrid = document.getElementById('shop-items-grid');
+    itemsGrid.innerHTML = '';
+
+    Object.values(ROAD_ITEMS).forEach(item => {
+      const cantAfford = this.cash < item.cost;
+      const card = document.createElement('div');
+      card.className = `shop-card ${cantAfford ? 'disabled' : ''}`;
+      if (this.selectedPlacement && this.selectedPlacement.id === item.id) card.classList.add('selected');
+
+      const canvas = document.createElement('canvas');
+      canvas.className = 'shop-thumb';
+      canvas.width = 48;
+      canvas.height = 48;
+      const thumbCtx = canvas.getContext('2d');
+      drawRoadItemModel(thumbCtx, 24, 24, item.id, 14);
+
+      card.appendChild(canvas);
+
+      const nameEl = document.createElement('div');
+      nameEl.className = 'shop-name';
+      nameEl.innerText = item.name;
+      card.appendChild(nameEl);
+
+      const costEl = document.createElement('div');
+      costEl.className = 'shop-cost';
+      costEl.innerText = `$${item.cost}`;
+      card.appendChild(costEl);
+
+      card.onclick = () => {
+        if (cantAfford) { this.showToast(`Need $${item.cost}`); return; }
+        if (this.selectedPlacement && this.selectedPlacement.id === item.id) {
+          this.selectedPlacement = null;
+        } else {
+          this.selectedPlacement = { type: 'item', id: item.id };
+          this.selectTower(null);
+        }
+        this.updateShopCards();
+      };
+      itemsGrid.appendChild(card);
+    });
+  }
+
+  /* ================= WAVE MANAGEMENT ================= */
+  startNextWave() {
+    if (this.inWave || this.isGameOver) return;
+    this.wave++;
+    this.inWave = true;
+    this.updateHUD();
+
+    document.getElementById('btn-next-wave').disabled = true;
+    document.getElementById('btn-next-wave').innerText = `Wave ${this.wave}...`;
+
+    this.generateWaveBalloons(this.wave);
+    audio.playQuack(1.1);
+    this.saveGame();
+  }
+
+  generateWaveBalloons(w) {
+    this.waveSpawnQueue = [];
+    const countMult = this.difficulty === 'hard' ? 1.15 : this.difficulty === 'easy' ? 0.85 : 1.0;
+
+    if (w === 1) {
+      this.enqueueBalloons('red', 8 * countMult, 0.55);
+    } else if (w === 2) {
+      this.enqueueBalloons('red', 12 * countMult, 0.45);
+      this.enqueueBalloons('blue', 4 * countMult, 0.60);
+    } else if (w === 3) {
+      this.enqueueBalloons('blue', 10 * countMult, 0.45);
+      this.enqueueBalloons('green', 4 * countMult, 0.55);
+    } else if (w === 4) {
+      this.enqueueBalloons('red', 15 * countMult, 0.35);
+      this.enqueueBalloons('green', 8 * countMult, 0.45);
+    } else if (w === 5) {
+      this.enqueueBalloons('green', 14 * countMult, 0.40);
+      this.enqueueBalloons('yellow', 4 * countMult, 0.50);
+    } else if (w === 7) {
+      this.enqueueBalloons('yellow', 12 * countMult, 0.35);
+      this.enqueueBalloons('pink', 4 * countMult, 0.45);
+    } else if (w === 10) {
+      this.enqueueBalloons('pink', 14 * countMult, 0.30);
+      this.enqueueBalloons('lead', 4 * countMult, 0.60);
+    } else if (w === 13) {
+      this.enqueueBalloons('lead', 8 * countMult, 0.50);
+      this.enqueueBalloons('rainbow', 3 * countMult, 0.65);
+    } else if (w === 16) {
+      this.enqueueBalloons('rainbow', 8 * countMult, 0.45);
+      this.enqueueBalloons('lead', 10 * countMult, 0.40);
+    } else if (w === 20) {
+      this.enqueueBalloons('ceramic', 4 * countMult, 0.70);
+      this.enqueueBalloons('rainbow', 12 * countMult, 0.35);
+    } else if (w === this.maxWave) {
+      this.enqueueBalloons('blimp', 1, 3.0);
+      this.enqueueBalloons('ceramic', 8, 0.50);
+      this.enqueueBalloons('rainbow', 16, 0.30);
+    } else {
+      const pool = ['red', 'blue', 'green'];
+      if (w >= 5) pool.push('yellow');
+      if (w >= 8) pool.push('pink');
+      if (w >= 11) pool.push('lead');
+      if (w >= 15) pool.push('rainbow');
+      if (w >= 22) pool.push('ceramic');
+
+      const amount = Math.floor((10 + w * 2.2) * countMult);
+      for (let i = 0; i < amount; i++) {
+        const typeIndex = Math.min(pool.length - 1, Math.floor(Math.random() * (pool.length * (w / (this.maxWave * 1.2) + 0.3))));
+        this.enqueueBalloons(pool[typeIndex], 1, 0.22 + Math.random() * 0.25);
+      }
+    }
+  }
+
+  enqueueBalloons(type, count, interval) {
+    for (let i = 0; i < Math.round(count); i++) {
+      this.waveSpawnQueue.push({ type, delay: interval });
+    }
+  }
+
+  endWave() {
+    this.inWave = false;
+    const bonus = Math.floor((120 + this.wave * 20) * this.diffConfig[this.difficulty].cashMult);
+    this.cash += bonus;
+
+    this.showFloatingText(this.canvas.width - 150, 30, `+$${bonus}`, '#facc15');
+    this.updateHUD();
+    this.updateShopCards();
+
+    document.getElementById('btn-next-wave').disabled = false;
+    document.getElementById('btn-next-wave').innerText = `Start Wave ${this.wave + 1}`;
+
+    if (this.wave >= this.maxWave) {
+      this.triggerGameOver(true);
+      return;
+    }
+
+    this.saveGame();
+  }
+
+  /* ================= PLACEMENT & SELECTION ================= */
+  distToSegment(p, v, w) {
+    const l2 = (v.x - w.x)**2 + (v.y - w.y)**2;
+    if (l2 === 0) return Math.hypot(p.x - v.x, p.y - v.y);
+    let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(p.x - (v.x + t * (w.x - v.x)), p.y - (v.y + t * (w.y - v.y)));
+  }
+
+  minDistToTrack(x, y) {
+    let minD = 9999;
+    for (let i = 0; i < this.pathPoints.length - 1; i++) {
+      const d = this.distToSegment({ x, y }, this.pathPoints[i], this.pathPoints[i + 1]);
+      if (d < minD) minD = d;
+    }
+    return minD;
+  }
+
+  canPlaceDuck(x, y) {
+    if (x < 45 || x > this.canvas.width - 45 || y < 45 || y > this.canvas.height - 45) return false;
+    if (this.minDistToTrack(x, y) < 48) return false;
+    for (const t of this.towers) {
+      if (Math.hypot(t.x - x, t.y - y) < 52) return false;
+    }
+    return true;
+  }
+
+  canPlaceRoadItem(x, y) {
+    if (x < 15 || x > this.canvas.width - 15 || y < 15 || y > this.canvas.height - 15) return false;
+    return this.minDistToTrack(x, y) <= 34;
+  }
+
+  placeObject(x, y) {
+    if (!this.selectedPlacement) return;
+
+    if (this.selectedPlacement.type === 'duck') {
+      const template = DUCK_TYPES[this.selectedPlacement.id];
+      if (this.cash < template.cost || !this.canPlaceDuck(x, y)) {
+        audio.playPop(120);
+        return;
+      }
+
+      this.cash -= template.cost;
+      const newTower = {
+        id: Date.now() + Math.random(),
+        type: template.id,
+        name: template.name,
+        x: x,
+        y: y,
+        level: 0,
+        range: template.range,
+        attackSpeed: template.attackSpeed,
+        damage: template.damage,
+        pierce: template.pierce || 1,
+        slowPct: template.slowPct || 0,
+        slowDuration: template.slowDuration || 0,
+        canPopLead: !!template.canPopLead,
+        isAoE: !!template.isAoE,
+        splashRadius: template.splashRadius || 0,
+        chainCount: template.chainCount || 0,
+        isFlying: !!template.isFlying,
+        flightAngle: 0,
+        bombTimer: 0,
+        pileCharges: 5,
+        targetMode: 'first',
+        cooldown: 0,
+        totalPops: 0,
+        totalDamage: 0,
+        angle: 0,
+        costInvested: template.cost
+      };
+
+      this.towers.push(newTower);
+      this.selectedPlacement = null;
+      this.selectTower(newTower);
+      audio.playQuack(1.0);
+    } else if (this.selectedPlacement.type === 'item') {
+      const template = ROAD_ITEMS[this.selectedPlacement.id];
+      if (this.cash < template.cost || !this.canPlaceRoadItem(x, y)) {
+        audio.playPop(120);
+        return;
+      }
+
+      this.cash -= template.cost;
+      this.roadItems.push({
+        id: Date.now() + Math.random(),
+        type: template.id,
+        x: x,
+        y: y,
+        charges: template.charges || 1,
+        radius: template.radius || 0,
+        slowPct: template.slowPct || 0,
+        slowDuration: template.slowDuration || 0,
+        leadPopping: false
+      });
+
+      audio.playPop(500);
+      this.selectedPlacement = null;
+    }
+
+    this.updateHUD();
+    this.updateShopCards();
+    this.saveGame();
+  }
+
+  /* ================= BOTTOM BAR INSPECTOR ================= */
+  selectTower(tower) {
+    this.selectedTower = tower;
+    const bar = document.getElementById('bottom-bar');
+
+    if (!tower) {
+      bar.style.display = 'none';
+      return;
+    }
+
+    this.selectedPlacement = null;
+    this.updateShopCards();
+
+    bar.style.display = 'flex';
+    this.updateBottomBarUI();
+  }
+
+  updateBottomBarUI() {
+    const t = this.selectedTower;
+    if (!t) return;
+
+    const avatarCanvas = document.getElementById('bb-avatar');
+    const actx = avatarCanvas.getContext('2d');
+    actx.clearRect(0, 0, 70, 70);
+    drawDuckModel(actx, 35, 35, t.type, 0, t.level, 1.0, 24);
+
+    document.getElementById('bb-name').innerText = t.name;
+    document.getElementById('bb-tier').innerText = `Tier ${t.level} / 3`;
+    document.getElementById('bb-pops').innerText = t.totalPops;
+    document.getElementById('bb-dmg').innerText = Math.floor(t.totalDamage);
+    document.getElementById('bb-range').innerText = t.range >= 9000 ? 'Global' : Math.round(t.range);
+
+    document.querySelectorAll('.bb-target-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mode === t.targetMode);
+    });
+
+    const tmpl = DUCK_TYPES[t.type];
+    const upgBtn = document.getElementById('bb-upg-btn');
+    const sellBtn = document.getElementById('bb-sell-btn');
+
+    if (t.level < 3) {
+      const upg = tmpl.upgrades[t.level];
+      document.getElementById('bb-upg-title').innerText = `Next: ${upg.name}`;
+      document.getElementById('bb-upg-desc').innerText = upg.desc;
+      document.getElementById('bb-upg-cost').innerText = `$${upg.cost}`;
+      upgBtn.disabled = this.cash < upg.cost;
+    } else {
+      document.getElementById('bb-upg-title').innerText = 'Max Upgrades Reached';
+      document.getElementById('bb-upg-desc').innerText = 'This duck has reached peak power.';
+      document.getElementById('bb-upg-cost').innerText = '';
+      upgBtn.disabled = true;
+    }
+
+    const sellVal = Math.floor(t.costInvested * 0.7);
+    sellBtn.innerText = `Sell (+$${sellVal})`;
+  }
+
+  upgradeSelectedTower() {
+    const t = this.selectedTower;
+    if (!t || t.level >= 3) return;
+
+    const tmpl = DUCK_TYPES[t.type];
+    const upg = tmpl.upgrades[t.level];
+    if (this.cash < upg.cost) return;
+
+    this.cash -= upg.cost;
+    t.costInvested += upg.cost;
+    upg.apply(t);
+    t.level++;
+
+    audio.playUpgrade();
+    this.showFloatingText(t.x, t.y - 25, 'UPGRADE', '#38bdf8');
+    this.updateHUD();
+    this.updateBottomBarUI();
+    this.updateShopCards();
+    this.saveGame();
+  }
+
+  sellSelectedTower() {
+    const t = this.selectedTower;
+    if (!t) return;
+
+    const sellVal = Math.floor(t.costInvested * 0.7);
+    this.cash += sellVal;
+    this.towers = this.towers.filter(item => item !== t);
+
+    audio.playPop(300);
+    this.showFloatingText(t.x, t.y, `+$${sellVal}`, '#facc15');
+    this.selectTower(null);
+    this.updateHUD();
+    this.updateShopCards();
+    this.saveGame();
+  }
+
+  /* ================= BALLOON DAMAGE & PROGRESSION ================= */
+  spawnBalloon(typeKey) {
+    const tmpl = BALLOON_TYPES[typeKey];
+    this.balloons.push({
+      id: Date.now() + Math.random(),
+      type: typeKey,
+      hp: tmpl.hp,
+      maxHp: tmpl.hp,
+      color: tmpl.color,
+      size: tmpl.size,
+      speed: tmpl.speed * this.diffConfig[this.difficulty].speedMult,
+      reward: tmpl.reward,
+      isLead: !!tmpl.isLead,
+      isRainbow: !!tmpl.isRainbow,
+      isCeramic: !!tmpl.isCeramic,
+      isBoss: !!tmpl.isBoss,
+      pathIndex: 0,
+      distTraveled: 0,
+      x: this.pathPoints[0].x,
+      y: this.pathPoints[0].y,
+      burnTimer: 0,
+      stunTimer: 0,
+      glueTimer: 0,
+      glueSlow: 1.0,
+      isAcidGlue: false
+    });
+  }
+
+  damageBalloon(balloon, dmg, tower, canHitLead = false) {
+    if (balloon.isLead && !canHitLead && (!tower || !tower.canPopLead)) {
+      return false;
+    }
+
+    balloon.hp -= dmg;
+    if (tower) {
+      tower.totalDamage += dmg;
+    }
+    this.totalDamage += dmg;
+
+    if (balloon.hp <= 0) {
+      this.popBalloon(balloon, tower);
+      return true;
+    } else {
+      audio.playPop(420);
+      return false;
+    }
+  }
+
+  popBalloon(balloon, tower) {
+    const tmpl = BALLOON_TYPES[balloon.type];
+    if (tower) tower.totalPops++;
+    
+    this.addPops(1);
+
+    const cashGain = Math.max(1, Math.floor(tmpl.reward * this.diffConfig[this.difficulty].cashMult));
+    this.cash += cashGain;
+    this.updateHUD();
+
+    audio.playPop(balloon.isBoss ? 160 : 600);
+    this.createPopParticles(balloon.x, balloon.y, balloon.color, balloon.size);
+
+    if (tmpl.next) {
+      const splits = tmpl.splitCount || 1;
+      for (let i = 0; i < splits; i++) {
+        const nextTmpl = BALLOON_TYPES[tmpl.next];
+        const child = {
+          id: Date.now() + Math.random(),
+          type: tmpl.next,
+          hp: nextTmpl.hp,
+          maxHp: nextTmpl.hp,
+          color: nextTmpl.color,
+          size: nextTmpl.size,
+          speed: nextTmpl.speed * this.diffConfig[this.difficulty].speedMult,
+          reward: nextTmpl.reward,
+          isLead: !!nextTmpl.isLead,
+          isRainbow: !!nextTmpl.isRainbow,
+          isCeramic: !!nextTmpl.isCeramic,
+          isBoss: !!nextTmpl.isBoss,
+          pathIndex: balloon.pathIndex,
+          distTraveled: balloon.distTraveled - (i * 12),
+          x: balloon.x - (i * 5),
+          y: balloon.y,
+          burnTimer: 0,
+          stunTimer: 0,
+          glueTimer: balloon.glueTimer,
+          glueSlow: balloon.glueSlow,
+          isAcidGlue: balloon.isAcidGlue
+        };
+        this.balloons.push(child);
+      }
+    }
+
+    this.balloons = this.balloons.filter(b => b !== balloon);
+  }
+
+  leakBalloon(balloon) {
+    const dmg = balloon.isBoss ? 40 : balloon.hp > 5 ? 5 : 1;
+    this.lives -= dmg;
+    audio.playPop(100);
+    this.showFloatingText(balloon.x, balloon.y, `-${dmg} ❤️`, '#ef4444');
+    this.balloons = this.balloons.filter(b => b !== balloon);
+    this.updateHUD();
+
+    if (this.lives <= 0) {
+      this.lives = 0;
+      this.updateHUD();
+      this.triggerGameOver(false);
+    }
+  }
+
+  triggerGameOver(won) {
+    this.isGameOver = true;
+    localStorage.removeItem('duckTD_saved_game');
+    this.checkResumeAvailable();
+
+    const modal = document.getElementById('game-over-modal');
+    const title = document.getElementById('go-title');
+    const msg = document.getElementById('go-message');
+
+    if (won) {
+      title.innerText = 'VICTORY';
+      title.className = 'win-title';
+      msg.innerText = `All waves cleared on ${this.difficulty.toUpperCase()}!`;
+    } else {
+      title.innerText = 'DEFEAT';
+      title.className = 'lose-title';
+      msg.innerText = `Overrun on Wave ${this.wave}.`;
+    }
+
+    document.getElementById('go-pops').innerText = this.totalPopsSession;
+    document.getElementById('go-waves').innerText = `${this.wave}/${this.maxWave}`;
+    document.getElementById('go-total-pops').innerText = this.totalPopsEver;
+
+    modal.classList.add('active');
+  }
+
+  /* ================= UPDATE LOOP & COMBAT ================= */
+  getTargetBalloon(tower) {
+    let candidates = this.balloons.filter(b => {
+      if (tower.range >= 9000) return true;
+      return Math.hypot(b.x - tower.x, b.y - tower.y) <= tower.range;
+    });
+
+    if (candidates.length === 0) return null;
+
+    if (tower.targetMode === 'first') {
+      return candidates.reduce((prev, curr) => curr.distTraveled > prev.distTraveled ? curr : prev);
+    } else if (tower.targetMode === 'last') {
+      return candidates.reduce((prev, curr) => curr.distTraveled < prev.distTraveled ? curr : prev);
+    } else if (tower.targetMode === 'strong') {
+      return candidates.reduce((prev, curr) => curr.hp > prev.hp ? curr : prev);
+    } else if (tower.targetMode === 'close') {
+      return candidates.reduce((prev, curr) => {
+        const d1 = Math.hypot(prev.x - tower.x, prev.y - tower.y);
+        const d2 = Math.hypot(curr.x - tower.x, curr.y - tower.y);
+        return d2 < d1 ? curr : prev;
+      });
+    }
+    return candidates[0];
+  }
+
+  update(dt) {
+    if (this.isGameOver) return;
+
+    // Spawner
+    if (this.inWave && this.waveSpawnQueue.length > 0) {
+      this.spawnTimer -= dt;
+      if (this.spawnTimer <= 0) {
+        const next = this.waveSpawnQueue.shift();
+        this.spawnBalloon(next.type);
+        this.spawnTimer = next.delay;
+      }
+    } else if (this.inWave && this.waveSpawnQueue.length === 0 && this.balloons.length === 0) {
+      this.endWave();
+    }
+
+    // Update Balloons
+    for (let i = this.balloons.length - 1; i >= 0; i--) {
+      const b = this.balloons[i];
+
+      if (b.glueTimer > 0) {
+        b.glueTimer -= dt;
+        if (b.isAcidGlue) {
+          b.hp -= 2.0 * dt;
+          if (b.hp <= 0) {
+            this.popBalloon(b, null);
+            continue;
+          }
+        }
+      }
+
+      if (b.stunTimer > 0) {
+        b.stunTimer -= dt;
+      } else {
+        const slowFactor = b.glueTimer > 0 ? (1 - b.glueSlow) : 1.0;
+        const moveDist = b.speed * 90 * slowFactor * dt;
+        b.distTraveled += moveDist;
+
+        const currentTarget = this.pathPoints[b.pathIndex + 1];
+        if (currentTarget) {
+          const dx = currentTarget.x - b.x;
+          const dy = currentTarget.y - b.y;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist <= moveDist) {
+            b.x = currentTarget.x;
+            b.y = currentTarget.y;
+            b.pathIndex++;
+            if (b.pathIndex >= this.pathPoints.length - 1) {
+              this.leakBalloon(b);
+              continue;
+            }
+          } else {
+            b.x += (dx / dist) * moveDist;
+            b.y += (dy / dist) * moveDist;
+          }
+        }
+      }
+
+      // Check Road Items Collision
+      for (let j = this.roadItems.length - 1; j >= 0; j--) {
+        const item = this.roadItems[j];
+        const dist = Math.hypot(b.x - item.x, b.y - item.y);
+
+        if (item.type === 'road_spike' && dist <= b.size + 10) {
+          this.damageBalloon(b, 1, null, item.leadPopping);
+          item.charges--;
+          if (item.charges <= 0) {
+            this.roadItems.splice(j, 1);
+          }
+        } else if (item.type === 'glue' && dist <= b.size + 14) {
+          b.glueTimer = item.slowDuration;
+          b.glueSlow = item.slowPct;
+          audio.playGlue();
+          item.charges--;
+          if (item.charges <= 0) {
+            this.roadItems.splice(j, 1);
+          }
+        } else if (item.type === 'freeze_trap' && dist <= b.size + 12) {
+          audio.playFreeze();
+          this.balloons.forEach(otherB => {
+            if (Math.hypot(otherB.x - item.x, otherB.y - item.y) <= item.radius) {
+              otherB.stunTimer = 4.0;
+              this.damageBalloon(otherB, 1, null, true);
+            }
+          });
+          this.createShockwave(item.x, item.y, item.radius, '#38bdf8');
+          this.roadItems.splice(j, 1);
+          break;
+        }
+      }
+
+      if (b.burnTimer > 0) {
+        b.burnTimer -= dt;
+        if (Math.random() < 0.25) {
+          b.hp -= 0.25;
+          if (b.hp <= 0) {
+            this.popBalloon(b, null);
+          }
+        }
+      }
+    }
+
+    // Update Towers
+    for (const tower of this.towers) {
+      if (tower.cooldown > 0) tower.cooldown -= dt;
+
+      // Flying Plane Duck Orbit
+      if (tower.type === 'plane_duck') {
+        tower.flightAngle = (tower.flightAngle || 0) + dt * 1.6;
+        const flightRadiusX = 180;
+        const flightRadiusY = 90;
+        tower.planeX = tower.x + Math.cos(tower.flightAngle) * flightRadiusX;
+        tower.planeY = tower.y + Math.sin(tower.flightAngle * 2) * flightRadiusY;
+        tower.planeRot = Math.atan2(
+          Math.cos(tower.flightAngle * 2) * 2 * flightRadiusY,
+          -Math.sin(tower.flightAngle) * flightRadiusX
+        );
+
+        tower.bombTimer = (tower.bombTimer || 0) - dt;
+        if (tower.bombTimer <= 0) {
+          tower.bombTimer = tower.bombInterval || 1.8;
+          this.projectiles.push({
+            type: 'bread',
+            tower: tower,
+            x: tower.planeX,
+            y: tower.planeY,
+            vx: 0,
+            vy: 0,
+            radius: tower.bombRadius || 60,
+            damage: tower.damage + 2,
+            life: 0.35
+          });
+        }
+
+        if (tower.cooldown <= 0) {
+          audio.playShoot('plane');
+          this.projectiles.push({
+            type: 'dart',
+            tower: tower,
+            x: tower.planeX,
+            y: tower.planeY,
+            angle: tower.planeRot,
+            speed: 800,
+            damage: tower.damage,
+            pierce: tower.skyFortress ? 6 : 2,
+            hitList: [],
+            life: 0.7
+          });
+          if (tower.twinGuns) {
+            this.projectiles.push({
+              type: 'dart',
+              tower: tower,
+              x: tower.planeX,
+              y: tower.planeY,
+              angle: tower.planeRot + 0.2,
+              speed: 800,
+              damage: tower.damage,
+              pierce: 2,
+              hitList: [],
+              life: 0.7
+            });
+            this.projectiles.push({
+              type: 'dart',
+              tower: tower,
+              x: tower.planeX,
+              y: tower.planeY,
+              angle: tower.planeRot - 0.2,
+              speed: 800,
+              damage: tower.damage,
+              pierce: 2,
+              hitList: [],
+              life: 0.7
+            });
+          }
+          tower.cooldown = tower.attackSpeed;
+        }
+        continue;
+      }
+
+      if (tower.type === 'spike_dispenser') {
+        if (tower.cooldown <= 0) {
+          const nearbyTrack = [];
+          for (let i = 0; i < this.pathPoints.length - 1; i++) {
+            const p1 = this.pathPoints[i];
+            const p2 = this.pathPoints[i + 1];
+            for (let step = 0; step <= 1; step += 0.25) {
+              const tx = p1.x + (p2.x - p1.x) * step;
+              const ty = p1.y + (p2.y - p1.y) * step;
+              if (Math.hypot(tx - tower.x, ty - tower.y) <= tower.range) {
+                nearbyTrack.push({ x: tx, y: ty });
+              }
+            }
+          }
+
+          if (nearbyTrack.length > 0) {
+            const targetPoint = nearbyTrack[Math.floor(Math.random() * nearbyTrack.length)];
+            this.roadItems.push({
+              id: Date.now() + Math.random(),
+              type: 'road_spike',
+              x: targetPoint.x + (Math.random() - 0.5) * 12,
+              y: targetPoint.y + (Math.random() - 0.5) * 12,
+              charges: tower.pileCharges || 5,
+              leadPopping: !!tower.hotSpikes
+            });
+            audio.playPop(700);
+            tower.cooldown = tower.attackSpeed;
+          }
+        }
+        continue;
+      }
+
+      const target = this.getTargetBalloon(tower);
+      if (target) {
+        tower.angle = Math.atan2(target.y - tower.y, target.x - tower.x);
+
+        if (tower.cooldown <= 0) {
+          this.towerAttack(tower, target);
+          tower.cooldown = tower.attackSpeed;
+        }
+      }
+    }
+
+    // Accurate Projectiles
+    for (let i = this.projectiles.length - 1; i >= 0; i--) {
+      const p = this.projectiles[i];
+
+      if (p.type === 'boomerang') {
+        p.t += dt * 1.7;
+        if (p.t >= 1) {
+          this.projectiles.splice(i, 1);
+          continue;
+        }
+
+        const forward = p.reach * Math.sin(p.t * Math.PI);
+        const lateral = p.curveWidth * Math.sin(p.t * Math.PI * 2);
+        p.x = p.startX + Math.cos(p.angle) * forward - Math.sin(p.angle) * lateral;
+        p.y = p.startY + Math.sin(p.angle) * forward + Math.cos(p.angle) * lateral;
+        p.rotation += dt * 26;
+
+        for (const b of this.balloons) {
+          if (!p.hitList.includes(b.id) && Math.hypot(b.x - p.x, b.y - p.y) <= b.size + 14) {
+            p.hitList.push(b.id);
+            this.damageBalloon(b, p.damage, p.tower, p.tower.canPopLead);
+            if (p.tower.burnDoT) b.burnTimer = 2.0;
+            p.pierce--;
+            if (p.pierce <= 0) {
+              this.projectiles.splice(i, 1);
+              break;
+            }
+          }
+        }
+      } else if (p.type === 'shuriken' || p.type === 'magic') {
+        p.x += Math.cos(p.angle) * p.speed * dt;
+        p.y += Math.sin(p.angle) * p.speed * dt;
+        p.life -= dt;
+
+        for (const b of this.balloons) {
+          if (!p.hitList.includes(b.id) && Math.hypot(b.x - p.x, b.y - p.y) <= b.size + 8) {
+            p.hitList.push(b.id);
+            this.damageBalloon(b, p.damage, p.tower, p.tower.canPopLead);
+            
+            if (p.type === 'magic' && p.tower.teleportChance && Math.random() < p.tower.teleportChance) {
+              b.distTraveled = Math.max(0, b.distTraveled - 120);
+              b.pathIndex = Math.max(0, b.pathIndex - 2);
+              this.createShockwave(b.x, b.y, 35, '#a855f7');
+            }
+
+            p.pierce--;
+            if (p.pierce <= 0) {
+              this.projectiles.splice(i, 1);
+              break;
+            }
+          }
+        }
+        if (p.life <= 0 && this.projectiles[i] === p) this.projectiles.splice(i, 1);
+      } else if (p.type === 'glue_glob') {
+        p.x += Math.cos(p.angle) * p.speed * dt;
+        p.y += Math.sin(p.angle) * p.speed * dt;
+        p.life -= dt;
+
+        for (const b of this.balloons) {
+          if (Math.hypot(b.x - p.x, b.y - p.y) <= b.size + 10) {
+            b.glueTimer = p.tower.slowDuration;
+            b.glueSlow = p.tower.slowPct;
+            b.isAcidGlue = !!p.tower.acidGlue;
+            audio.playGlue();
+
+            if (p.tower.splatter) {
+              this.balloons.forEach(nearbyB => {
+                if (nearbyB !== b && Math.hypot(nearbyB.x - p.x, nearbyB.y - p.y) <= 80) {
+                  nearbyB.glueTimer = p.tower.slowDuration;
+                  nearbyB.glueSlow = p.tower.slowPct;
+                  nearbyB.isAcidGlue = !!p.tower.acidGlue;
+                }
+              });
+            }
+
+            this.projectiles.splice(i, 1);
+            break;
+          }
+        }
+        if (p.life <= 0 && this.projectiles[i] === p) this.projectiles.splice(i, 1);
+      } else if (p.type === 'bread') {
+        p.life -= dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        if (p.life <= 0) {
+          audio.playExplosion();
+          this.balloons.forEach(b => {
+            if (Math.hypot(b.x - p.x, b.y - p.y) <= p.radius) {
+              this.damageBalloon(b, p.damage, p.tower, p.tower.canPopLead);
+            }
+          });
+          this.createShockwave(p.x, p.y, p.radius, '#b45309');
+          this.projectiles.splice(i, 1);
+        }
+      } else if (p.type === 'dart') {
+        p.life -= dt;
+        p.x += Math.cos(p.angle) * p.speed * dt;
+        p.y += Math.sin(p.angle) * p.speed * dt;
+
+        for (const b of this.balloons) {
+          if (!p.hitList.includes(b.id) && Math.hypot(b.x - p.x, b.y - p.y) <= b.size + 6) {
+            p.hitList.push(b.id);
+            this.damageBalloon(b, p.damage, p.tower);
+            p.pierce--;
+            if (p.pierce <= 0) {
+              this.projectiles.splice(i, 1);
+              break;
+            }
+          }
+        }
+        if (p.life <= 0 && this.projectiles[i] === p) {
+          this.projectiles.splice(i, 1);
+        }
+      } else if (p.type === 'flame') {
+        p.life -= dt;
+        p.x += Math.cos(p.angle) * p.speed * dt;
+        p.y += Math.sin(p.angle) * p.speed * dt;
+        p.size += dt * 45;
+
+        for (const b of this.balloons) {
+          if (!p.hitList.includes(b.id) && Math.hypot(b.x - p.x, b.y - p.y) <= b.size + p.size) {
+            p.hitList.push(b.id);
+            this.damageBalloon(b, p.damage, p.tower, true);
+            if (p.tower.burnDoT) b.burnTimer = 2.0;
+          }
+        }
+        if (p.life <= 0) this.projectiles.splice(i, 1);
+      }
+    }
+
+    // Particles
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const pt = this.particles[i];
+      pt.x += pt.vx * dt;
+      pt.y += pt.vy * dt;
+      pt.alpha -= dt * 2.0;
+      if (pt.alpha <= 0) this.particles.splice(i, 1);
+    }
+
+    // Floating Numbers
+    for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+      const ft = this.floatingTexts[i];
+      ft.y -= dt * 35;
+      ft.life -= dt;
+      if (ft.life <= 0) this.floatingTexts.splice(i, 1);
+    }
+
+    if (this.selectedTower) this.updateBottomBarUI();
+  }
+
+  towerAttack(tower, target) {
+    if (tower.type === 'peashooter') {
+      audio.playShoot('peashooter');
+      const shots = tower.multiShot || 1;
+      for (let s = 0; s < shots; s++) {
+        const offset = (s - (shots - 1) / 2) * 0.18;
+        this.projectiles.push({
+          type: 'dart',
+          tower: tower,
+          x: tower.x + Math.cos(tower.angle) * 22,
+          y: tower.y + Math.sin(tower.angle) * 22,
+          angle: tower.angle + offset,
+          speed: 800,
+          damage: tower.damage,
+          pierce: tower.level >= 1 ? 2 : 1,
+          hitList: [],
+          life: 0.75
+        });
+      }
+    } else if (tower.type === 'ninja_duck') {
+      audio.playShoot('shuriken');
+      const count = tower.shurikenCount || 3;
+      for (let s = 0; s < count; s++) {
+        const offset = (s - (count - 1) / 2) * 0.16;
+        this.projectiles.push({
+          type: 'shuriken',
+          tower: tower,
+          x: tower.x + Math.cos(tower.angle) * 22,
+          y: tower.y + Math.sin(tower.angle) * 22,
+          angle: tower.angle + offset,
+          speed: 850,
+          damage: tower.ninjaCrits && Math.random() < 0.25 ? tower.damage * 4 : tower.damage,
+          pierce: tower.pierce,
+          hitList: [],
+          life: 0.6
+        });
+      }
+    } else if (tower.type === 'wizard_duck') {
+      audio.playShoot('magic');
+      this.projectiles.push({
+        type: 'magic',
+        tower: tower,
+        x: tower.x + Math.cos(tower.angle) * 22,
+        y: tower.y + Math.sin(tower.angle) * 22,
+        angle: tower.angle,
+        speed: 550,
+        damage: tower.damage,
+        pierce: 3,
+        hitList: [],
+        life: 0.8
+      });
+    } else if (tower.type === 'glue_duck') {
+      audio.playShoot('glue');
+      this.projectiles.push({
+        type: 'glue_glob',
+        tower: tower,
+        x: tower.x + Math.cos(tower.angle) * 22,
+        y: tower.y + Math.sin(tower.angle) * 22,
+        angle: tower.angle,
+        speed: 620,
+        life: 0.65
+      });
+    } else if (tower.type === 'boomerang_duck') {
+      audio.playShoot('boomerang');
+      const targetDist = Math.hypot(target.x - tower.x, target.y - tower.y);
+      const reach = Math.max(120, Math.min(tower.range, targetDist + 45));
+      this.projectiles.push({
+        type: 'boomerang',
+        tower: tower,
+        startX: tower.x,
+        startY: tower.y,
+        x: tower.x,
+        y: tower.y,
+        angle: tower.angle,
+        reach: reach,
+        curveWidth: 60,
+        t: 0,
+        rotation: 0,
+        damage: tower.damage,
+        pierce: tower.pierce,
+        hitList: []
+      });
+    } else if (tower.type === 'quacker') {
+      audio.playQuack(1.0 + Math.random() * 0.2);
+      this.createShockwave(tower.x, tower.y, tower.range, '#facc15');
+      this.balloons.forEach(b => {
+        if (Math.hypot(b.x - tower.x, b.y - tower.y) <= tower.range) {
+          this.damageBalloon(b, tower.damage, tower);
+          if (tower.hasStun) b.stunTimer = 0.6;
+        }
+      });
+    } else if (tower.type === 'bread_bomber') {
+      audio.playShoot('bread');
+      const travelTime = 0.45;
+      this.projectiles.push({
+        type: 'bread',
+        tower: tower,
+        x: tower.x,
+        y: tower.y,
+        vx: (target.x - tower.x) / travelTime,
+        vy: (target.y - tower.y) / travelTime,
+        radius: tower.splashRadius,
+        damage: tower.damage,
+        life: travelTime
+      });
+    } else if (tower.type === 'sniper') {
+      audio.playShoot('sniper');
+      this.damageBalloon(target, tower.damage, tower, tower.canPopLead);
+      this.createLaserBeam(tower.x, tower.y, target.x, target.y, '#f59e0b');
+    } else if (tower.type === 'fire_drake') {
+      audio.playShoot('fire');
+      const spread = (Math.random() - 0.5) * 0.7;
+      this.projectiles.push({
+        type: 'flame',
+        tower: tower,
+        x: tower.x + Math.cos(tower.angle) * 22,
+        y: tower.y + Math.sin(tower.angle) * 22,
+        angle: tower.angle + spread,
+        speed: 400,
+        size: 9,
+        damage: tower.damage,
+        hitList: [],
+        life: 0.3
+      });
+    } else if (tower.type === 'tesla') {
+      audio.playShoot('tesla');
+      let current = target;
+      let chained = [current];
+      this.damageBalloon(current, tower.damage, tower, true);
+      if (tower.hasStun) current.stunTimer = 0.6;
+      this.createLaserBeam(tower.x, tower.y, current.x, current.y, '#38bdf8');
+
+      for (let c = 1; c < tower.chainCount; c++) {
+        const next = this.balloons.find(b => !chained.includes(b) && Math.hypot(b.x - current.x, b.y - current.y) < 160);
+        if (!next) break;
+        this.damageBalloon(next, tower.damage * 0.85, tower, true);
+        if (tower.hasStun) next.stunTimer = 0.4;
+        this.createLaserBeam(current.x, current.y, next.x, next.y, '#7dd3fc');
+        chained.push(next);
+        current = next;
+      }
+    }
+  }
+
+  createPopParticles(x, y, color, size) {
+    for (let i = 0; i < 9; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const spd = 70 + Math.random() * 120;
+      this.particles.push({
+        x, y,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd,
+        color: color === 'rainbow' ? '#facc15' : color,
+        size: 4,
+        alpha: 1
+      });
+    }
+  }
+
+  createShockwave(x, y, radius, color = '#facc15') {
+    this.particles.push({
+      type: 'shockwave',
+      x, y,
+      radius: 6,
+      maxRadius: radius,
+      color,
+      alpha: 1.0,
+      vx: 0, vy: 0
+    });
+  }
+
+  createLaserBeam(x1, y1, x2, y2, color) {
+    this.particles.push({
+      type: 'beam',
+      x1, y1, x2, y2,
+      color,
+      alpha: 0.85,
+      vx: 0, vy: 0
+    });
+  }
+
+  showFloatingText(x, y, text, color = '#ffffff') {
+    this.floatingTexts.push({ x, y, text, color, life: 0.75 });
+  }
+
+  render() {
+    const ctx = this.ctx;
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.renderDecoratedMap(ctx);
+
+    for (const item of this.roadItems) {
+      drawRoadItemModel(ctx, item.x, item.y, item.type, 18);
+    }
+
+    if (this.selectedPlacement && this.isMouseOnCanvas) {
+      ctx.save();
+      if (this.selectedPlacement.type === 'duck') {
+        const tmpl = DUCK_TYPES[this.selectedPlacement.id];
+        const valid = this.canPlaceDuck(this.mousePos.x, this.mousePos.y);
+
+        ctx.beginPath();
+        ctx.arc(this.mousePos.x, this.mousePos.y, tmpl.range >= 9000 ? 500 : tmpl.range, 0, Math.PI * 2);
+        ctx.fillStyle = valid ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)';
+        ctx.strokeStyle = valid ? '#22c55e' : '#ef4444';
+        ctx.lineWidth = 3;
+        ctx.fill();
+        ctx.stroke();
+
+        drawDuckModel(ctx, this.mousePos.x, this.mousePos.y, tmpl.id, 0, 0, valid ? 0.8 : 0.4, 24);
+      } else {
+        drawRoadItemModel(ctx, this.mousePos.x, this.mousePos.y, this.selectedPlacement.id, 18);
+      }
+      ctx.restore();
+    }
+
+    if (this.selectedTower) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(this.selectedTower.x, this.selectedTower.y, this.selectedTower.range >= 9000 ? 500 : this.selectedTower.range, 0, Math.PI * 2);
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([6, 6]);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    for (const tower of this.towers) {
+      if (tower.type === 'plane_duck') {
+        ctx.fillStyle = '#475569';
+        ctx.fillRect(tower.x - 28, tower.y - 28, 56, 56);
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(tower.x - 28, tower.y - 28, 56, 56);
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 16px sans-serif';
+        ctx.fillText('✈️', tower.x - 10, tower.y + 6);
+
+        if (tower.planeX) {
+          drawDuckModel(ctx, tower.planeX, tower.planeY, tower.type, tower.planeRot, tower.level, 1.0, 22);
+        }
+      } else {
+        drawDuckModel(ctx, tower.x, tower.y, tower.type, tower.angle, tower.level, 1.0, 24);
+      }
+    }
+
+    for (const b of this.balloons) {
+      this.drawBalloon(ctx, b);
+    }
+
+    for (const p of this.projectiles) {
+      if (p.type === 'boomerang') {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.fillStyle = '#0284c7';
+        ctx.beginPath();
+        ctx.arc(0, 0, 12, 0, Math.PI);
+        ctx.fill();
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      } else if (p.type === 'shuriken') {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fillRect(-6, -6, 12, 12);
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(-6, -6, 12, 12);
+        ctx.restore();
+      } else if (p.type === 'magic') {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 9, 0, Math.PI * 2);
+        ctx.fillStyle = '#c084fc';
+        ctx.fill();
+        ctx.strokeStyle = '#581c87';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      } else if (p.type === 'glue_glob') {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
+        ctx.fillStyle = '#84cc16';
+        ctx.fill();
+        ctx.strokeStyle = '#365314';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      } else if (p.type === 'bread') {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.fillStyle = '#b45309';
+        ctx.fillRect(-9, -6, 18, 12);
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-9, -6, 18, 12);
+        ctx.restore();
+      } else if (p.type === 'dart') {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.fillStyle = '#facc15';
+        ctx.fillRect(-8, -3, 16, 6);
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(6, -4, 6, 8);
+        ctx.restore();
+      } else if (p.type === 'flame') {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = '#f97316';
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    for (const pt of this.particles) {
+      if (pt.type === 'shockwave') {
+        pt.radius += (pt.maxRadius - pt.radius) * 0.2;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = pt.color;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        ctx.restore();
+      } else if (pt.type === 'beam') {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(pt.x1, pt.y1);
+        ctx.lineTo(pt.x2, pt.y2);
+        ctx.strokeStyle = pt.color;
+        ctx.lineWidth = 3.5;
+        ctx.stroke();
+        ctx.restore();
+      } else {
+        ctx.save();
+        ctx.globalAlpha = pt.alpha;
+        ctx.fillStyle = pt.color;
+        ctx.fillRect(pt.x - 3, pt.y - 3, 6, 6);
+        ctx.restore();
+      }
+    }
+
+    for (const ft of this.floatingTexts) {
+      ctx.save();
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillStyle = ft.color;
+      ctx.fillText(ft.text, ft.x, ft.y);
+      ctx.restore();
+    }
+  }
+
+  renderDecoratedMap(ctx) {
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+
+    ctx.fillStyle = '#22c55e';
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.fillStyle = '#16a34a';
+    for (let x = 20; x < w; x += 90) {
+      for (let y = 20; y < h; y += 80) {
+        ctx.fillRect(x, y, 6, 12);
+        ctx.fillRect(x + 7, y - 3, 6, 15);
+      }
+    }
+
+    const pondX = w * 0.52;
+    const pondY = h * 0.48;
+    const pondR1 = w * 0.13;
+    const pondR2 = h * 0.15;
+
+    ctx.beginPath();
+    ctx.ellipse(pondX, pondY, pondR1 + 14, pondR2 + 12, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#4ade80';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.ellipse(pondX, pondY, pondR1, pondR2, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#38bdf8';
+    ctx.fill();
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 6;
+    ctx.stroke();
+
+    ctx.fillStyle = '#15803d';
+    ctx.beginPath();
+    ctx.arc(pondX - 35, pondY - 20, 16, 0, Math.PI * 1.8);
+    ctx.lineTo(pondX - 35, pondY - 20);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(pondX + 40, pondY + 25, 14, 0, Math.PI * 1.8);
+    ctx.lineTo(pondX + 40, pondY + 25);
+    ctx.fill();
+
+    ctx.fillStyle = '#f472b6';
+    ctx.beginPath();
+    ctx.arc(pondX - 32, pondY - 24, 7, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.beginPath();
+    ctx.moveTo(this.pathPoints[0].x, this.pathPoints[0].y);
+    for (let i = 1; i < this.pathPoints.length; i++) ctx.lineTo(this.pathPoints[i].x, this.pathPoints[i].y);
+    ctx.lineWidth = 72;
+    ctx.strokeStyle = '#b45309';
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(this.pathPoints[0].x, this.pathPoints[0].y);
+    for (let i = 1; i < this.pathPoints.length; i++) ctx.lineTo(this.pathPoints[i].x, this.pathPoints[i].y);
+    ctx.lineWidth = 60;
+    ctx.strokeStyle = '#fde047';
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(this.pathPoints[0].x, this.pathPoints[0].y);
+    for (let i = 1; i < this.pathPoints.length; i++) ctx.lineTo(this.pathPoints[i].x, this.pathPoints[i].y);
+    ctx.lineWidth = 3;
+    ctx.setLineDash([12, 14]);
+    ctx.strokeStyle = '#ca8a04';
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const treeLocs = [
+      { x: w * 0.08, y: h * 0.4 },
+      { x: w * 0.32, y: h * 0.12 },
+      { x: w * 0.88, y: h * 0.35 },
+      { x: w * 0.82, y: h * 0.8 },
+      { x: w * 0.06, y: h * 0.92 }
+    ];
+
+    treeLocs.forEach(t => {
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(t.x - 6, t.y, 12, 20);
+      ctx.beginPath();
+      ctx.arc(t.x, t.y - 8, 26, 0, Math.PI * 2);
+      ctx.fillStyle = '#15803d';
+      ctx.fill();
+      ctx.strokeStyle = '#052e16';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    });
+
+    const flowerLocs = [
+      { x: w * 0.28, y: h * 0.42 },
+      { x: w * 0.48, y: h * 0.85 },
+      { x: w * 0.68, y: h * 0.45 },
+      { x: w * 0.85, y: h * 0.12 }
+    ];
+
+    flowerLocs.forEach(fl => {
+      ctx.fillStyle = '#facc15';
+      ctx.fillRect(fl.x, fl.y, 6, 6);
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(fl.x + 8, fl.y + 3, 6, 6);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(fl.x - 6, fl.y + 6, 6, 6);
+    });
+  }
+
+  drawBalloon(ctx, b) {
+    ctx.save();
+    ctx.translate(b.x, b.y);
+
+    const r = b.size;
+
+    if (b.isBoss) {
+      ctx.beginPath();
+      ctx.ellipse(0, 0, r * 1.4, r * 0.9, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#312e81';
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('BLIMP', 0, 6);
+
+      const hpPct = Math.max(0, b.hp / b.maxHp);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(-30, -r - 14, 60, 7);
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(-30, -r - 14, 60 * hpPct, 7);
+      ctx.restore();
+      return;
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(0, r);
+    ctx.lineTo(0, r + 8);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r, r * 1.15, 0, 0, Math.PI * 2);
+
+    if (b.color === 'rainbow') {
+      ctx.fillStyle = '#f59e0b';
+    } else {
+      ctx.fillStyle = b.color;
+    }
+    ctx.fill();
+
+    ctx.strokeStyle = b.isCeramic ? '#451a03' : '#000';
+    ctx.lineWidth = b.isCeramic ? 4 : 1.5;
+    ctx.stroke();
+
+    if (b.glueTimer > 0) {
+      ctx.beginPath();
+      ctx.arc(0, 0, r + 3, 0, Math.PI * 2);
+      ctx.strokeStyle = '#84cc16';
+      ctx.lineWidth = 3.5;
+      ctx.stroke();
+    }
+
+    if (b.stunTimer > 0) {
+      ctx.font = '16px sans-serif';
+      ctx.fillText('❄️', -8, 6);
+    }
+
+    ctx.restore();
+  }
+
+  /* ================= EVENTS & CONTROLS ================= */
+  initEvents() {
+    // Console command resetall
+    window.resetall = () => this.resetAllProgress();
+
+    // Menu Difficulty Selection
+    document.querySelectorAll('.diff-card').forEach(card => {
+      card.onclick = () => {
+        document.querySelectorAll('.diff-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        const d = card.dataset.diff;
+        const desc = document.getElementById('diff-description');
+        if (d === 'easy') desc.innerText = 'Easy: 200 Lives, +30% Cash, 30 Waves. Casual pacing.';
+        if (d === 'medium') desc.innerText = 'Medium: 150 Lives, Standard Cash, 40 Waves. Balanced challenge.';
+        if (d === 'hard') desc.innerText = 'Hard: 80 Lives, -10% Cash, 50 Waves. True duck commanders only.';
+      };
+    });
+
+    document.getElementById('btn-open-diff-modal').onclick = () => {
+      document.getElementById('diff-modal').classList.add('active');
+    };
+
+    document.getElementById('btn-close-diff').onclick = () => {
+      document.getElementById('diff-modal').classList.remove('active');
+    };
+
+    document.getElementById('btn-start-new-battle').onclick = () => {
+      audio.init();
+      const sel = document.querySelector('.diff-card.selected').dataset.diff;
+      this.startNewGame(sel);
+    };
+
+    document.getElementById('btn-resume-game').onclick = () => {
+      audio.init();
+      this.resumeGame();
+    };
+
+    document.getElementById('btn-next-wave').onclick = () => {
+      audio.init();
+      this.startNextWave();
+    };
+
+    document.getElementById('btn-speed').onclick = () => {
+      this.speedIndex = (this.speedIndex + 1) % this.speedMultipliers.length;
+      this.gameSpeed = this.speedMultipliers[this.speedIndex];
+      document.getElementById('btn-speed').innerText = `${this.gameSpeed}x`;
+    };
+
+    document.getElementById('btn-sound').onclick = () => {
+      audio.muted = !audio.muted;
+      document.getElementById('btn-sound').innerText = audio.muted ? '🔇' : '🔊';
+    };
+
+    document.getElementById('btn-menu-back').onclick = () => {
+      this.saveGame();
+      document.getElementById('game-container').style.display = 'none';
+      document.getElementById('menu-screen').classList.add('active');
+      this.checkResumeAvailable();
+    };
+
+    document.querySelectorAll('.bb-target-btn').forEach(btn => {
+      btn.onclick = () => {
+        if (this.selectedTower) {
+          this.selectedTower.targetMode = btn.dataset.mode;
+          this.updateBottomBarUI();
+          this.saveGame();
+        }
+      };
+    });
+
+    document.getElementById('bb-upg-btn').onclick = () => {
+      this.upgradeSelectedTower();
+    };
+
+    document.getElementById('bb-sell-btn').onclick = () => {
+      this.sellSelectedTower();
+    };
+
+    document.getElementById('bb-btn-close').onclick = () => {
+      this.selectTower(null);
+    };
+
+    document.getElementById('btn-codex').onclick = () => {
+      document.getElementById('codex-modal').classList.add('active');
+    };
+    document.getElementById('btn-close-codex').onclick = () => {
+      document.getElementById('codex-modal').classList.remove('active');
+    };
+
+    document.getElementById('btn-go-replay').onclick = () => {
+      document.getElementById('game-over-modal').classList.remove('active');
+      this.startNewGame(this.difficulty);
+    };
+
+    document.getElementById('btn-go-menu').onclick = () => {
+      document.getElementById('game-over-modal').classList.remove('active');
+      document.getElementById('game-container').style.display = 'none';
+      document.getElementById('menu-screen').classList.add('active');
+      this.checkResumeAvailable();
+    };
+
+    this.canvas.onmousemove = (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      this.mousePos.x = e.clientX - rect.left;
+      this.mousePos.y = e.clientY - rect.top;
+      this.isMouseOnCanvas = true;
+    };
+
+    this.canvas.onmouseleave = () => {
+      this.isMouseOnCanvas = false;
+    };
+
+    this.canvas.onclick = (e) => {
+      audio.init();
+      const rect = this.canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      const clickedTower = this.towers.find(t => Math.hypot(t.x - clickX, t.y - clickY) <= 30);
+      if (clickedTower) {
+        this.selectTower(clickedTower);
+        return;
+      }
+
+      if (this.selectedPlacement) {
+        this.placeObject(clickX, clickY);
+      } else {
+        this.selectTower(null);
+      }
+    };
+
+    window.onkeydown = (e) => {
+      if (e.key === 'Escape') {
+        this.selectedPlacement = null;
+        this.selectTower(null);
+        this.updateShopCards();
+        document.getElementById('diff-modal').classList.remove('active');
+        document.getElementById('codex-modal').classList.remove('active');
+      } else if (e.key === ' ' || e.code === 'Space') {
+        if (!this.inWave && document.getElementById('game-container').style.display !== 'none') {
+          this.startNextWave();
+        }
+      } else if (e.key === 'u' || e.key === 'U') {
+        this.upgradeSelectedTower();
+      } else if (e.key === 's' || e.key === 'S') {
+        this.sellSelectedTower();
+      }
+    };
+  }
+
+  renderCodex() {
+    const list = document.getElementById('codex-list');
+    list.innerHTML = '';
+    
+    Object.values(DUCK_TYPES).forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'codex-entry';
+
+      const cvs = document.createElement('canvas');
+      cvs.className = 'codex-thumb';
+      cvs.width = 52;
+      cvs.height = 52;
+      drawDuckModel(cvs.getContext('2d'), 26, 26, d.id, 0, 0, 1.0, 18);
+
+      el.appendChild(cvs);
+
+      const info = document.createElement('div');
+      info.className = 'codex-info';
+      info.innerHTML = `
+        <h4>${d.name} <span style="color:var(--yellow);">($${d.cost} | Unlocks Lvl ${d.unlockLvl})</span></h4>
+        <p>${d.description}</p>
+      `;
+      el.appendChild(info);
+      list.appendChild(el);
+    });
+
+    Object.values(ROAD_ITEMS).forEach(i => {
+      const el = document.createElement('div');
+      el.className = 'codex-entry';
+
+      const cvs = document.createElement('canvas');
+      cvs.className = 'codex-thumb';
+      cvs.width = 52;
+      cvs.height = 52;
+      drawRoadItemModel(cvs.getContext('2d'), 26, 26, i.id, 16);
+
+      el.appendChild(cvs);
+
+      const info = document.createElement('div');
+      info.className = 'codex-info';
+      info.innerHTML = `
+        <h4>${i.name} <span style="color:var(--yellow);">($${i.cost})</span></h4>
+        <p>${i.description}</p>
+      `;
+      el.appendChild(info);
+      list.appendChild(el);
+    });
+  }
+
+  gameLoop(timestamp) {
+    const rawDt = Math.min((timestamp - this.lastTime) / 1000, 0.1);
+    this.lastTime = timestamp;
+
+    if (!document.getElementById('menu-screen').classList.contains('active')) {
+      const dt = rawDt * this.gameSpeed;
+      this.update(dt);
+      this.render();
+    }
+
+    requestAnimationFrame(this.gameLoop.bind(this));
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  window.duckGame = new Game();
+  console.log("%c[Duck TD Ready] Type 'resetall()' to reset all level and saved game progress.", "color: #38bdf8; font-size: 13px; font-weight: bold;");
+});
+</script>
+</body>
+</html>
